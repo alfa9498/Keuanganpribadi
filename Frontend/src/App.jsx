@@ -29,7 +29,7 @@ function App() {
     // Check for user session on mount
     const checkSession = async () => {
       try {
-        const response = await fetch('http://localhost:5000/me', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/me`, {
           credentials: 'include'
         });
         if (response.ok) {
@@ -46,7 +46,7 @@ function App() {
 
   // Real-time Update Listener
   useEffect(() => {
-    const socket = io('http://localhost:5000', {
+    const socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
       withCredentials: true
     });
 
