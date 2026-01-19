@@ -8,11 +8,17 @@ const userController = require("./controllers/userController");
 const transactionController = require("./controllers/transactionController");
 const notificationController = require("./controllers/notificationController");
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,
+  process.env.WEBHOOK_URL
+].filter(Boolean);
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
@@ -22,7 +28,7 @@ const io = new Server(server, {
 global.io = io;
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Vite default origin
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -94,6 +100,10 @@ const telegramBotService = require("./services/telegramBotService");
 // Start Telegram Bot
 telegramBotService.init();
 
-server.listen(5000, () => {
-  console.log("🚀 Server berjalan di http://localhost:5000");
-});
+if (require.main === module) {
+  server.listen(5000, () => {
+    console.log("🚀 Server berjalan di http://localhost:5000");
+  });
+}
+
+module.exports = app;
