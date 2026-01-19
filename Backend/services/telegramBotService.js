@@ -17,9 +17,15 @@ const init = () => {
         return;
     }
 
-    // Polling allows the bot to check for updates without a public URL
-    bot = new TelegramBot(token, { polling: true });
-    console.log('🤖 Telegram Bot is running...');
+    // Initialize Bot
+    if (process.env.WEBHOOK_URL) {
+        bot = new TelegramBot(token); // No polling
+        console.log(`🤖 Telegram Bot initialized in Webhook mode: ${process.env.WEBHOOK_URL}`);
+        bot.setWebHook(`${process.env.WEBHOOK_URL}/api/telegram-webhook`);
+    } else {
+        bot = new TelegramBot(token, { polling: true });
+        console.log('🤖 Telegram Bot is running in Polling mode...');
+    }
 
     // Set Bot Commands Menu
     bot.setMyCommands([
@@ -28,6 +34,11 @@ const init = () => {
         { command: '/in', description: 'Input Pemasukan (Manual)' },
         { command: '/out', description: 'Input Pengeluaran (Manual)' }
     ]);
+
+    // External Trigger for Webhooks
+    const processUpdate = (body) => {
+        if (bot) bot.processUpdate(body);
+    };
 
     // Middleware to check authorization
     const isAuthorized = (msg) => {
@@ -452,4 +463,4 @@ Apakah sudah benar? Klik simpan atau edit jika ada yang salah.
     });
 };
 
-module.exports = { init };
+module.exports = { init, processUpdate };

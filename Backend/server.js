@@ -66,6 +66,12 @@ app.get("/notifications/unread-count", notificationController.getUnreadCount);
 app.put("/notifications/:id/read", notificationController.markAsRead);
 app.put("/notifications/mark-all-read", notificationController.markAllAsRead);
 
+// Telegram Webhook Endpoint
+app.post("/api/telegram-webhook", (req, res) => {
+  telegramBotService.processUpdate(req.body);
+  res.sendStatus(200);
+});
+
 // 404 Handler
 app.use((req, res) => {
   res.status(404).json({
