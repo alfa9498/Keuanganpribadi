@@ -72,33 +72,34 @@ app.get("/ping", (req, res) => {
 app.get("/db-test", (req, res) => {
   const db = require('./config/db');
   const mysql = require("mysql2");
-  const toHex = (s) => s ? s.split('').map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ') : '';
+  const toHex = (s) => s ? s.split('').map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ') : 'NULL';
   
+  const h = (process.env.DB_HOST || "").trim();
+  const u = (process.env.DB_USER || "").trim();
+  const p = (process.env.DB_PASSWORD || "").trim();
+  const d = (process.env.DB_NAME || "").trim();
+  const prt = parseInt(process.env.DB_PORT || "4000");
+
   const rawConn = mysql.createConnection({
-    host: (process.env.DB_HOST || "").trim(),
-    user: (process.env.DB_USER || "").trim(),
-    password: (process.env.DB_PASSWORD || "").trim(),
-    port: parseInt(process.env.DB_PORT || "4000"),
+    host: h,
+    user: u,
+    password: p,
+    port: prt,
     ssl: { rejectUnauthorized: false, minVersion: 'TLSv1.2' }
   });
 
   rawConn.connect((rawErr) => {
-    const pwd = (process.env.DB_PASSWORD || "").trim();
     const diagData = {
       success: false,
-      message: "Deep Database Diagnostic",
+      message: "Deep Database Forensic Diagnostic",
       raw_conn_error: rawErr ? { message: rawErr.message, code: rawErr.code, sqlState: rawErr.sqlState } : "SUCCESS",
-      config: {
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        db: process.env.DB_NAME,
-        pass_hint: `${pwd.length} chars, starts with ${pwd.charAt(0)}, ends with ${pwd.charAt(pwd.length-1)}`
-      },
-      hex_diagnostics: {
-        host_hex: toHex(process.env.DB_HOST),
-        user_hex: toHex(process.env.DB_USER),
-        pass_start_hex: toHex(pwd.charAt(0)),
-        pass_end_hex: toHex(pwd.charAt(pwd.length-1))
+      hex_forensics: {
+        host: toHex(process.env.DB_HOST),
+        user: toHex(process.env.DB_USER),
+        pass: toHex(p), // full pass hex for forensic
+        db: toHex(process.env.DB_NAME),
+        port: toHex(process.env.DB_PORT),
+        ssl: toHex(process.env.DB_SSL)
       }
     };
 
@@ -106,17 +107,17 @@ app.get("/db-test", (req, res) => {
       return res.status(500).json(diagData);
     }
 
-    // If raw works, test the pool (with DB selection)
     db.query("SELECT 1", (poolErr, results) => {
       if (poolErr) {
         diagData.pool_error = { message: poolErr.message, code: poolErr.code, sqlState: poolErr.sqlState };
         return res.status(500).json(diagData);
       }
-      res.json({ success: true, message: "Connected successfully (Both Raw and Pool)", data: results });
+      res.json({ success: true, message: "Connected successfully (Full Sync)", data: results });
     });
 
     rawConn.end();
   });
+
 
 
 });
