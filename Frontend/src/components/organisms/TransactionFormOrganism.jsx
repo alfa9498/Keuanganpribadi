@@ -3,6 +3,8 @@ import { Button } from '../atoms/Button';
 import { Card } from '../atoms/Card';
 import { FormField } from '../molecules/FormField';
 import { useNotification } from '../../context/NotificationContext';
+import { API_URL } from '../../config/api';
+
 
 const expenseCategories = {
     "Survival (Kebutuhan)": ["Makanan", "Makan & Minum", "Sarapan", "Jajan Harian", "Transportasi", "Transport Harian", "Bensin", "Parkir", "Ojol / Taksi Online", "pengeluaran Pulang", "Tagihan", "Listrik", "Internet", "Pulsa", "Air", "Tagihan Internet", "Biaya Admin", "Kesehatan", "Berobat", "Obat", "BPJS / Asuransi", "Sewa", "mobil", "motor", "kontrakan", "kosan", "Orang Tua", "Orang tua aa", "Orang tua neng", "Listrik Orang Tua", "Pulsa Orang Tua"],
@@ -109,8 +111,8 @@ export const TransactionFormOrganism = ({ user, onSuccess, onCancel, initialData
 
         try {
             const url = isEdit
-                ? `http://localhost:5000/transaction/${initialData.id}`
-                : 'http://localhost:5000/transaction';
+                ? `${API_URL}/transaction/${initialData.id}`
+                : `${API_URL}/transaction`;
 
             const method = isEdit ? 'PUT' : 'POST';
 

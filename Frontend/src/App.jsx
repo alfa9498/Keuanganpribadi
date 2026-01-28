@@ -13,6 +13,7 @@ import { ResetPasswordOrganism } from './components/organisms/ResetPasswordOrgan
 import { MainLayoutTemplate } from './components/templates/MainLayoutTemplate';
 
 import { NotificationProvider } from './context/NotificationContext';
+import { API_URL, SOCKET_URL } from './config/api';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -29,7 +30,7 @@ function App() {
     // Check for user session on mount
     const checkSession = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/me`, {
+        const response = await fetch(`${API_URL}/me`, {
           credentials: 'include'
         });
         if (response.ok) {
@@ -46,7 +47,7 @@ function App() {
 
   // Real-time Update Listener
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
+    const socket = io(SOCKET_URL, {
       withCredentials: true
     });
 

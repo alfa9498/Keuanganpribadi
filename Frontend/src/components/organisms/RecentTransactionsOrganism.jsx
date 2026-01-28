@@ -8,6 +8,8 @@ import { useNotification } from '../../context/NotificationContext';
 import { CategoryFilter } from '../molecules/CategoryFilter';
 import { TimeFilter } from '../molecules/TimeFilter';
 import { AccountFilter } from '../molecules/AccountFilter';
+import { API_URL } from '../../config/api';
+
 
 export const RecentTransactionsOrganism = ({ transactions, onViewAll, user, onRefresh, fixedType = null, title = "Transaksi Terakhir", filterCategory: externalCategory, filterRange = 'ALL', onRangeChange }) => {
     const { showNotification } = useNotification();
@@ -154,7 +156,7 @@ export const RecentTransactionsOrganism = ({ transactions, onViewAll, user, onRe
                 params.append('endDate', endDate);
             }
 
-            const response = await fetch(`http://localhost:5000/transaction?${params.toString()}`, {
+            const response = await fetch(`${API_URL}/transaction?${params.toString()}`, {
                 credentials: 'include'
             });
             const result = await response.json();
@@ -223,7 +225,7 @@ export const RecentTransactionsOrganism = ({ transactions, onViewAll, user, onRe
         setIsDeleting(true);
         try {
             console.log(`Deleting ID: ${selectedTx.id}`);
-            const response = await fetch(`http://localhost:5000/transaction/${selectedTx.id}`, {
+            const response = await fetch(`${API_URL}/transaction/${selectedTx.id}`, {
                 method: 'DELETE',
                 credentials: 'include'
             });

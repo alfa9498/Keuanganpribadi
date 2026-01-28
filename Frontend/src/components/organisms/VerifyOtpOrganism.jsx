@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Button } from '../atoms/Button';
 import { Card } from '../atoms/Card';
 import { FormField } from '../molecules/FormField';
+import { API_URL } from '../../config/api';
+
 
 export const VerifyOtpOrganism = ({ email, onSuccess, onBack }) => {
     const [otp, setOtp] = useState('');
@@ -14,7 +16,7 @@ export const VerifyOtpOrganism = ({ email, onSuccess, onBack }) => {
         setError(null);
 
         try {
-            const response = await fetch('http://localhost:5000/verify-otp', {
+            const response = await fetch(`${API_URL}/verify-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, otp })

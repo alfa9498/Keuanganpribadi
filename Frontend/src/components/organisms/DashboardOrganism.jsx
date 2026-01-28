@@ -10,6 +10,8 @@ import {
 import { TimeFilter } from '../molecules/TimeFilter';
 import { CategoryFilter } from '../molecules/CategoryFilter';
 import { Calendar, Wallet, Landmark, Coins, TrendingUp, CreditCard, X } from 'lucide-react';
+import { API_URL } from '../../config/api';
+
 
 const ACCOUNTS = ['Cash Account', 'BCA', 'BNI', 'BSI', 'Muamalat', 'Permata', 'Mandiri', 'Gopay', 'OVO', 'Dana', 'Bareksa', 'Treasury', 'Tabungan BNI Anak'];
 const DASHBOARD_ACCOUNTS = ['BSI', 'BCA', 'BNI', 'Permata', 'Tabungan BNI Anak'];
@@ -153,7 +155,7 @@ export const DashboardOrganism = ({ user, onLogout, filterRange, setFilterRange,
 
     const fetchTransactions = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/transaction?user_id=${user.id}`, {
+            const response = await fetch(`${API_URL}/transaction?user_id=${user.id}`, {
                 credentials: 'include'
             });
             const result = await response.json();

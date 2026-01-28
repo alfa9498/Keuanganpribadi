@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Button } from '../atoms/Button';
 import { Card } from '../atoms/Card';
 import { FormField } from '../molecules/FormField';
+import { API_URL } from '../../config/api';
+
 
 export const LoginFormOrganism = ({ onLoginSuccess, onSwitchToRegister, onForgotPassword }) => {
     const [formData, setFormData] = useState({
@@ -21,7 +23,7 @@ export const LoginFormOrganism = ({ onLoginSuccess, onSwitchToRegister, onForgot
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:5000/login', {
+            const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

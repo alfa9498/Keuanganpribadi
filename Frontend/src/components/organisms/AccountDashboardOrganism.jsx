@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Wallet, ArrowRightLeft, TrendingUp, TrendingDown, CreditCard, Landmark, Coins } from 'lucide-react';
 import { StatCard } from '../molecules/StatCard';
+import { API_URL } from '../../config/api';
+
 
 export const AccountDashboardOrganism = ({ user }) => {
     const [transactions, setTransactions] = useState([]);
@@ -15,7 +17,7 @@ export const AccountDashboardOrganism = ({ user }) => {
     const fetchTransactions = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:5000/transaction?user_id=${user.id}`, {
+            const response = await fetch(`${API_URL}/transaction?user_id=${user.id}`, {
                 credentials: 'include'
             });
             const result = await response.json();

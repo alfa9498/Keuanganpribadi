@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Button } from '../atoms/Button';
 import { Card } from '../atoms/Card';
 import { FormField } from '../molecules/FormField';
+import { API_URL } from '../../config/api';
+
 
 export const ResetPasswordOrganism = ({ email, otp, onSuccess }) => {
     const [password, setPassword] = useState('');
@@ -20,7 +22,7 @@ export const ResetPasswordOrganism = ({ email, otp, onSuccess }) => {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:5000/reset-password', {
+            const response = await fetch(`${API_URL}/reset-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, otp, newPassword: password })

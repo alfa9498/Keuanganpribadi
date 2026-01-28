@@ -6,6 +6,8 @@ import { AccountFilter } from '../molecules/AccountFilter';
 import { Badge } from '../atoms/Badge';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { API_URL } from '../../config/api';
+
 
 export const ReportDashboardOrganism = ({ user }) => {
     const [allTransactions, setAllTransactions] = useState([]);
@@ -43,7 +45,7 @@ export const ReportDashboardOrganism = ({ user }) => {
     const fetchTransactions = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:5000/transaction?user_id=${user.id}`);
+            const response = await fetch(`${API_URL}/transaction?user_id=${user.id}`);
             const result = await response.json();
             if (response.ok) {
                 setAllTransactions(result.data);
