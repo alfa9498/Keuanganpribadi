@@ -8,11 +8,16 @@ const db = mysql.createPool({
   password: (process.env.DB_PASSWORD || "").trim(),
   database: (process.env.DB_NAME || "myapp_db").trim(),
   port: parseInt(process.env.DB_PORT || "3306"),
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : null,
+  ssl: process.env.DB_SSL === 'true' ? { 
+    rejectUnauthorized: false,
+    minVersion: 'TLSv1.2'
+  } : null,
   waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  connectionLimit: 5, // Reduced for serverless
+  queueLimit: 0,
+  connectTimeout: 10000 // 10 seconds
 });
+
 
 
 // test koneksi

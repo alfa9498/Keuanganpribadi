@@ -71,30 +71,47 @@ app.get("/ping", (req, res) => {
 // Database Test Endpoint
 app.get("/db-test", (req, res) => {
   const db = require('./config/db');
-  db.query("SELECT 1", (err, results) => {
-    if (err) {
-      console.error("❌ DB TEST FAILED:", err);
-      const pwd = process.env.DB_PASSWORD || "";
-      return res.status(500).json({ 
-        success: false, 
-        message: "Database connection failed", 
-        error: err.message,
-        code: err.code,
-        config: {
-          host: process.env.DB_HOST,
-          user: process.env.DB_USER,
-          port: process.env.DB_PORT,
-          db: process.env.DB_NAME,
-          ssl: process.env.DB_SSL,
-          pass_length: pwd.length,
-          pass_start: pwd.charAt(0),
-          pass_end: pwd.charAt(pwd.length - 1)
-        }
-      });
-
-    }
-    res.json({ success: true, message: "Database connection successful", data: results });
+  const mysql = require("mysql2");
+  const rawConn = mysql.createConnection({
+    host: (process.env.DB_HOST || "").trim(),
+    user: (process.env.DB_USER || "").trim(),
+    password: (process.env.DB_PASSWORD || "").trim(),
+    port: parseInt(process.env.DB_PORT || "4000"),
+    ssl: { rejectUnauthorized: false, minVersion: 'TLSv1.2' }
   });
+
+  rawConn.connect((rawErr) => {
+    const pwd = process.env.DB_PASSWORD || "";
+    const diagData = {
+      success: false,
+      message: "Database test result",
+      pool_error: null,
+      raw_conn_error: rawErr ? { message: rawErr.message, code: rawErr.code, sqlState: rawErr.sqlState } : "SUCCESS",
+      config: {
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        port: process.env.DB_PORT,
+        db: process.env.DB_NAME,
+        pass_hint: `${pwd.length} chars, starts with ${pwd.charAt(0)}, ends with ${pwd.charAt(pwd.length-1)}`
+      }
+    };
+
+    if (rawErr) {
+      return res.status(500).json(diagData);
+    }
+
+    // If raw works, test the pool (with DB selection)
+    db.query("SELECT 1", (poolErr, results) => {
+      if (poolErr) {
+        diagData.pool_error = { message: poolErr.message, code: poolErr.code, sqlState: poolErr.sqlState };
+        return res.status(500).json(diagData);
+      }
+      res.json({ success: true, message: "Connected successfully (Both Raw and Pool)", data: results });
+    });
+
+    rawConn.end();
+  });
+
 });
 
 
