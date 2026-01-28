@@ -7,9 +7,10 @@
   },
   "rewrites": [
     {
-      "source": "/(ping|login|register|me|logout|forgot-password|verify-otp|reset-password)",
+      "source": "/(ping|login|register|me|logout|forgot-password|verify-otp|reset-password|db-test)",
       "destination": "/api/index.js"
     },
+
     {
       "source": "/transaction(.*)",
       "destination": "/api/index.js"
