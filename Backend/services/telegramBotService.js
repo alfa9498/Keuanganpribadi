@@ -32,10 +32,14 @@ const init = () => {
         bot = new TelegramBot(token); // No polling
         console.log(`🤖 Telegram Bot initialized in Webhook mode: ${process.env.WEBHOOK_URL}`);
         bot.setWebHook(`${process.env.WEBHOOK_URL}/api/telegram-webhook`);
+    } else if (process.env.VERCEL === '1') {
+        bot = new TelegramBot(token); // No polling
+        console.log('🤖 Telegram Bot: Polling disabled in Vercel environment.');
     } else {
         bot = new TelegramBot(token, { polling: true });
         console.log('🤖 Telegram Bot is running in Polling mode...');
     }
+
 
     // Set Bot Commands Menu
     bot.setMyCommands([

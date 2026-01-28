@@ -35,12 +35,20 @@ const corsOptions = {
   exposedHeaders: ['set-cookie']
 };
 
-const io = new Server(server, {
-  cors: corsOptions
-});
+const isVercel = process.env.VERCEL === '1';
+let io;
 
-// Make io accessible globally
-global.io = io;
+if (!isVercel) {
+  io = new Server(server, {
+    cors: corsOptions
+  });
+  // Make io accessible globally
+  global.io = io;
+  console.log("ℹ️ Socket.IO initialized (Local Mode)");
+} else {
+  console.log("ℹ️ Socket.IO disabled (Vercel Serverless Mode)");
+  global.io = { emit: () => {} }; // Mock io to prevent crashes in services
+}
 
 app.use(cors(corsOptions));
 
@@ -99,10 +107,20 @@ app.use((req, res) => {
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  console.error("Global Error:", err);
+  const errorDetails = {
+    message: err.message,
+    stack: isVercel ? undefined : err.stack, // Don't expose stack in prod but good for debugging if needed
+    path: req.path,
+    method: req.method
+  };
+  
+  console.error("❌ Global Error Handler Triggered:");
+  console.error(err);
+  
   res.status(500).json({
     message: "Internal Server Error",
-    error: err.message
+    error: err.message,
+    details: isVercel ? "Check Vercel Runtime Logs for full stack trace" : err.stack
   });
 });
 
