@@ -74,6 +74,7 @@ app.get("/db-test", (req, res) => {
   db.query("SELECT 1", (err, results) => {
     if (err) {
       console.error("❌ DB TEST FAILED:", err);
+      const pwd = process.env.DB_PASSWORD || "";
       return res.status(500).json({ 
         success: false, 
         message: "Database connection failed", 
@@ -84,9 +85,13 @@ app.get("/db-test", (req, res) => {
           user: process.env.DB_USER,
           port: process.env.DB_PORT,
           db: process.env.DB_NAME,
-          ssl: process.env.DB_SSL
+          ssl: process.env.DB_SSL,
+          pass_length: pwd.length,
+          pass_start: pwd.charAt(0),
+          pass_end: pwd.charAt(pwd.length - 1)
         }
       });
+
     }
     res.json({ success: true, message: "Database connection successful", data: results });
   });
