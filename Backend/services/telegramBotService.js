@@ -10,6 +10,16 @@ const appUserId = process.env.TELEGRAM_USER_ID || 1; // Fetch from .env or defau
 
 let bot = null;
 
+// External Trigger for Webhooks
+const processUpdate = (body) => {
+    if (bot) {
+        bot.processUpdate(body);
+    } else {
+        console.warn('⚠️ Telegram Bot not initialized, ignoring update.');
+    }
+};
+
+
 const init = () => {
     console.log('🏁 Initializing Telegram Bot Service...');
     if (!token) {
@@ -35,10 +45,7 @@ const init = () => {
         { command: '/out', description: 'Input Pengeluaran (Manual)' }
     ]);
 
-    // External Trigger for Webhooks
-    const processUpdate = (body) => {
-        if (bot) bot.processUpdate(body);
-    };
+
 
     // Middleware to check authorization
     const isAuthorized = (msg) => {
