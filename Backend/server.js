@@ -8,31 +8,42 @@ const userController = require("./controllers/userController");
 const transactionController = require("./controllers/transactionController");
 const notificationController = require("./controllers/notificationController");
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  process.env.FRONTEND_URL,
-  process.env.WEBHOOK_URL
-].filter(Boolean);
-
 const app = express();
 const server = http.createServer(app);
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in allowed list or is a Vercel deployment
+    const isAllowed = [
+      "http://localhost:5173",
+      process.env.FRONTEND_URL,
+      process.env.WEBHOOK_URL
+    ].some(allowed => allowed && origin === allowed);
+
+    if (isAllowed || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['set-cookie']
+};
+
 const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
-  }
+  cors: corsOptions
 });
 
 // Make io accessible globally
 global.io = io;
 
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(cookieParser());
 
