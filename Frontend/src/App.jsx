@@ -47,6 +47,12 @@ function App() {
 
   // Real-time Update Listener
   useEffect(() => {
+    // Skip socket.io on Vercel (serverless doesn't support persistent websockets)
+    if (window.location.hostname.endsWith('.vercel.app')) {
+      console.log('ℹ️ Real-time Sync disabled in Vercel environment.');
+      return;
+    }
+
     const socket = io(SOCKET_URL, {
       withCredentials: true
     });

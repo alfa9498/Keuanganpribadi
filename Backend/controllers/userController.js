@@ -41,8 +41,13 @@ exports.login = (req, res) => {
     db.query(query, [email], (err, results) => {
         if (err) {
             console.error("Login Error:", err);
-            return res.status(500).json({ message: "Terjadi kesalahan server" });
+            return res.status(500).json({ 
+                message: "Terjadi kesalahan server saat login",
+                error: err.message,
+                code: err.code
+            });
         }
+
 
         if (results.length === 0) {
             return res.status(401).json({ message: "Email atau password salah" });

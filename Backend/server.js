@@ -68,6 +68,31 @@ app.get("/ping", (req, res) => {
   res.send("PONG");
 });
 
+// Database Test Endpoint
+app.get("/db-test", (req, res) => {
+  const db = require('./config/db');
+  db.query("SELECT 1", (err, results) => {
+    if (err) {
+      console.error("❌ DB TEST FAILED:", err);
+      return res.status(500).json({ 
+        success: false, 
+        message: "Database connection failed", 
+        error: err.message,
+        code: err.code,
+        config: {
+          host: process.env.DB_HOST,
+          user: process.env.DB_USER,
+          port: process.env.DB_PORT,
+          db: process.env.DB_NAME,
+          ssl: process.env.DB_SSL
+        }
+      });
+    }
+    res.json({ success: true, message: "Database connection successful", data: results });
+  });
+});
+
+
 // User Routes
 app.post("/login", userController.login);
 app.post("/register", userController.register);
