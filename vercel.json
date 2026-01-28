@@ -1,0 +1,49 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/ping",
+      "destination": "/Backend/api/index.js"
+    },
+    {
+      "source": "/login",
+      "destination": "/Backend/api/index.js"
+    },
+    {
+      "source": "/register",
+      "destination": "/Backend/api/index.js"
+    },
+    {
+      "source": "/me",
+      "destination": "/Backend/api/index.js"
+    },
+    {
+      "source": "/transaction(.*)",
+      "destination": "/Backend/api/index.js"
+    },
+    {
+      "source": "/notifications(.*)",
+      "destination": "/Backend/api/index.js"
+    },
+    {
+      "source": "/forgot-password",
+      "destination": "/Backend/api/index.js"
+    },
+    {
+      "source": "/verify-otp",
+      "destination": "/Backend/api/index.js"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "/Backend/api/index.js"
+    },
+    {
+      "source": "/logout",
+      "destination": "/Backend/api/index.js"
+    },
+    {
+      "source": "/api/telegram-webhook",
+      "destination": "/Backend/api/index.js"
+    }
+  ]
+}
