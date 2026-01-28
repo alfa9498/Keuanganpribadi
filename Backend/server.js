@@ -98,7 +98,12 @@ app.use((err, req, res, next) => {
 const telegramBotService = require("./services/telegramBotService");
 
 // Start Telegram Bot
-telegramBotService.init();
+try {
+  telegramBotService.init();
+} catch (error) {
+  console.error("⚠️ Failed to initialize Telegram Bot:", error.message);
+}
+
 
 if (require.main === module) {
   server.listen(5000, () => {
