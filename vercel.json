@@ -1,31 +1,32 @@
 {
   "version": 2,
   "functions": {
-    "Backend/api/index.js": {
+    "api/index.js": {
       "includeFiles": "Backend/**"
     }
   },
   "rewrites": [
     {
       "source": "/(ping|login|register|me|logout|forgot-password|verify-otp|reset-password)",
-      "destination": "/Backend/api/index.js"
+      "destination": "/api/index.js"
     },
     {
       "source": "/transaction(.*)",
-      "destination": "/Backend/api/index.js"
+      "destination": "/api/index.js"
     },
     {
       "source": "/notifications(.*)",
-      "destination": "/Backend/api/index.js"
+      "destination": "/api/index.js"
     },
     {
       "source": "/api/telegram-webhook",
-      "destination": "/Backend/api/index.js"
+      "destination": "/api/index.js"
     },
     {
       "source": "/socket.io/(.*)",
-      "destination": "/Backend/api/index.js"
+      "destination": "/api/index.js"
     },
+
     {
       "source": "/(.*)",
       "destination": "/index.html"

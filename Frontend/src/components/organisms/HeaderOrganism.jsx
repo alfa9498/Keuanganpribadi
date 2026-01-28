@@ -3,6 +3,8 @@ import { Menu, Bell, X, Calendar } from 'lucide-react';
 import { TimeFilter } from '../molecules/TimeFilter';
 import { CategoryFilter } from '../molecules/CategoryFilter';
 import { AccountFilter } from '../molecules/AccountFilter';
+import { API_URL } from '../../config/api';
+
 
 export const HeaderOrganism = ({ user, toggleSidebar, onLogout, activeTab, filterRange, setFilterRange, filterCategory, setFilterCategory, filterAccount, setFilterAccount }) => {
     const [showNotifications, setShowNotifications] = useState(false);
@@ -15,7 +17,7 @@ export const HeaderOrganism = ({ user, toggleSidebar, onLogout, activeTab, filte
         if (!user?.id) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/notifications/unread-count?user_id=${user.id}`, {
+            const response = await fetch(`${API_URL}/notifications/unread-count?user_id=${user.id}`, {
                 credentials: 'include'
             });
             const result = await response.json();
@@ -32,7 +34,7 @@ export const HeaderOrganism = ({ user, toggleSidebar, onLogout, activeTab, filte
         if (!user?.id) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/notifications?user_id=${user.id}&limit=10`, {
+            const response = await fetch(`${API_URL}/notifications?user_id=${user.id}&limit=10`, {
                 credentials: 'include'
             });
             const result = await response.json();
@@ -47,7 +49,7 @@ export const HeaderOrganism = ({ user, toggleSidebar, onLogout, activeTab, filte
     // Mark notification as read
     const markAsRead = async (notificationId) => {
         try {
-            const response = await fetch(`http://localhost:5000/notifications/${notificationId}/read`, {
+            const response = await fetch(`${API_URL}/notifications/${notificationId}/read`, {
                 method: 'PUT',
                 credentials: 'include'
             });
@@ -67,7 +69,7 @@ export const HeaderOrganism = ({ user, toggleSidebar, onLogout, activeTab, filte
         if (!user?.id) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/notifications/mark-all-read?user_id=${user.id}`, {
+            const response = await fetch(`${API_URL}/notifications/mark-all-read?user_id=${user.id}`, {
                 method: 'PUT',
                 credentials: 'include'
             });

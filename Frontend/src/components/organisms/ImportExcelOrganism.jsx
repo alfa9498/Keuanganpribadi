@@ -6,6 +6,7 @@ import { FileUp, Table, Check, AlertCircle, Loader2, FileText, ClipboardList, Im
 import { useNotification } from '../../context/NotificationContext';
 import * as pdfjs from 'pdfjs-dist';
 import Tesseract from 'tesseract.js';
+import { API_URL } from '../../config/api';
 
 // Set up worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
@@ -53,7 +54,7 @@ export const ImportExcelOrganism = ({ user, onImportSuccess }) => {
 
     useEffect(() => {
         if (user?.id) {
-            fetch(`http://localhost:5000/transaction?user_id=${user.id}`)
+            fetch(`${API_URL}/transaction?user_id=${user.id}`)
                 .then(res => res.json())
                 .then(result => {
                     if (result.success) setExistingTransactions(result.data);
@@ -731,7 +732,7 @@ export const ImportExcelOrganism = ({ user, onImportSuccess }) => {
                 delete payload.isDuplicate;
 
                 try {
-                    const response = await fetch('http://localhost:5000/transaction', {
+                    const response = await fetch(`${API_URL}/transaction`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
