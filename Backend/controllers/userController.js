@@ -71,10 +71,11 @@ exports.login = (req, res) => {
 
         res.cookie('token', token, {
             httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            sameSite: 'lax',
+            secure: true, // MUST be true for Vercel (HTTPS)
+            sameSite: 'none', // Needed for cross-site (preview to prod)
             maxAge: 3600000 // 1 hour
         });
+
 
         res.status(200).json({
             message: "Login berhasil",

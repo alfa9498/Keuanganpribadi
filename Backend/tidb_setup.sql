@@ -1,13 +1,21 @@
 -- Consolidated TiDB Schema for PRODUCTION
 -- Run this in your TiDB Cloud Console
 
+-- 0. Clean Existing Data (Careful: This deletes all data!)
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS password_resets;
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS users;
+
 -- 1. Users Table
+
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     phone VARCHAR(20),
     password VARCHAR(255) NOT NULL,
+    gender ENUM('male', 'female') DEFAULT 'male',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

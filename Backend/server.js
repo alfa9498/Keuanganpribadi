@@ -16,18 +16,15 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
     
-    // Check if origin is in allowed list or is a Vercel deployment
-    const isAllowed = [
-      "http://localhost:5173",
-      process.env.FRONTEND_URL,
-      process.env.WEBHOOK_URL
-    ].some(allowed => allowed && origin === allowed);
+    const isVercelOrigin = origin.endsWith('.vercel.app');
+    const isAllowedLocal = origin === "http://localhost:5173";
 
-    if (isAllowed || origin.endsWith('.vercel.app')) {
+    if (isAllowedLocal || isVercelOrigin) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
+
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -68,59 +65,6 @@ app.get("/ping", (req, res) => {
   res.send("PONG");
 });
 
-// Database Test Endpoint
-app.get("/db-test", (req, res) => {
-  const db = require('./config/db');
-  const mysql = require("mysql2");
-  const toHex = (s) => s ? s.split('').map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ') : 'NULL';
-  
-  const h = (process.env.DB_HOST || "").trim();
-  const u = (process.env.DB_USER || "").trim();
-  const p = (process.env.DB_PASSWORD || "").trim();
-  const d = (process.env.DB_NAME || "").trim();
-  const prt = parseInt(process.env.DB_PORT || "4000");
-
-  const rawConn = mysql.createConnection({
-    host: h,
-    user: u,
-    password: p,
-    port: prt,
-    ssl: { rejectUnauthorized: false, minVersion: 'TLSv1.2' }
-  });
-
-  rawConn.connect((rawErr) => {
-    const diagData = {
-      success: false,
-      message: "Deep Database Forensic Diagnostic",
-      raw_conn_error: rawErr ? { message: rawErr.message, code: rawErr.code, sqlState: rawErr.sqlState } : "SUCCESS",
-      hex_forensics: {
-        host: toHex(process.env.DB_HOST),
-        user: toHex(process.env.DB_USER),
-        pass: toHex(p), // full pass hex for forensic
-        db: toHex(process.env.DB_NAME),
-        port: toHex(process.env.DB_PORT),
-        ssl: toHex(process.env.DB_SSL)
-      }
-    };
-
-    if (rawErr) {
-      return res.status(500).json(diagData);
-    }
-
-    db.query("SELECT 1", (poolErr, results) => {
-      if (poolErr) {
-        diagData.pool_error = { message: poolErr.message, code: poolErr.code, sqlState: poolErr.sqlState };
-        return res.status(500).json(diagData);
-      }
-      res.json({ success: true, message: "Connected successfully (Full Sync)", data: results });
-    });
-
-    rawConn.end();
-  });
-
-
-
-});
 
 
 // User Routes

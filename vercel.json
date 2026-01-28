@@ -7,7 +7,7 @@
   },
   "rewrites": [
     {
-      "source": "/(ping|login|register|me|logout|forgot-password|verify-otp|reset-password|db-test)",
+      "source": "/(ping|login|register|me|logout|forgot-password|verify-otp|reset-password)",
       "destination": "/api/index.js"
     },
 
