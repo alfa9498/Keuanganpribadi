@@ -2,8 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const db = require('./config/db');
 
-const schemaPath = path.join(__dirname, 'schema.sql');
+const schemaPath = path.join(__dirname, 'tidb_setup.sql');
 const sql = fs.readFileSync(schemaPath, 'utf8');
+
 
 // Split queries by semicolon (simple split, might need robust parsing for complex SQL)
 const queries = sql.split(';').filter(q => q.trim().length > 0);
