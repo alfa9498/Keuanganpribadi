@@ -1,4 +1,12 @@
-const Tesseract = require('tesseract.js');
+const vision = require('@google-cloud/vision');
+
+// Initialize Google Vision client
+const client = new vision.ImageAnnotatorClient({
+    // Use service account key from environment variable
+    credentials: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON 
+        ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
+        : undefined
+});
 
 const KEYWORD_MAPPING = {
     'SPBU': 'Transportasi',
@@ -28,9 +36,6 @@ const KEYWORD_MAPPING = {
     'STARBUCKS': 'Makanan',
     'MCDONALD': 'Makanan',
     'KFC': 'Makanan',
-    'PARKIR': 'Transportasi',
-    'STASIUN': 'Transportasi',
-    'BIAYA': 'Transportasi',
     'BENSIN': 'Transportasi',
     'PERTALITE': 'Transportasi',
     'PERTAMAX': 'Transportasi'
@@ -38,46 +43,53 @@ const KEYWORD_MAPPING = {
 
 const parseReceipt = async (imageBuffer) => {
     try {
-        console.log("Starting OCR processing (eng+ind)...");
-        const result = await Tesseract.recognize(imageBuffer, 'eng+ind', {
-            logger: m => {
-                if (m.status === 'recognizing text' && Math.round(m.progress * 100) % 25 === 0) {
-                    console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`);
-                }
-            }
-        });
+        console.log("🔍 Starting Google Vision OCR processing...");
+        const startTime = Date.now();
         
-        const rawText = result.data.text;
-        console.log("Raw OCR Text:", rawText);
+        // Call Google Vision API
+        const [result] = await client.textDetection(imageBuffer);
+        const detections = result.textAnnotations;
+        
+        if (!detections || detections.length === 0) {
+            console.log("⚠️ No text detected in image");
+            return {
+                category: 'Lainnya',
+                amount: 0,
+                description: 'Scan Struk (Tidak Terdeteksi)',
+                text: ''
+            };
+        }
+        
+        // First annotation contains full text
+        const rawText = detections[0].description;
+        console.log(`✅ OCR completed in ${Date.now() - startTime}ms`);
+        console.log("📄 Raw OCR Text:", rawText);
 
         // 1. Clean and Filter Text
         const lines = rawText.split('\n')
             .map(line => line.trim())
             .filter(line => {
-                // Remove very short lines (mostly noise)
                 if (line.length < 3) return false;
-                // Remove lines that are just symbols/noise
                 if (/^[^\w\s]+$/.test(line)) return false;
                 return true;
             });
 
         const cleanText = lines.join('\n').toUpperCase();
-        console.log("Cleaned OCR Text:", cleanText);
+        console.log("🧹 Cleaned OCR Text:", cleanText);
 
         // 2. Keyword Matching for Category
         let detectedCategory = 'Lainnya';
         for (const [keyword, category] of Object.entries(KEYWORD_MAPPING)) {
             if (cleanText.includes(keyword)) {
                 detectedCategory = category;
+                console.log(`🏷️ Category detected: ${detectedCategory} (keyword: ${keyword})`);
                 break;
             }
         }
 
         // 3. Extract Merchant Name (Description)
-        // Usually the first 1-2 lines of a receipt are the store name
         let detectedDescription = 'Scan Struk';
         if (lines.length > 0) {
-            // Take the first line as merchant name, but avoid total-related keywords
             const firstLine = lines[0].replace(/[`*_|]/g, '').trim();
             const totalKeywords = ['TOTAL', 'JUMLAH', 'BAYAR', 'BIAYA', 'PONDOK', 'STASIUN'];
             const isTotalLine = totalKeywords.some(k => firstLine.toUpperCase().includes(k));
@@ -86,6 +98,7 @@ const parseReceipt = async (imageBuffer) => {
                 detectedDescription = firstLine;
             }
         }
+        console.log(`📝 Description: ${detectedDescription}`);
 
         // 4. Extract Amount
         let detectedAmount = 0;
@@ -93,27 +106,32 @@ const parseReceipt = async (imageBuffer) => {
 
         for (const line of lines) {
             const cleanLine = line.toUpperCase().replace(/\s/g, '');
-            if (cleanLine.includes('TOTAL') || cleanLine.includes('JUMLAH') || cleanLine.includes('BAYAR') || cleanLine.includes('BIAYA') || cleanLine.includes('NETTO')) {
+            if (cleanLine.includes('TOTAL') || cleanLine.includes('JUMLAH') || 
+                cleanLine.includes('BAYAR') || cleanLine.includes('BIAYA') || 
+                cleanLine.includes('NETTO')) {
                 const match = line.match(amountRegex);
                 if (match) {
                     const cleanNum = parseInt(match[1].replace(/[.,]/g, ''));
                     if (!isNaN(cleanNum) && cleanNum > 0) {
                          detectedAmount = cleanNum;
+                         console.log(`💰 Amount found: Rp ${detectedAmount.toLocaleString('id-ID')}`);
                          break;
                     }
                 }
             }
         }
 
-        // Fallback: Search for any amount-like number near keywords if total not found
+        // Fallback: Search for any amount-like number
         if (detectedAmount === 0) {
-            console.log("Trying fallback amount detection...");
+            console.log("🔄 Trying fallback amount detection...");
             for (const line of lines) {
                 const match = line.match(amountRegex);
                 if (match) {
                     const cleanNum = parseInt(match[1].replace(/[.,]/g, ''));
                     if (!isNaN(cleanNum) && cleanNum > 500 && cleanNum < 10000000) {
                         detectedAmount = cleanNum;
+                        console.log(`💰 Fallback amount: Rp ${detectedAmount.toLocaleString('id-ID')}`);
+                        break;
                     }
                 }
             }
@@ -127,7 +145,7 @@ const parseReceipt = async (imageBuffer) => {
         };
 
     } catch (error) {
-        console.error("OCR Error:", error);
+        console.error("❌ OCR Error:", error);
         throw error;
     }
 };
