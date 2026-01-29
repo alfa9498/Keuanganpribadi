@@ -13,6 +13,7 @@ let bot = null;
 
 // External Trigger for Webhooks
 const processUpdate = (body) => {
+    console.log('📨 Received Update from Telegram:', JSON.stringify(body, null, 2));
     if (bot) {
         bot.processUpdate(body);
     } else {
@@ -33,11 +34,15 @@ const init = () => {
 
     if (webhookHost) {
         bot = new TelegramBot(token); // No polling
-        console.log(`🤖 Telegram Bot initialized in Webhook mode: ${webhookHost}`);
-        bot.setWebHook(`${webhookHost}/api/telegram-webhook`);
+        const webhookUrl = `${webhookHost}/api/telegram-webhook`;
+        console.log(`🤖 Setting Webhook to: ${webhookUrl}`);
+        
+        bot.setWebHook(webhookUrl)
+            .then(res => console.log('✅ Telegram Webhook Status:', res))
+            .catch(err => console.error('❌ Failed to set Telegram Webhook:', err));
     } else if (process.env.VERCEL === '1') {
         bot = new TelegramBot(token); // No polling
-        console.log('🤖 Telegram Bot: Polling disabled in Vercel environment (No Webhook URL).');
+        console.log('🤖 Telegram Bot: Polling disabled in Vercel environment (No Webhook URL detected).');
     } else {
         bot = new TelegramBot(token, { polling: true });
         console.log('🤖 Telegram Bot is running in Polling mode...');
