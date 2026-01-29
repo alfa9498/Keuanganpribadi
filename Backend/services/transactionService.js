@@ -15,15 +15,14 @@ const createTransaction = (data) => {
             return reject(new Error("Data transaksi tidak lengkap!"));
         }
 
-        const query = "INSERT INTO transactions (user_id, date, type, category, amount, description, payment_method, account, to_account, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const query = "INSERT INTO transactions (user_id, date, type, category, amount, description, payment_method, account, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         // Default values
         const val_payment = payment_method || 'Cash';
         const val_account = account || 'Cash Account';
-        const val_to_account = to_account || null;
         const val_status = status || 'done';
 
-        db.query(query, [user_id, date, type, category, amount, description, val_payment, val_account, val_to_account, val_status], (err, result) => {
+        db.query(query, [user_id, date, type, category, amount, description, val_payment, val_account, val_status], (err, result) => {
             if (err) {
                 console.error("Create Transaction Error:", err);
                 return reject(err);
