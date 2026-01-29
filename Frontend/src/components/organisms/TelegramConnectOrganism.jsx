@@ -12,14 +12,16 @@ export const TelegramConnectOrganism = ({ user }) => {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch(`${API_URL}/telegram-link`, {
+            // Fetch verification code
+            const codeResponse = await fetch(`${API_URL}/telegram-verification-code`, {
                 credentials: 'include'
             });
-            const data = await response.json();
-            if (response.ok) {
-                setLinkData(data);
+            const codeData = await codeResponse.json();
+            
+            if (codeResponse.ok) {
+                setLinkData({ verificationCode: codeData.verificationCode });
             } else {
-                setError(data.message || "Gagal mengambil link linking.");
+                setError(codeData.message || "Gagal mengambil kode verifikasi.");
             }
         } catch (err) {
             setError("Gagal menghubungi server.");
@@ -29,8 +31,6 @@ export const TelegramConnectOrganism = ({ user }) => {
     };
 
     useEffect(() => {
-        // If user not already linked (we don't check user.telegram_chat_id yet as it might be outdated in session)
-        // Ideally we fetch updated profile, but let's just fetch link on mount for now.
         fetchLink();
     }, []);
 
@@ -88,41 +88,40 @@ export const TelegramConnectOrganism = ({ user }) => {
                                     </div>
                                 ) : linkData ? (
                                     <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 text-center space-y-4">
-                                        <p className="text-sm text-slate-500 mb-2">Klik tombol di bawah ini:</p>
-                                        <a 
-                                            href={linkData.deepLink || linkData.url} 
-                                            className="btn-primary w-full flex items-center justify-center gap-2 py-3"
-                                        >
-                                            <Send size={18} />
-                                            Hubungkan Telegram
-                                        </a>
+                                        <p className="text-sm text-slate-500 mb-2">Cara menghubungkan:</p>
                                         
-                                        <div className="relative">
-                                            <div className="absolute inset-0 flex items-center">
-                                                <div className="w-full border-t border-slate-200"></div>
-                                            </div>
-                                            <div className="relative flex justify-center text-xs uppercase">
-                                                <span className="bg-slate-50 px-2 text-slate-400">Atau copy link</span>
-                                            </div>
+                                        <div className="bg-white rounded-lg p-4 border-2 border-blue-200">
+                                            <p className="text-xs text-slate-500 mb-2">1. Buka bot Telegram:</p>
+                                            <a 
+                                                href="https://t.me/MyKeuangan94_bot"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="btn-primary w-full flex items-center justify-center gap-2 py-2 text-sm"
+                                            >
+                                                <Send size={16} />
+                                                Buka Bot
+                                            </a>
                                         </div>
 
-                                        <div className="flex gap-2">
-                                            <input 
-                                                type="text" 
-                                                readOnly 
-                                                value={linkData.url}
-                                                className="input-field text-xs bg-white"
-                                            />
+                                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border-2 border-blue-300">
+                                            <p className="text-xs text-slate-600 mb-2 font-semibold">2. Ketik kode ini di bot:</p>
+                                            <div className="text-4xl font-bold text-blue-600 tracking-widest mb-2">
+                                                {linkData.verificationCode}
+                                            </div>
                                             <button 
-                                                onClick={handleCopy}
-                                                className="p-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500"
-                                                title="Copy Link"
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(linkData.verificationCode);
+                                                    setCopied(true);
+                                                    setTimeout(() => setCopied(false), 2000);
+                                                }}
+                                                className="text-xs text-blue-600 hover:text-blue-700 underline flex items-center justify-center gap-1 mx-auto"
                                             >
-                                                {copied ? <CheckCircle size={18} className="text-green-500" /> : <Copy size={18} />}
+                                                {copied ? <CheckCircle size={14} /> : <Copy size={14} />}
+                                                {copied ? 'Tersalin!' : 'Copy Kode'}
                                             </button>
                                         </div>
-                                        <p className="text-xs text-slate-400">Link berlaku selama 5 menit.</p>
-                                        <p className="text-xs text-amber-600 mt-2">💡 <strong>Tips:</strong> Jika tombol tidak berfungsi, copy link di atas dan paste di aplikasi Telegram Anda.</p>
+
+                                        <p className="text-xs text-slate-400">Kode berlaku selama 5 menit.</p>
                                     </div>
                                 ) : (
                                     <div className="text-center text-red-500 text-sm">
