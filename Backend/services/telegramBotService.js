@@ -13,11 +13,21 @@ let bot = null;
 
 // External Trigger for Webhooks
 const processUpdate = (body) => {
+    if (!bot) {
+        console.log('🏁 Initializing bot on-demand for update...');
+        init();
+    }
+    
     console.log('📨 Received Update from Telegram:', JSON.stringify(body, null, 2));
+    
     if (bot) {
-        bot.processUpdate(body);
+        try {
+            bot.processUpdate(body);
+        } catch (err) {
+            console.error('❌ Error processing update:', err);
+        }
     } else {
-        console.warn('⚠️ Telegram Bot not initialized, ignoring update.');
+        console.warn('⚠️ Telegram Bot failed to initialize, cannot process update.');
     }
 };
 
@@ -29,23 +39,26 @@ const init = () => {
         return;
     }
 
-    // Initialize Bot
+    // Prevent re-initialization if already in memory
+    if (bot && process.env.VERCEL === '1') {
+        return;
+    }
+
+    // Initialize Bot instance if not exists
+    if (!bot) {
+        bot = new TelegramBot(token, { polling: !process.env.VERCEL });
+    }
+
     const webhookHost = process.env.WEBHOOK_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
 
-    if (webhookHost) {
-        bot = new TelegramBot(token); // No polling
+    if (webhookHost && process.env.VERCEL === '1') {
         const webhookUrl = `${webhookHost}/api/telegram-webhook`;
-        console.log(`🤖 Setting Webhook to: ${webhookUrl}`);
-        
+        console.log(`🤖 Ensuring Webhook: ${webhookUrl}`);
         bot.setWebHook(webhookUrl)
-            .then(res => console.log('✅ Telegram Webhook Status:', res))
-            .catch(err => console.error('❌ Failed to set Telegram Webhook:', err));
-    } else if (process.env.VERCEL === '1') {
-        bot = new TelegramBot(token); // No polling
-        console.log('🤖 Telegram Bot: Polling disabled in Vercel environment (No Webhook URL detected).');
-    } else {
-        bot = new TelegramBot(token, { polling: true });
-        console.log('🤖 Telegram Bot is running in Polling mode...');
+            .then(res => console.log('✅ Webhook Response:', res))
+            .catch(err => console.error('❌ Webhook Error:', err.message));
+    } else if (!process.env.VERCEL) {
+        console.log('🤖 Bot is running in Polling mode (Local)...');
     }
 
 
