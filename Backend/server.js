@@ -72,6 +72,7 @@ app.post("/login", userController.login);
 app.post("/register", userController.register);
 app.get("/me", userController.me);
 app.post("/logout", userController.logout);
+app.get("/api/telegram-link", userController.generateTelegramLink);
 
 // Forgot Password
 app.post("/forgot-password", userController.requestPasswordReset);

@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, LayoutDashboard, Receipt, LineChart, LogOut, Menu, User, Settings, CreditCard, ChevronLeft } from 'lucide-react';
+import { ChevronDown, ChevronRight, LayoutDashboard, Receipt, LineChart, LogOut, Menu, User, Settings, CreditCard, ChevronLeft, Send } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 // Sidebar Item Component
@@ -124,6 +124,7 @@ export const SidebarOrganism = ({ activeTab, onTabChange, isOpen, toggleSidebar,
         { id: 'accounts', label: 'Accounts', icon: CreditCard },
         { id: 'transaction-list', label: 'Transactions', icon: Receipt },
         { id: 'filter', label: 'Reports', icon: LineChart },
+        { id: 'telegram', label: 'Telegram Bot', icon: Send },
     ];
 
     return (

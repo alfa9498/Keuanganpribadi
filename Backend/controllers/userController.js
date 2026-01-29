@@ -215,3 +215,36 @@ exports.resetPassword = (req, res) => {
         });
     });
 };
+
+// 4. Generate Telegram Link
+exports.generateTelegramLink = (req, res) => {
+    const token = req.cookies.token;
+
+    if (!token) {
+        return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const userId = decoded.id;
+        
+        // Generate a special short-lived token for linking (5 mins)
+        // We include fullName for Greeting message
+        const linkPayload = { 
+            id: userId, 
+            fullName: decoded.fullName,
+            type: 'telegram_link' 
+        };
+        const linkToken = jwt.sign(linkPayload, JWT_SECRET, { expiresIn: '5m' });
+
+        const botUsername = process.env.TELEGRAM_BOT_USERNAME || 'MyFinanceBot'; 
+        
+        res.status(200).json({ 
+            linkToken: linkToken,
+            url: `https://t.me/${botUsername}?start=${linkToken}`
+        });
+
+    } catch (err) {
+        res.status(401).json({ message: "Invalid session" });
+    }
+};
