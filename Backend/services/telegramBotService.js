@@ -134,7 +134,7 @@ const init = () => {
         }
 
         // --- HANDLE VERIFICATION CODE INPUT (for linking) ---
-        if (!user && text && /^\d{6}$/.test(text)) {
+        if (text && /^\d{6}$/.test(text)) {
             console.log('🔢 Received potential verification code:', text);
             const codeData = verificationCodes.get(text);
             
@@ -154,9 +154,9 @@ const init = () => {
                     });
                     
                     // Show menu
-                    const user = await getUser(chatId);
-                    if (user) {
-                        const welcomeMessage = `\n🏦 **Halo, ${user.full_name}!**\n\nApa yang ingin Anda catat hari ini?\n        `;
+                    const linkedUser = await getUser(chatId);
+                    if (linkedUser) {
+                        const welcomeMessage = `\n🏦 **Halo, ${linkedUser.full_name}!**\n\nApa yang ingin Anda catat hari ini?\n        `;
                         const opts = {
                             parse_mode: 'Markdown',
                             reply_markup: {
@@ -183,7 +183,11 @@ const init = () => {
                 return;
             } else {
                 console.log('❌ Invalid verification code');
-                bot.sendMessage(chatId, '⚠️ Kode verifikasi tidak valid. Pastikan Anda memasukkan 6 digit angka yang benar.');
+                // Don't show error for every 6-digit number, might be transaction amount
+                // Only show if user is not linked
+                if (!user) {
+                    bot.sendMessage(chatId, '⚠️ Kode verifikasi tidak valid. Pastikan Anda memasukkan 6 digit angka yang benar.');
+                }
                 return;
             }
         }
