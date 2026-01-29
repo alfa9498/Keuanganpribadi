@@ -1,12 +1,25 @@
 const vision = require('@google-cloud/vision');
 
-// Initialize Google Vision client
-const client = new vision.ImageAnnotatorClient({
-    // Use service account key from environment variable
-    credentials: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON 
+const vision = require('@google-cloud/vision');
+
+// Initialize Google Vision client safely
+let client;
+try {
+    const credentials = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON 
         ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
-        : undefined
-});
+        : undefined;
+
+    if (credentials) {
+        client = new vision.ImageAnnotatorClient({
+            credentials
+        });
+        console.log("✅ Google Vision Client initialized successfully");
+    } else {
+        console.warn("⚠️ GOOGLE_APPLICATION_CREDENTIALS_JSON is missing. OCR will not work.");
+    }
+} catch (error) {
+    console.error("❌ Failed to initialize Google Vision Client (JSON Parse Error?):", error.message);
+}
 
 const KEYWORD_MAPPING = {
     'SPBU': 'Transportasi',
