@@ -246,7 +246,8 @@ exports.generateTelegramLink = (req, res) => {
         }        
         res.status(200).json({ 
             linkToken: linkToken,
-            url: `https://t.me/${botUsername}?start=${linkToken}`
+            url: `https://t.me/${botUsername}?start=${linkToken}`,
+            deepLink: `tg://resolve?domain=${botUsername}&start=${linkToken}`
         });
 
     } catch (err) {

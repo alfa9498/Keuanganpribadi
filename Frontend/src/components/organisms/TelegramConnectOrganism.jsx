@@ -90,9 +90,7 @@ export const TelegramConnectOrganism = ({ user }) => {
                                     <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 text-center space-y-4">
                                         <p className="text-sm text-slate-500 mb-2">Klik tombol di bawah ini:</p>
                                         <a 
-                                            href={linkData.url} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
+                                            href={linkData.deepLink || linkData.url} 
                                             className="btn-primary w-full flex items-center justify-center gap-2 py-3"
                                         >
                                             <Send size={18} />
@@ -124,6 +122,7 @@ export const TelegramConnectOrganism = ({ user }) => {
                                             </button>
                                         </div>
                                         <p className="text-xs text-slate-400">Link berlaku selama 5 menit.</p>
+                                        <p className="text-xs text-amber-600 mt-2">💡 <strong>Tips:</strong> Jika tombol tidak berfungsi, copy link di atas dan paste di aplikasi Telegram Anda.</p>
                                     </div>
                                 ) : (
                                     <div className="text-center text-red-500 text-sm">
