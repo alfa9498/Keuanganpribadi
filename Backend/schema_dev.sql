@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     description TEXT,
     payment_method VARCHAR(50) DEFAULT 'Cash', -- Kolom tambahan yang mungkin diperlukan
     account VARCHAR(50) DEFAULT 'Cash Account', -- Kolom tambahan yang mungkin diperlukan
+    to_account VARCHAR(50) DEFAULT NULL,       -- Koloam untuk transfer dana
     status VARCHAR(20) DEFAULT 'done',         -- Kolom tambahan yang mungkin diperlukan
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
