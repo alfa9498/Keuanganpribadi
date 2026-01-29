@@ -41,21 +41,30 @@ const init = () => {
 
     // Prevent re-initialization if already in memory
     if (bot && process.env.VERCEL === '1') {
+        console.log('🤖 Bot already initialized.');
         return;
     }
 
     // Initialize Bot instance if not exists
     if (!bot) {
         bot = new TelegramBot(token, { polling: !process.env.VERCEL });
+        console.log(`🤖 Telegram Bot instance created (Polling: ${!process.env.VERCEL})`);
     }
 
-    const webhookHost = process.env.WEBHOOK_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+    // Prefer dynamic VERCEL_URL for Preview deployments, unless WEBHOOK_URL is explicitly overriding for Production
+    let webhookHost = null;
+    if (process.env.VERCEL === '1') {
+        // VERCEL_URL is provided by Vercel for each deployment
+        webhookHost = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.WEBHOOK_URL;
+    } else {
+        webhookHost = process.env.WEBHOOK_URL;
+    }
 
     if (webhookHost && process.env.VERCEL === '1') {
-        const webhookUrl = `${webhookHost}/api/telegram-webhook`;
-        console.log(`🤖 Ensuring Webhook: ${webhookUrl}`);
+        const webhookUrl = `${webhookHost}/telegram-webhook`;
+        console.log(`🤖 Setting/Ensuring Webhook: ${webhookUrl}`);
         bot.setWebHook(webhookUrl)
-            .then(res => console.log('✅ Webhook Response:', res))
+            .then(res => console.log('✅ Webhook Response:', res, 'for URL:', webhookUrl))
             .catch(err => console.error('❌ Webhook Error:', err.message));
     } else if (!process.env.VERCEL) {
         console.log('🤖 Bot is running in Polling mode (Local)...');
@@ -72,9 +81,17 @@ const init = () => {
 
     // Helper: Get User from Chat ID
     const getUser = async (chatId) => {
-        const query = "SELECT * FROM users WHERE telegram_chat_id = ?";
-        const [rows] = await db.promise().query(query, [chatId.toString()]);
-        return rows.length > 0 ? rows[0] : null;
+        try {
+            const query = "SELECT * FROM users WHERE telegram_chat_id = ?";
+            const [rows] = await db.promise().query(query, [chatId.toString()]);
+            if (rows.length === 0) {
+                console.log(`🔍 No user found for telegram_chat_id: ${chatId}`);
+            }
+            return rows.length > 0 ? rows[0] : null;
+        } catch (err) {
+            console.error(`❌ DB Error in getUser(${chatId}):`, err.message);
+            return null;
+        }
     };
 
     // State for interactive sessions (e.g., editing amount)
