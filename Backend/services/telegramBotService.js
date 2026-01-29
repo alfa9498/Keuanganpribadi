@@ -7,7 +7,10 @@ const db = require('../config/db'); // Added DB connection
 require('dotenv').config();
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const JWT_SECRET = 'your_jwt_secret_key'; // Should be same as userController
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
+
+// Store verification codes temporarily (in production, use Redis)
+const verificationCodes = new Map(); // Map<code, {userId, fullName, expires}>
 
 let bot = null;
 
@@ -128,6 +131,61 @@ const init = () => {
         if (text === '❓ Bantuan') {
             bot.sendMessage(chatId, "Kirim foto struk atau klik tombol di bawah untuk input manual.");
             return;
+        }
+
+        // --- HANDLE VERIFICATION CODE INPUT (for linking) ---
+        if (!user && text && /^\d{6}$/.test(text)) {
+            console.log('🔢 Received potential verification code:', text);
+            const codeData = verificationCodes.get(text);
+            
+            if (codeData && codeData.expires > Date.now()) {
+                console.log('✅ Valid verification code found');
+                try {
+                    const [result] = await db.promise().query(
+                        "UPDATE users SET telegram_chat_id = ?, telegram_username = ? WHERE id = ?",
+                        [chatId.toString(), msg.from.username || null, codeData.userId]
+                    );
+                    console.log('✅ Database updated via verification code, affected rows:', result.affectedRows);
+                    
+                    verificationCodes.delete(text); // Remove used code
+                    
+                    bot.sendMessage(chatId, `✅ **Akun Berhasil Dihubungkan!**\n\nHalo ${codeData.fullName || 'User'}, sekarang Anda bisa mencatat keuangan via Telegram!`, {
+                        parse_mode: 'Markdown'
+                    });
+                    
+                    // Show menu
+                    const user = await getUser(chatId);
+                    if (user) {
+                        const welcomeMessage = `\n🏦 **Halo, ${user.full_name}!**\n\nApa yang ingin Anda catat hari ini?\n        `;
+                        const opts = {
+                            parse_mode: 'Markdown',
+                            reply_markup: {
+                                keyboard: [
+                                    ['➕ Pemasukan', '➖ Pengeluaran'],
+                                    ['❓ Bantuan']
+                                ],
+                                resize_keyboard: true,
+                                persistent: true
+                            }
+                        };
+                        bot.sendMessage(chatId, welcomeMessage, opts);
+                    }
+                    return;
+                } catch (err) {
+                    console.error('❌ Error linking with verification code:', err);
+                    bot.sendMessage(chatId, '⚠️ Terjadi kesalahan saat menghubungkan akun. Silakan coba lagi.');
+                    return;
+                }
+            } else if (codeData) {
+                console.log('⏰ Verification code expired');
+                bot.sendMessage(chatId, '⚠️ Kode verifikasi sudah kadaluarsa. Silakan request kode baru dari Web App.');
+                verificationCodes.delete(text);
+                return;
+            } else {
+                console.log('❌ Invalid verification code');
+                bot.sendMessage(chatId, '⚠️ Kode verifikasi tidak valid. Pastikan Anda memasukkan 6 digit angka yang benar.');
+                return;
+            }
         }
         
         // State Machine Handling
@@ -536,4 +594,18 @@ Updated:
     });
 };
 
-module.exports = { init, processUpdate };
+module.exports = { 
+    init, 
+    processUpdate,
+    storeVerificationCode: (code, data) => {
+        verificationCodes.set(code, data);
+        console.log(`🔑 Verification code stored: ${code} for user ${data.userId}`);
+        // Auto-cleanup after expiry
+        setTimeout(() => {
+            if (verificationCodes.has(code)) {
+                verificationCodes.delete(code);
+                console.log(`🗑️ Verification code expired and removed: ${code}`);
+            }
+        }, 5 * 60 * 1000);
+    }
+};

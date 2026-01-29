@@ -7,7 +7,7 @@
   },
   "rewrites": [
     {
-      "source": "/(ping|login|register|me|logout|forgot-password|verify-otp|reset-password|telegram-link)",
+      "source": "/(ping|login|register|me|logout|forgot-password|verify-otp|reset-password|telegram-link|telegram-verification-code)",
       "destination": "/api/index.js"
     },
 
