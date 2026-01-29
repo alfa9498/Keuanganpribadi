@@ -219,19 +219,28 @@ Klik simpan di bawah:
     // /start - Menu Utama & Deep Linking
     bot.onText(/\/start(.*)/, async (msg, match) => {
         const chatId = msg.chat.id;
-        const payload = match[1] ? match[1].trim() : null;
+        const rawPayload = match[1] || '';
+        const payload = rawPayload.trim();
+        
+        console.log('🔍 /start received from chatId:', chatId);
+        console.log('🔍 Raw payload:', rawPayload);
+        console.log('🔍 Trimmed payload:', payload);
+        console.log('🔍 Payload length:', payload.length);
 
-        if (payload) {
+        if (payload && payload.length > 0) {
             // Handle Linking
+            console.log('🔗 Attempting to link account with JWT...');
             try {
                 const decoded = jwt.verify(payload, JWT_SECRET);
+                console.log('✅ JWT verified successfully:', decoded);
                 const userId = decoded.id;
 
                 // Update DB
-                await db.promise().query(
+                const [result] = await db.promise().query(
                     "UPDATE users SET telegram_chat_id = ?, telegram_username = ? WHERE id = ?",
                     [chatId.toString(), msg.from.username || null, userId]
                 );
+                console.log('✅ Database updated, affected rows:', result.affectedRows);
 
                 bot.sendMessage(chatId, `✅ **Akun Berhasil Dihubungkan!**\n\nHalo ${decoded.fullName || 'User'}, sekarang Anda bisa mencatat keuangan via Telegram!`, {
                     parse_mode: 'Markdown'
@@ -239,18 +248,23 @@ Klik simpan di bawah:
                 
                 // Continue to show menu logic below...
             } catch (err) {
-                console.error("Linking Error:", err);
+                console.error("❌ Linking Error:", err.message);
+                console.error("❌ Full error:", err);
                 bot.sendMessage(chatId, "⚠️ Link tidak valid atau sudah kadaluarsa. Silakan request link baru dari Web App.");
                 return;
             }
+        } else {
+            console.log('ℹ️ No payload provided, showing menu for existing user');
         }
 
         // Check Auth Status for Menu
         const user = await getUser(chatId);
         if (!user) {
-            bot.sendMessage(chatId, "⚠️ **Akun Belum Terhubung.**\nSilakan login ke Web App dan pilih menu 'Hubungkan Telegram' untuk mendapatkan akses.", { parse_mode: 'Markdown' });
+            console.log('⚠️ User not found in DB for chatId:', chatId);
+            bot.sendMessage(chatId, "⚠️ **Akun Belum Terhubung.**\nSilakan login ke Web App dan pilih menu 'Hubungkan Telegram' untuk mendapatkan akses.\n\nSilakan hubungkan akun Anda terlebih dahulu.", { parse_mode: 'Markdown' });
             return;
         }
+        console.log('✅ User found:', user.full_name);
         
         delete userState[chatId];
         const welcomeMessage = `
