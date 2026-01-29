@@ -1,7 +1,5 @@
 const vision = require('@google-cloud/vision');
 
-const vision = require('@google-cloud/vision');
-
 // Initialize Google Vision client safely
 let client;
 try {
