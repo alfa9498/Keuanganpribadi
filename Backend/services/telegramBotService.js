@@ -29,13 +29,15 @@ const init = () => {
     }
 
     // Initialize Bot
-    if (process.env.WEBHOOK_URL) {
+    const webhookHost = process.env.WEBHOOK_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+
+    if (webhookHost) {
         bot = new TelegramBot(token); // No polling
-        console.log(`🤖 Telegram Bot initialized in Webhook mode: ${process.env.WEBHOOK_URL}`);
-        bot.setWebHook(`${process.env.WEBHOOK_URL}/api/telegram-webhook`);
+        console.log(`🤖 Telegram Bot initialized in Webhook mode: ${webhookHost}`);
+        bot.setWebHook(`${webhookHost}/api/telegram-webhook`);
     } else if (process.env.VERCEL === '1') {
         bot = new TelegramBot(token); // No polling
-        console.log('🤖 Telegram Bot: Polling disabled in Vercel environment.');
+        console.log('🤖 Telegram Bot: Polling disabled in Vercel environment (No Webhook URL).');
     } else {
         bot = new TelegramBot(token, { polling: true });
         console.log('🤖 Telegram Bot is running in Polling mode...');

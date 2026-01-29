@@ -237,8 +237,13 @@ exports.generateTelegramLink = (req, res) => {
         };
         const linkToken = jwt.sign(linkPayload, JWT_SECRET, { expiresIn: '5m' });
 
-        const botUsername = process.env.TELEGRAM_BOT_USERNAME || 'MyFinanceBot'; 
+        const botUsername = process.env.TELEGRAM_BOT_USERNAME;
         
+        if (!botUsername) {
+            return res.status(500).json({ 
+                message: "Aplikasi belum dikonfigurasi: TELEGRAM_BOT_USERNAME belum diset di server." 
+            });
+        }        
         res.status(200).json({ 
             linkToken: linkToken,
             url: `https://t.me/${botUsername}?start=${linkToken}`
