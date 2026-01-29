@@ -107,33 +107,8 @@ const init = () => {
         // Skip if it's a command (handled by onText)
         if (text && text.startsWith('/')) return;
 
-        // AUTH CHECK
-        const user = await getUser(chatId);
-        if (!user) {
-            // Only allow unauthenticated if it's a start command (handled elsewhere) or help
-            // But here we are in 'message' event for interactive stuff
-            // We can send a generic "Please link account" message if they try to chat
-            // handled below in specific checks or generic response
-            return; 
-        }
-
-        // --- HANDLE PERSISTENT KEYBOARD CLICKS ---
-        if (text === '➕ Pemasukan') {
-            userState[chatId] = { type: 'wait_amt', t: 'income', user };
-            bot.sendMessage(chatId, "Silakan ketik **Nominal** pemasukan:");
-            return;
-        }
-        if (text === '➖ Pengeluaran') {
-            userState[chatId] = { type: 'wait_amt', t: 'expense', user };
-            bot.sendMessage(chatId, "Silakan ketik **Nominal** pengeluaran:");
-            return;
-        }
-        if (text === '❓ Bantuan') {
-            bot.sendMessage(chatId, "Kirim foto struk atau klik tombol di bawah untuk input manual.");
-            return;
-        }
-
         // --- HANDLE VERIFICATION CODE INPUT (for linking) ---
+        // This MUST be before auth check so unlinked users can link!
         if (text && /^\d{6}$/.test(text)) {
             console.log('🔢 Received potential verification code:', text);
             const codeData = verificationCodes.get(text);
@@ -182,14 +157,33 @@ const init = () => {
                 verificationCodes.delete(text);
                 return;
             } else {
-                console.log('❌ Invalid verification code');
-                // Don't show error for every 6-digit number, might be transaction amount
-                // Only show if user is not linked
-                if (!user) {
-                    bot.sendMessage(chatId, '⚠️ Kode verifikasi tidak valid. Pastikan Anda memasukkan 6 digit angka yang benar.');
-                }
-                return;
+                console.log('❌ Invalid verification code:', text);
+                // Don't return here - might be a transaction amount
+                // Continue to auth check below
             }
+        }
+
+        // AUTH CHECK
+        const user = await getUser(chatId);
+        if (!user) {
+            // User not linked and not a valid verification code
+            return; 
+        }
+
+        // --- HANDLE PERSISTENT KEYBOARD CLICKS ---
+        if (text === '➕ Pemasukan') {
+            userState[chatId] = { type: 'wait_amt', t: 'income', user };
+            bot.sendMessage(chatId, "Silakan ketik **Nominal** pemasukan:");
+            return;
+        }
+        if (text === '➖ Pengeluaran') {
+            userState[chatId] = { type: 'wait_amt', t: 'expense', user };
+            bot.sendMessage(chatId, "Silakan ketik **Nominal** pengeluaran:");
+            return;
+        }
+        if (text === '❓ Bantuan') {
+            bot.sendMessage(chatId, "Kirim foto struk atau klik tombol di bawah untuk input manual.");
+            return;
         }
         
         // State Machine Handling
