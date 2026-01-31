@@ -470,81 +470,94 @@ export const ReportDashboardOrganism = ({ user }) => {
       </div>
 
       {/* Transaction Ledger Table Only - Full Width */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
-          <h3 className="font-bold text-slate-700 flex items-center gap-2">
-            <FileText size={16} className="text-slate-400" />
-            Transaction Ledger
+      <div className="bg-white rounded-xl border border-slate-300 shadow-md overflow-hidden">
+        <div className="px-6 py-3 border-b border-slate-300 flex justify-between items-center bg-slate-100/50">
+          <h3 className="font-black text-slate-800 flex items-center gap-2 text-sm uppercase tracking-wider">
+            <FileText size={16} className="text-finance-primary" />
+            Buku Kas / Ledger Transaksi
           </h3>
-          <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded">
-            {filteredTransactions.length} Records
+          <span className="text-[10px] font-black text-slate-500 bg-white border border-slate-300 px-3 py-1 rounded-full shadow-sm">
+            {filteredTransactions.length} ENTRIES
           </span>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="text-xs font-bold text-slate-500 bg-slate-50 border-b border-slate-100 uppercase tracking-wider">
-                <th className="px-6 py-3">Date</th>
-                <th className="px-6 py-3">Type</th>
-                <th className="px-6 py-3">Category</th>
-                <th className="px-6 py-3 text-right">Amount</th>
-                <th className="px-6 py-3 hidden lg:table-cell">Account</th>
-                <th className="px-6 py-3 hidden xl:table-cell">Method</th>
-                <th className="px-6 py-3 text-center hidden md:table-cell">
+        <div className="overflow-x-auto overflow-y-auto max-h-[600px] border-t border-slate-300">
+          <table className="w-full text-left border-collapse table-fixed min-w-[1000px]">
+            <thead className="sticky top-0 z-20 shadow-sm">
+              <tr className="text-[11px] font-black text-slate-700 bg-slate-200 border-b border-slate-300 uppercase tracking-tight">
+                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 w-32">
+                  Tanggal
+                </th>
+                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 w-20">
+                  Tipe
+                </th>
+                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 w-48">
+                  Kategori / Deskripsi
+                </th>
+                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 text-right w-40">
+                  Jumlah
+                </th>
+                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 hidden lg:table-cell w-32">
+                  Akun
+                </th>
+                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 hidden xl:table-cell w-32">
+                  Metode
+                </th>
+                <th className="px-4 py-2 bg-slate-200 text-center hidden md:table-cell w-24">
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50 text-sm">
-              {filteredTransactions.map((tx) => (
+            <tbody className="text-[12px] font-medium tabular-nums divide-y divide-slate-300">
+              {filteredTransactions.map((tx, idx) => (
                 <tr
                   key={tx.id}
-                  className="hover:bg-slate-50/80 transition-colors"
+                  className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50/80"} hover:bg-blue-50/50 transition-colors group`}
                 >
-                  <td className="px-6 py-3 font-medium text-slate-700 whitespace-nowrap">
+                  <td className="px-4 py-2 border-r border-slate-200 text-slate-800 font-bold whitespace-nowrap">
                     {new Date(tx.date).toLocaleDateString("id-ID", {
                       day: "2-digit",
                       month: "short",
                       year: "numeric",
                     })}
                   </td>
-                  <td className="px-6 py-3">
+                  <td className="px-4 py-2 border-r border-slate-200">
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${tx.type === "income" ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"}`}
+                      className={`text-[9px] font-black px-2 py-0.5 rounded border uppercase ${tx.type === "income" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-rose-100 text-rose-700 border-rose-200"}`}
                     >
                       {tx.type === "income" ? "IN" : "OUT"}
                     </span>
                   </td>
-                  <td className="px-6 py-3">
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-slate-700 text-xs">
+                  <td className="px-4 py-2 border-r border-slate-200">
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-bold text-slate-900 leading-none mb-0.5">
                         {tx.category}
                       </span>
                       {tx.description && (
-                        <span className="text-[10px] text-slate-400 italic truncate max-w-[200px]">
+                        <span className="text-[10px] text-slate-500 italic truncate max-w-full">
                           {tx.description}
                         </span>
                       )}
                     </div>
                   </td>
                   <td
-                    className={`px-6 py-3 text-right font-bold tabular-nums ${tx.type === "income" ? "text-emerald-600" : "text-rose-600"}`}
+                    className={`px-4 py-2 border-r border-slate-200 text-right font-black ${tx.type === "income" ? "text-emerald-600" : "text-rose-600"}`}
                   >
+                    {tx.type === "income" ? "+" : "-"}
                     {formatCurrency(tx.amount)}
                   </td>
-                  <td className="px-6 py-3 text-slate-600 text-xs hidden lg:table-cell">
+                  <td className="px-4 py-2 border-r border-slate-200 text-slate-700 hidden lg:table-cell">
                     {tx.account}
                   </td>
-                  <td className="px-6 py-3 text-slate-500 text-[10px] hidden xl:table-cell">
+                  <td className="px-4 py-2 border-r border-slate-200 text-slate-500 text-[10px] hidden xl:table-cell">
                     {tx.payment_method}
                   </td>
-                  <td className="px-6 py-3 text-center hidden md:table-cell">
+                  <td className="px-4 py-2 text-center hidden md:table-cell">
                     {tx.status === "done" ? (
-                      <span className="text-[10px] font-bold text-slate-400">
+                      <span className="text-[9px] font-black text-slate-400">
                         DONE
                       </span>
                     ) : (
-                      <span className="text-[10px] font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded">
+                      <span className="text-[9px] font-black text-amber-600 bg-amber-100 px-2 py-0.5 rounded border border-amber-200">
                         PENDING
                       </span>
                     )}
