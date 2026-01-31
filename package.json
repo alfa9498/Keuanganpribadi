@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "dev": "npm run dev --prefix Frontend",
     "build": "npm install --prefix Frontend && npm run build --prefix Frontend"
   },
   "dependencies": {
@@ -19,4 +20,3 @@
     "tesseract.js": "^7.0.0"
   }
 }
-

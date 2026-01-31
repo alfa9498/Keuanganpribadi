@@ -24,3 +24,5 @@ yarn-error.log*
 # Tesseract trained data (large files)
 Backend/eng.traineddata
 Backend/ind.traineddata
+.vercel
+.env*.local
