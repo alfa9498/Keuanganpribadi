@@ -1035,13 +1035,6 @@ export const DashboardOrganism = ({
                       boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
                     }}
                   />
-                  <Legend
-                    layout="horizontal"
-                    verticalAlign="bottom"
-                    align="center"
-                    iconType="circle"
-                    wrapperStyle={{ fontSize: "10px", paddingTop: "20px" }}
-                  />
                   <Pie
                     activeIndex={activeIndex}
                     activeShape={renderActiveShape}
