@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "../atoms/Button";
 import { StatCard } from "../molecules/StatCard";
 import { BentoGrid, BentoCard } from "../atoms/BentoGrid";
+import { AnimatedList } from "../atoms/AnimatedList";
 
 import {
   AreaChart,
@@ -981,29 +982,34 @@ export const DashboardOrganism = ({
             </h3>
             <p className="text-slate-400 text-xs">Saldo real-time</p>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 pt-0 space-y-3 custom-scrollbar">
-            {accountSummaries.map((acc) => (
-              <div
-                key={acc.name}
-                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800 group hover:bg-white dark:hover:bg-slate-700 shadow-sm border border-slate-100 dark:border-slate-700 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm">
-                    {getAccountIcon(acc.name, acc.icon)}
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-bold text-slate-400 uppercase leading-none mb-1">
-                      {acc.name}
-                    </p>
-                    <p
-                      className={`text-sm font-black leading-none ${acc.balance >= 0 ? "text-slate-800 dark:text-white" : "text-rose-500"}`}
-                    >
-                      {formatCurrency(acc.balance)}
-                    </p>
+          <div className="flex-1 overflow-hidden">
+            <AnimatedList
+              items={accountSummaries}
+              onItemSelect={(acc) => console.log("Selected account:", acc)}
+              showGradients
+              enableArrowNavigation
+              displayScrollbar
+              className="h-[400px]"
+              renderItem={(acc) => (
+                <div className="flex items-center justify-between p-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm">
+                      {getAccountIcon(acc.name, acc.icon)}
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold text-slate-400 uppercase leading-none mb-1">
+                        {acc.name}
+                      </p>
+                      <p
+                        className={`text-sm font-black leading-none ${acc.balance >= 0 ? "text-slate-800 dark:text-white" : "text-rose-500"}`}
+                      >
+                        {formatCurrency(acc.balance)}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )}
+            />
           </div>
         </BentoCard>
 
