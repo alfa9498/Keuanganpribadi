@@ -699,7 +699,7 @@ export const DashboardOrganism = ({
   };
 
   return (
-    <div className="w-full max-w-[1600px] pt-0 px-4 pb-4 md:pt-0 md:px-6 md:pb-6 space-y-4 animate-fade-in font-inter">
+    <div className="w-full max-w-[1600px] pt-0 px-0 md:px-6 pb-4 md:pb-6 space-y-4 animate-fade-in font-inter">
       <BentoGrid>
         {/* 1. Stat Card: Income */}
         <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800">
