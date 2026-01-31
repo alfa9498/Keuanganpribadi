@@ -213,19 +213,44 @@ export const ReportDashboardOrganism = ({ user }) => {
   }, [filteredTransactions]);
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
-    const dateNow = new Date().toLocaleDateString("id-ID");
+    // Initialize jsPDF in Landscape orientation
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
 
-    // Title & Header Information
-    doc.setFontSize(22);
-    doc.setTextColor(37, 99, 235); // Finance Primary Blue
-    doc.text("FINANCIAL REPORT", 14, 25);
+    const dateNow = new Date().toLocaleDateString("id-ID");
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // 1. Professional Header & Background
+    doc.setFillColor(37, 99, 235); // Finance Primary Blue
+    doc.rect(0, 0, pageWidth, 40, "F");
+
+    doc.setFontSize(28);
+    doc.setTextColor(255);
+    doc.setFont("helvetica", "bold");
+    doc.text("LAPORAN KEUANGAN TAHUNAN", 15, 25);
 
     doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Generated on: ${dateNow}`, 14, 35);
-    doc.text(`Profil Pengguna: ${user.fullName || user.email}`, 14, 40);
+    doc.setTextColor(255);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Dicetak pada: ${dateNow}`, pageWidth - 15, 15, {
+      align: "right",
+    });
+    doc.text(`User: ${user.fullName || user.email}`, pageWidth - 15, 22, {
+      align: "right",
+    });
 
+    // Subheader bar for Filters
+    doc.setFillColor(248, 250, 252);
+    doc.rect(0, 40, pageWidth, 20, "F");
+    doc.setDrawColor(226, 232, 240);
+    doc.line(0, 60, pageWidth, 60);
+
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
     let periodLabel = filterRange;
     if (filterRange === "ALL") periodLabel = "Semua Waktu";
     else if (filterRange === "TODAY") periodLabel = "Hari Ini";
@@ -243,105 +268,178 @@ export const ReportDashboardOrganism = ({ user }) => {
       periodLabel = `${new Date(s).toLocaleDateString("id-ID")} - ${new Date(e).toLocaleDateString("id-ID")}`;
     }
 
-    doc.text(`Periode: ${periodLabel}`, 14, 45);
-    doc.text(`Akun: ${filterAccount || "Semua Akun"}`, 14, 50);
-    doc.text(`Kategori: ${filterCategory || "Semua Kategori"}`, 14, 55);
-    doc.text(`Total Records: ${filteredTransactions.length}`, 14, 60);
+    doc.text(`PERIODE: ${periodLabel.toUpperCase()}`, 15, 52);
+    doc.text(`AKUN: ${(filterAccount || "SEMUA AKUN").toUpperCase()}`, 120, 52);
+    doc.text(
+      `KATEGORI: ${(filterCategory || "SEMUA KATEGORI").toUpperCase()}`,
+      200,
+      52,
+    );
 
-    // 1. Summary Section
+    // 2. Summary Section - Two Columns Layout
     doc.setFontSize(14);
-    doc.setTextColor(40);
-    doc.text("Ringkasan Keuangan", 14, 85);
+    doc.setTextColor(30, 41, 59);
+    doc.setFont("helvetica", "bold");
+    doc.text("IKHTISAR SALDO", 15, 75);
 
     autoTable(doc, {
-      startY: 90,
-      head: [["Deskripsi", "Jumlah"]],
+      startY: 80,
+      margin: { left: 15 },
+      tableWidth: 120,
+      head: [["DESKRIPSI", "JUMLAH"]],
       body: [
-        ["Total Pemasukan", formatCurrency(summary.income)],
-        ["Total Pengeluaran", formatCurrency(summary.expense)],
-        ["Saldo Bersih", formatCurrency(summary.balance)],
+        ["TOTAL PEMASUKAN", formatCurrency(summary.income)],
+        ["TOTAL PENGELUARAN", formatCurrency(summary.expense)],
+        ["SALDO BERSIH", formatCurrency(summary.balance)],
       ],
-      theme: "striped",
-      headStyles: { fillColor: [37, 99, 235], fontStyle: "bold" },
-      styles: { fontSize: 11, cellPadding: 5 },
-    });
-
-    // 2. Category Breakdown
-    const finalYHeader = doc.lastAutoTable.finalY + 15;
-    doc.setFontSize(14);
-    doc.text("Pengeluaran per Kategori", 14, finalYHeader);
-
-    autoTable(doc, {
-      startY: finalYHeader + 5,
-      head: [["Kategori", "Jumlah"]],
-      body: categoryBreakdown.map((item) => [
-        item.name,
-        formatCurrency(item.value),
-      ]),
       theme: "grid",
-      headStyles: { fillColor: [245, 158, 11] }, // Amber for tags
-      styles: { fontSize: 10 },
-    });
-
-    // 3. Ledger (Detailed List)
-    doc.addPage();
-    doc.setFontSize(16);
-    doc.setTextColor(37, 99, 235);
-    doc.text("Buku Kas / Ledger Transaksi (Detail)", 14, 20);
-
-    autoTable(doc, {
-      startY: 25,
-      head: [
-        ["Tanggal", "Tipe", "Kategori", "Jumlah", "Akun", "Metode", "Status"],
-      ],
-      body: filteredTransactions.map((tx) => [
-        new Date(tx.date).toLocaleDateString("id-ID"),
-        tx.type === "income" ? "Masuk" : "Keluar",
-        tx.category,
-        `${tx.type === "income" ? "+" : "-"}${formatCurrency(tx.amount)}`,
-        tx.account,
-        tx.payment_method,
-        tx.status.toUpperCase(),
-      ]),
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [37, 99, 235] },
-      alternateRowStyles: { fillColor: [249, 250, 251] },
+      headStyles: {
+        fillColor: [37, 99, 235],
+        textColor: 255,
+        fontStyle: "bold",
+        halign: "center",
+      },
+      styles: {
+        fontSize: 10,
+        cellPadding: 4,
+        lineColor: [226, 232, 240],
+        lineWidth: 0.1,
+      },
       columnStyles: {
-        3: { halign: "right", fontStyle: "bold" }, // Amount column
+        1: { halign: "right", fontStyle: "bold" },
       },
     });
 
-    // Footer on last page
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
+    doc.text("DISTRIBUSI PENGELUARAN", 150, 75);
+    autoTable(doc, {
+      startY: 80,
+      margin: { left: 150 },
+      tableWidth: 130,
+      head: [["KATEGORI", "PERSENTASE", "JUMLAH"]],
+      body: categoryBreakdown
+        .slice(0, 5)
+        .map((item) => [
+          item.name,
+          `${((item.value / summary.expense) * 100).toFixed(1)}%`,
+          formatCurrency(item.value),
+        ]),
+      theme: "grid",
+      headStyles: {
+        fillColor: [71, 85, 105],
+        textColor: 255,
+        fontStyle: "bold",
+        halign: "center",
+      },
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+        lineColor: [226, 232, 240],
+        lineWidth: 0.1,
+      },
+      columnStyles: {
+        1: { halign: "center" },
+        2: { halign: "right", fontStyle: "bold" },
+      },
+    });
+
+    // 3. Ledger (Detailed List) - New Page
+    doc.addPage();
+    // Repeating header style for readability
+    doc.setFillColor(30, 41, 59);
+    doc.rect(0, 0, pageWidth, 15, "F");
+    doc.setFontSize(10);
+    doc.setTextColor(255);
+    doc.text("BUKU KAS / RINCIAN TRANSAKSI DETAIL", 15, 10);
+
+    autoTable(doc, {
+      startY: 20,
+      head: [
+        [
+          "TANGGAL",
+          "TIPE",
+          "KATEGORI",
+          "DESKRIPSI",
+          "JUMLAH",
+          "AKUN",
+          "METODE",
+          "STATUS",
+        ],
+      ],
+      body: filteredTransactions.map((tx) => [
+        new Date(tx.date).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+        tx.type === "income" ? "MASUK" : "KELUAR",
+        tx.category.toUpperCase(),
+        tx.description || "-",
+        `${tx.type === "income" ? "+" : "-"}${formatCurrency(tx.amount)}`,
+        tx.account.toUpperCase(),
+        (tx.payment_method || "-").toUpperCase(),
+        tx.status.toUpperCase(),
+      ]),
+      theme: "grid",
+      styles: {
+        fontSize: 8,
+        cellPadding: 3,
+        overflow: "linebreak",
+        lineColor: [226, 232, 240],
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fillColor: [37, 99, 235],
+        textColor: 255,
+        fontStyle: "bold",
+        halign: "center",
+      },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      columnStyles: {
+        1: { halign: "center", fontStyle: "bold" },
+        4: { halign: "right", fontStyle: "bold" },
+        7: { halign: "center" },
+      },
+      // Column width distribution for landscape
+      columnWidths: {
+        0: 30, // Date
+        1: 20, // Type
+        2: 40, // Category
+        3: 65, // Description (Largo)
+        4: 40, // Amount
+        5: 30, // Account
+        6: 25, // Method
+        7: 20, // Status
+      },
+    });
+
+    // Footer with page numbering
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
       doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184);
 
-      // Bottom blue bar
-      doc.setFillColor(37, 99, 235);
-      doc.rect(
-        0,
-        doc.internal.pageSize.height - 15,
-        doc.internal.pageSize.width,
+      // Line above footer
+      doc.setDrawColor(226, 232, 240);
+      doc.line(15, pageHeight - 15, pageWidth - 15, pageHeight - 15);
+
+      doc.text(
+        `© ${new Date().getFullYear()} MyTodo Financial Planner | Laporan Dihasilkan Secara Otomatis`,
         15,
-        "F",
-      );
-
-      doc.setFontSize(10);
-      doc.setTextColor(255);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        doc.internal.pageSize.width - 35,
-        doc.internal.pageSize.height - 6,
+        pageHeight - 10,
       );
       doc.text(
-        `© ${new Date().getFullYear()} MyTodo Financial Planner - Automated Financial Report`,
-        14,
-        doc.internal.pageSize.height - 6,
+        `Halaman ${i} dari ${totalPages}`,
+        pageWidth - 15,
+        pageHeight - 10,
+        {
+          align: "right",
+        },
       );
     }
 
     doc.save(
-      `Financial_Report_${user.fullName || "User"}_${new Date().getTime()}.pdf`,
+      `Laporan_Keuangan_${user.fullName || "User"}_${new Date().getTime()}.pdf`,
     );
   };
 
