@@ -24,6 +24,10 @@
       "destination": "/api/index.js"
     },
     {
+      "source": "/accounts(.*)",
+      "destination": "/api/index.js"
+    },
+    {
       "source": "/socket.io/(.*)",
       "destination": "/api/index.js"
     },
@@ -34,4 +38,3 @@
     }
   ]
 }
-
