@@ -69,6 +69,8 @@ exports.login = (req, res) => {
       fullName: user.full_name,
       email: user.email,
       gender: user.gender || "male",
+      telegramChatId: user.telegram_chat_id,
+      telegramUsername: user.telegram_username,
     };
 
     const token = jwt.sign(userData, JWT_SECRET, { expiresIn: "1h" });
@@ -96,7 +98,14 @@ exports.me = (req, res) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    res.status(200).json({ user: decoded });
+    const query =
+      "SELECT id, full_name as fullName, email, gender, telegram_chat_id as telegramChatId, telegram_username as telegramUsername FROM users WHERE id = ?";
+    db.query(query, [decoded.id], (err, results) => {
+      if (err || results.length === 0) {
+        return res.status(401).json({ message: "User not found" });
+      }
+      res.status(200).json({ user: results[0] });
+    });
   } catch (err) {
     res.status(401).json({ message: "Invalid token" });
   }
@@ -218,11 +227,9 @@ exports.resetPassword = (req, res) => {
       "SELECT * FROM password_resets WHERE user_id = ? AND otp = ? AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1";
     db.query(otpQuery, [userId, otp], (otpErr, otpResults) => {
       if (otpResults.length === 0) {
-        return res
-          .status(400)
-          .json({
-            message: "OTP salah atau kadaluarsa. Silakan ulangi proses.",
-          });
+        return res.status(400).json({
+          message: "OTP salah atau kadaluarsa. Silakan ulangi proses.",
+        });
       }
 
       // Update Password

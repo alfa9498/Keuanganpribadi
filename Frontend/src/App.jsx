@@ -10,7 +10,7 @@ import { ReportDashboardOrganism } from "./components/organisms/ReportDashboardO
 import { ForgotPasswordOrganism } from "./components/organisms/ForgotPasswordOrganism";
 import { VerifyOtpOrganism } from "./components/organisms/VerifyOtpOrganism";
 import { ResetPasswordOrganism } from "./components/organisms/ResetPasswordOrganism";
-// TelegramConnectOrganism removed
+import { TelegramConnectOrganism } from "./components/organisms/TelegramConnectOrganism";
 import { MainLayoutTemplate } from "./components/templates/MainLayoutTemplate";
 import { AuthContainer } from "./components/templates/AuthContainer";
 
@@ -28,24 +28,30 @@ function App() {
   const [resetEmail, setResetEmail] = useState("");
   const [resetOtp, setResetOtp] = useState("");
 
-  useEffect(() => {
-    // Check for user session on mount
-    const checkSession = async () => {
-      try {
-        const response = await fetch(`${API_URL}/me`, {
-          credentials: "include",
-        });
-        if (response.ok) {
-          const result = await response.json();
-          setUser(result.user);
-          setActiveTab("dashboard");
-        }
-      } catch (err) {
-        console.error("Session check failed", err);
+  const checkSession = async () => {
+    try {
+      const response = await fetch(`${API_URL}/me`, {
+        credentials: "include",
+      });
+      if (response.ok) {
+        const result = await response.json();
+        setUser(result.user);
       }
-    };
+    } catch (err) {
+      console.error("Session check failed", err);
+    }
+  };
+
+  useEffect(() => {
     checkSession();
   }, []);
+
+  // Expose checkSession to auto-refresh when clicking Telegram tab
+  useEffect(() => {
+    if (activeTab === "telegram") {
+      checkSession();
+    }
+  }, [activeTab]);
 
   // Real-time Update Listener
   useEffect(() => {
@@ -218,7 +224,7 @@ function App() {
         )}
         {activeTab === "filter" && <ReportDashboardOrganism user={user} />}
         {activeTab === "accounts" && <AccountDashboardOrganism user={user} />}
-        {/* Telegram Connect removed */}
+        {activeTab === "telegram" && <TelegramConnectOrganism user={user} />}
       </MainLayoutTemplate>
     </NotificationProvider>
   );
