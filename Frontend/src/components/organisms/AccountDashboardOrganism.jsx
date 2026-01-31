@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Wallet,
   ArrowRightLeft,
@@ -202,6 +202,25 @@ export const AccountDashboardOrganism = ({ user }) => {
     return Object.values(summaries).sort((a, b) => b.balance - a.balance);
   }, [transactions, accounts]);
 
+  const gridRef = useRef(null);
+
+  const handleGridMouseMove = (e) => {
+    if (!gridRef.current) return;
+    const rect = gridRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    gridRef.current.style.setProperty("--x", `${x}px`);
+    gridRef.current.style.setProperty("--y", `${y}px`);
+  };
+
+  const handleCardMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty("--mouse-x", `${x}px`);
+    e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
+  };
+
   const handleAddAccount = () => {
     setEditingAccount(null);
     setAccountForm({
@@ -358,64 +377,75 @@ export const AccountDashboardOrganism = ({ user }) => {
       )}
 
       {/* Account Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div
+        ref={gridRef}
+        onMouseMove={handleGridMouseMove}
+        className="chroma-grid"
+      >
+        <div className="chroma-overlay" />
+        <div className="chroma-fade" />
+
         {accountSummaries.map((acc) => (
           <div
             key={acc.name}
-            className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow group flex flex-col justify-between"
+            onMouseMove={handleCardMouseMove}
+            className="chroma-card !bg-slate-900 group"
           >
-            <div>
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-3 bg-slate-50 rounded-2xl group-hover:bg-slate-100 transition-colors">
-                  {getAccountIcon(acc.name)}
-                </div>
-                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={() => handleEditAccount(acc)}
-                    className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors"
-                    title={
-                      acc.isUnregistered ? "Daftarkan Akun Ini" : "Edit Akun"
-                    }
-                  >
-                    <Pencil size={16} />
-                  </button>
-                  {!acc.isUnregistered && (
-                    <button
-                      onClick={() => handleDeleteAccount(acc.id)}
-                      className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
-                      title="Hapus Akun"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  )}
-                </div>
+            <div className="chroma-img-wrapper flex items-center justify-center min-h-[140px]">
+              <div className="p-5 bg-slate-800/50 rounded-2xl border border-white/5 shadow-xl transition-all group-hover:scale-110 group-hover:bg-slate-800">
+                {getAccountIcon(acc.name, acc.icon)}
               </div>
-
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
-                {acc.name}
-              </h3>
-              <p className="text-[10px] text-slate-400 mb-2">{acc.type}</p>
-              <p
-                className={`text-2xl font-black mb-6 ${acc.balance >= 0 ? "text-slate-800" : "text-rose-600"}`}
-              >
-                {formatCurrency(acc.balance)}
-              </p>
             </div>
 
-            <div className="space-y-3 pt-4 border-t border-slate-50">
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400 flex items-center gap-1.5">
-                  <TrendingUp size={14} className="text-emerald-500" /> Income
+            <div className="chroma-info h-full">
+              <div className="flex flex-col gap-1 min-w-0">
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] truncate">
+                  {acc.name}
+                </h3>
+                <p className="text-2xl font-black text-white tabular-nums truncate">
+                  {formatCurrency(acc.balance)}
+                </p>
+                <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">
+                  {acc.type}
                 </span>
-                <span className="font-bold text-emerald-600">
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => handleEditAccount(acc)}
+                  className="p-2.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all active:scale-90"
+                  title={
+                    acc.isUnregistered ? "Daftarkan Akun Ini" : "Edit Akun"
+                  }
+                >
+                  <Pencil size={18} />
+                </button>
+                {!acc.isUnregistered && (
+                  <button
+                    onClick={() => handleDeleteAccount(acc.id)}
+                    className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all active:scale-90"
+                    title="Hapus Akun"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-4 border-t border-white/5 mx-4 mb-4">
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-slate-500 flex items-center gap-1.5 font-medium">
+                  <TrendingUp size={12} className="text-emerald-500" /> Income
+                </span>
+                <span className="font-bold text-emerald-500">
                   +{formatCurrency(acc.income + acc.transfers_in)}
                 </span>
               </div>
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400 flex items-center gap-1.5">
-                  <TrendingDown size={14} className="text-rose-500" /> Expense
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-slate-500 flex items-center gap-1.5 font-medium">
+                  <TrendingDown size={12} className="text-rose-500" /> Expense
                 </span>
-                <span className="font-bold text-rose-600">
+                <span className="font-bold text-rose-500">
                   -{formatCurrency(acc.expense + acc.transfers_out)}
                 </span>
               </div>
