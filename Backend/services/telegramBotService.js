@@ -1,21 +1,36 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
+const jwt = require('jsonwebtoken'); // Added for Deep Linking
 const transactionService = require('./transactionService');
 const ocrService = require('./ocrService');
+const db = require('../config/db'); // Added DB connection
 require('dotenv').config();
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const ownerChatId = process.env.TELEGRAM_CHAT_ID;
-const appUserId = process.env.TELEGRAM_USER_ID || 1; // Fetch from .env or default to 1
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
+
+// Store verification codes temporarily (in production, use Redis)
+const verificationCodes = new Map(); // Map<code, {userId, fullName, expires}>
 
 let bot = null;
 
 // External Trigger for Webhooks
 const processUpdate = (body) => {
+    if (!bot) {
+        console.log('🏁 Initializing bot on-demand for update...');
+        init();
+    }
+    
+    console.log('📨 Received Update from Telegram:', JSON.stringify(body, null, 2));
+    
     if (bot) {
-        bot.processUpdate(body);
+        try {
+            bot.processUpdate(body);
+        } catch (err) {
+            console.error('❌ Error processing update:', err);
+        }
     } else {
-        console.warn('⚠️ Telegram Bot not initialized, ignoring update.');
+        console.warn('⚠️ Telegram Bot failed to initialize, cannot process update.');
     }
 };
 
@@ -27,17 +42,35 @@ const init = () => {
         return;
     }
 
-    // Initialize Bot
-    if (process.env.WEBHOOK_URL) {
-        bot = new TelegramBot(token); // No polling
-        console.log(`🤖 Telegram Bot initialized in Webhook mode: ${process.env.WEBHOOK_URL}`);
-        bot.setWebHook(`${process.env.WEBHOOK_URL}/api/telegram-webhook`);
-    } else if (process.env.VERCEL === '1') {
-        bot = new TelegramBot(token); // No polling
-        console.log('🤖 Telegram Bot: Polling disabled in Vercel environment.');
+    // Prevent re-initialization if already in memory
+    if (bot && process.env.VERCEL === '1') {
+        console.log('🤖 Bot already initialized.');
+        return;
+    }
+
+    // Initialize Bot instance if not exists
+    if (!bot) {
+        bot = new TelegramBot(token, { polling: !process.env.VERCEL });
+        console.log(`🤖 Telegram Bot instance created (Polling: ${!process.env.VERCEL})`);
+    }
+
+    // Prefer dynamic VERCEL_URL for Preview deployments, unless WEBHOOK_URL is explicitly overriding for Production
+    let webhookHost = null;
+    if (process.env.VERCEL === '1') {
+        // VERCEL_URL is provided by Vercel for each deployment
+        webhookHost = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.WEBHOOK_URL;
     } else {
-        bot = new TelegramBot(token, { polling: true });
-        console.log('🤖 Telegram Bot is running in Polling mode...');
+        webhookHost = process.env.WEBHOOK_URL;
+    }
+
+    if (webhookHost && process.env.VERCEL === '1') {
+        const webhookUrl = `${webhookHost}/telegram-webhook`;
+        console.log(`🤖 Setting/Ensuring Webhook: ${webhookUrl}`);
+        bot.setWebHook(webhookUrl)
+            .then(res => console.log('✅ Webhook Response:', res, 'for URL:', webhookUrl))
+            .catch(err => console.error('❌ Webhook Error:', err.message));
+    } else if (!process.env.VERCEL) {
+        console.log('🤖 Bot is running in Polling mode (Local)...');
     }
 
 
@@ -49,38 +82,102 @@ const init = () => {
         { command: '/out', description: 'Input Pengeluaran (Manual)' }
     ]);
 
-
-
-    // Middleware to check authorization
-    const isAuthorized = (msg) => {
-        const chatId = msg.chat.id.toString();
-        // Skip log for persistent menu clicks unless they are text
-        if (msg.text) console.log(`[BOT] Incoming from ${chatId} (${msg.from?.username || 'no-username'}): ${msg.text}`);
-        
-        if (chatId !== ownerChatId) {
-            console.warn(`[BOT] Unauthorized attempt from: ${chatId}`);
-            bot.sendMessage(msg.chat.id, "⛔ Unauthorized access.");
-            return false;
+    // Helper: Get User from Chat ID
+    const getUser = async (chatId) => {
+        try {
+            const query = "SELECT * FROM users WHERE telegram_chat_id = ?";
+            const [rows] = await db.promise().query(query, [chatId.toString()]);
+            if (rows.length === 0) {
+                console.log(`🔍 No user found for telegram_chat_id: ${chatId}`);
+            }
+            return rows.length > 0 ? rows[0] : null;
+        } catch (err) {
+            console.error(`❌ DB Error in getUser(${chatId}):`, err.message);
+            return null;
         }
-        return true;
     };
 
     // State for interactive sessions (e.g., editing amount)
     const userState = {};
 
     bot.on('message', async (msg) => {
-        if (!isAuthorized(msg)) return;
         const chatId = msg.chat.id;
         const text = msg.text;
 
+        // Skip if it's a command (handled by onText)
+        if (text && text.startsWith('/')) return;
+
+        // --- HANDLE VERIFICATION CODE INPUT (for linking) ---
+        // This MUST be before auth check so unlinked users can link!
+        if (text && /^\d{6}$/.test(text)) {
+            console.log('🔢 Received potential verification code:', text);
+            const codeData = verificationCodes.get(text);
+            
+            if (codeData && codeData.expires > Date.now()) {
+                console.log('✅ Valid verification code found');
+                try {
+                    const [result] = await db.promise().query(
+                        "UPDATE users SET telegram_chat_id = ?, telegram_username = ? WHERE id = ?",
+                        [chatId.toString(), msg.from.username || null, codeData.userId]
+                    );
+                    console.log('✅ Database updated via verification code, affected rows:', result.affectedRows);
+                    
+                    verificationCodes.delete(text); // Remove used code
+                    
+                    bot.sendMessage(chatId, `✅ **Akun Berhasil Dihubungkan!**\n\nHalo ${codeData.fullName || 'User'}, sekarang Anda bisa mencatat keuangan via Telegram!`, {
+                        parse_mode: 'Markdown'
+                    });
+                    
+                    // Show menu
+                    const linkedUser = await getUser(chatId);
+                    if (linkedUser) {
+                        const welcomeMessage = `\n🏦 **Halo, ${linkedUser.full_name}!**\n\nApa yang ingin Anda catat hari ini?\n        `;
+                        const opts = {
+                            parse_mode: 'Markdown',
+                            reply_markup: {
+                                keyboard: [
+                                    ['➕ Pemasukan', '➖ Pengeluaran'],
+                                    ['❓ Bantuan']
+                                ],
+                                resize_keyboard: true,
+                                persistent: true
+                            }
+                        };
+                        bot.sendMessage(chatId, welcomeMessage, opts);
+                    }
+                    return;
+                } catch (err) {
+                    console.error('❌ Error linking with verification code:', err);
+                    bot.sendMessage(chatId, '⚠️ Terjadi kesalahan saat menghubungkan akun. Silakan coba lagi.');
+                    return;
+                }
+            } else if (codeData) {
+                console.log('⏰ Verification code expired');
+                bot.sendMessage(chatId, '⚠️ Kode verifikasi sudah kadaluarsa. Silakan request kode baru dari Web App.');
+                verificationCodes.delete(text);
+                return;
+            } else {
+                console.log('❌ Invalid verification code:', text);
+                // Don't return here - might be a transaction amount
+                // Continue to auth check below
+            }
+        }
+
+        // AUTH CHECK
+        const user = await getUser(chatId);
+        if (!user) {
+            // User not linked and not a valid verification code
+            return; 
+        }
+
         // --- HANDLE PERSISTENT KEYBOARD CLICKS ---
         if (text === '➕ Pemasukan') {
-            userState[chatId] = { type: 'wait_amt', t: 'income' };
+            userState[chatId] = { type: 'wait_amt', t: 'income', user };
             bot.sendMessage(chatId, "Silakan ketik **Nominal** pemasukan:");
             return;
         }
         if (text === '➖ Pengeluaran') {
-            userState[chatId] = { type: 'wait_amt', t: 'expense' };
+            userState[chatId] = { type: 'wait_amt', t: 'expense', user };
             bot.sendMessage(chatId, "Silakan ketik **Nominal** pengeluaran:");
             return;
         }
@@ -88,9 +185,7 @@ const init = () => {
             bot.sendMessage(chatId, "Kirim foto struk atau klik tombol di bawah untuk input manual.");
             return;
         }
-
-        if (!text || text.startsWith('/')) return;
-
+        
         // State Machine Handling
         if (userState[chatId]) {
             const state = userState[chatId];
@@ -112,7 +207,7 @@ const init = () => {
                         parse_mode: 'Markdown'
                     });
                 } else {
-                    bot.sendMessage(chatId, "⚠️ Masukkan angka nominal yang valid.");
+                    bot.sendMessage(chatId, "⚠️ Masukkan angka nominal yang valid. (Contoh: 50000)");
                 }
                 return;
             }
@@ -177,14 +272,61 @@ Klik simpan di bawah:
         }
     });
 
-    // /start - Menu Utama
-    bot.onText(/\/start/, (msg) => {
-        if (!isAuthorized(msg)) return;
-        delete userState[msg.chat.id];
-        const welcomeMessage = `
-🏦 **Selamat Datang di Finance Bot!**
+    // /start - Menu Utama & Deep Linking
+    bot.onText(/\/start(.*)/, async (msg, match) => {
+        const chatId = msg.chat.id;
+        const rawPayload = match[1] || '';
+        const payload = rawPayload.trim();
+        
+        console.log('🔍 /start received from chatId:', chatId);
+        console.log('🔍 Raw payload:', rawPayload);
+        console.log('🔍 Trimmed payload:', payload);
+        console.log('🔍 Payload length:', payload.length);
 
-Gunakan tombol di bawah untuk input cepat atau kirim foto struk.
+        if (payload && payload.length > 0) {
+            // Handle Linking
+            console.log('🔗 Attempting to link account with JWT...');
+            try {
+                const decoded = jwt.verify(payload, JWT_SECRET);
+                console.log('✅ JWT verified successfully:', decoded);
+                const userId = decoded.id;
+
+                // Update DB
+                const [result] = await db.promise().query(
+                    "UPDATE users SET telegram_chat_id = ?, telegram_username = ? WHERE id = ?",
+                    [chatId.toString(), msg.from.username || null, userId]
+                );
+                console.log('✅ Database updated, affected rows:', result.affectedRows);
+
+                bot.sendMessage(chatId, `✅ **Akun Berhasil Dihubungkan!**\n\nHalo ${decoded.fullName || 'User'}, sekarang Anda bisa mencatat keuangan via Telegram!`, {
+                    parse_mode: 'Markdown'
+                });
+                
+                // Continue to show menu logic below...
+            } catch (err) {
+                console.error("❌ Linking Error:", err.message);
+                console.error("❌ Full error:", err);
+                bot.sendMessage(chatId, "⚠️ Link tidak valid atau sudah kadaluarsa. Silakan request link baru dari Web App.");
+                return;
+            }
+        } else {
+            console.log('ℹ️ No payload provided, showing menu for existing user');
+        }
+
+        // Check Auth Status for Menu
+        const user = await getUser(chatId);
+        if (!user) {
+            console.log('⚠️ User not found in DB for chatId:', chatId);
+            bot.sendMessage(chatId, "⚠️ **Akun Belum Terhubung.**\nSilakan login ke Web App dan pilih menu 'Hubungkan Telegram' untuk mendapatkan akses.\n\nSilakan hubungkan akun Anda terlebih dahulu.", { parse_mode: 'Markdown' });
+            return;
+        }
+        console.log('✅ User found:', user.full_name);
+        
+        delete userState[chatId];
+        const welcomeMessage = `
+🏦 **Halo, ${user.full_name}!**
+
+Apa yang ingin Anda catat hari ini?
         `;
         const opts = {
             parse_mode: 'Markdown',
@@ -197,78 +339,78 @@ Gunakan tombol di bawah untuk input cepat atau kirim foto struk.
                 persistent: true
             }
         };
-        bot.sendMessage(msg.chat.id, welcomeMessage, opts);
+        bot.sendMessage(chatId, welcomeMessage, opts);
     });
 
     // /help
-    bot.onText(/\/help/, (msg) => {
-        if (!isAuthorized(msg)) return;
+    bot.onText(/\/help/, async (msg) => {
+        const user = await getUser(msg.chat.id);
+        if (!user) {
+             bot.sendMessage(msg.chat.id, "Silakan hubungkan akun Anda terlebih dahulu.");
+             return;
+        }
+
         delete userState[msg.chat.id]; // Clear state
         const helpMessage = `
-🤖 **Finance Bot Help**
+🤖 **Panduan Bot Keuangan**
 
 **1. Input Cepat (Tombol):**
-Klik /start lalu pilih **Pemasukan** atau **Pengeluaran**. Ikuti langkahnya!
+Klik /start lalu pilih tombol menu.
 
 **2. Scan Struk (Foto):**
-Kirim foto struk, saya akan baca otomatis. Anda bisa edit jumlah, kategori, atau deskripsi sebelum simpan.
+Kirim foto struk -> Bot akan membaca detailnya.
 
-**3. Manual (Perintah):**
-\`/in 50000 Gaji\`
-\`/out 20000 Makanan\`
+**3. Manual (Perintah Langsung):**
+\`/in [nominal] [kategori] [deskripsi]\`
+\`/out [nominal] [kategori] [deskripsi]\`
+
+Contoh:
+\`/out 20000 Makanan Makan Siang\`
         `;
         bot.sendMessage(msg.chat.id, helpMessage, { parse_mode: 'Markdown' });
     });
 
-    // Helper function to parse date
+    // Helper to parse date
     const parseDate = (dateStr) => {
         if (!dateStr) return new Date();
-        
-        // Support DD/MM/YYYY or DD-MM-YYYY
         const datePattern = /(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/;
         const match = dateStr.match(datePattern);
-        
         if (match) {
-            const day = parseInt(match[1]);
-            const month = parseInt(match[2]) - 1; // JS months are 0-indexed
-            const year = parseInt(match[3]);
-            return new Date(year, month, day);
+            return new Date(match[3], match[2] - 1, match[1]);
         }
-        
-        return new Date(); // Default to today if parsing fails
+        return new Date();
     };
 
-    // /in & /out - Updated to support optional date AND optional description
-    // Updated Regex: \/(in|out)\s+(\d+)\s+(\S+)(?:\s+(.+))?
-    // Explanation: (\S+) is category, then optional space and rest of message
+    // /in & /out
     bot.onText(/\/(in|out)\s+(\d+)\s+(\S+)(?:\s+(.+))?/, async (msg, match) => {
-        if (!isAuthorized(msg)) return;
+        const chatId = msg.chat.id;
+        const user = await getUser(chatId);
+        if (!user) {
+            bot.sendMessage(chatId, "⛔ Akun belum terhubung.", { reply_to_message_id: msg.message_id });
+            return;
+        }
 
         const type = match[1] === 'in' ? 'income' : 'expense';
         const amount = parseInt(match[2]);
         const category = match[3];
         const restOfMessage = match[4] ? match[4].trim() : "";
 
-        console.log(`[BOT] Command: ${type}, Amt: ${amount}, Cat: ${category}, Rest: ${restOfMessage}`);
-
-        // Try to extract date from end of message
         let description = restOfMessage;
-        let transactionDate = new Date();
+        let transactionDate = new Date(); // Default today
 
+        // Check for date at the end
         if (restOfMessage) {
             const words = restOfMessage.split(' ');
             const lastWord = words[words.length - 1];
-            const datePattern = /^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/;
-            
-            if (datePattern.test(lastWord)) {
+            if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(lastWord)) {
                 transactionDate = parseDate(lastWord);
                 description = words.slice(0, -1).join(' ');
             }
         }
 
         try {
-            const result = await transactionService.createTransaction({
-                user_id: appUserId, // Use configured User ID
+            await transactionService.createTransaction({
+                user_id: user.id, // Linked User ID
                 date: transactionDate,
                 type: type,
                 category: category,
@@ -280,198 +422,188 @@ Kirim foto struk, saya akan baca otomatis. Anda bisa edit jumlah, kategori, atau
             });
 
             const formattedDate = transactionDate.toLocaleDateString('id-ID');
-            bot.sendMessage(msg.chat.id, `✅ **Transaction Saved!**\nDate: ${formattedDate}\nType: ${type}\nCategory: ${category}\nAmount: Rp ${amount.toLocaleString('id-ID')}\nDesc: ${description || 'Input via Telegram'}`, { parse_mode: 'Markdown' });
+            bot.sendMessage(chatId, `✅ **Sukses!**\nTanggal: ${formattedDate}\nTipe: ${type}\nNominal: Rp ${amount.toLocaleString('id-ID')}`, { parse_mode: 'Markdown' });
 
         } catch (error) {
             console.error("Bot Transaction Error:", error);
-            bot.sendMessage(msg.chat.id, `❌ Failed to save transaction: ${error.message}`);
+            bot.sendMessage(chatId, `❌ Gagal menyimpan: ${error.message}`);
         }
     });
 
-    // Incomplete command helper
-    bot.onText(/\/(in|out)$/, (msg) => {
-        if (!isAuthorized(msg)) return;
-        delete userState[msg.chat.id];
-        bot.sendMessage(msg.chat.id, "⚠️ Format salah. Gunakan:\n`/out 50000 Makanan Deskripsi`", { parse_mode: 'Markdown' });
-    });
-
-    // photo handler - use Buttons instead of copy-paste instructions
+    // Handle Photos (OCR)
     bot.on('photo', async (msg) => {
-        if (!isAuthorized(msg)) return;
-        delete userState[msg.chat.id];
+        const chatId = msg.chat.id;
+        const user = await getUser(chatId);
+        if (!user) {
+            bot.sendMessage(chatId, "⛔ Akun belum terhubung.");
+            return;
+        }
 
+        delete userState[chatId];
         try {
-            bot.sendMessage(msg.chat.id, "⏳ Memproses struk... (OCR)");
+            bot.sendMessage(chatId, "⏳ Membaca struk... (OCR)");
 
             const photo = msg.photo[msg.photo.length - 1];
             const fileLink = await bot.getFileLink(photo.file_id);
             const response = await axios.get(fileLink, { responseType: 'arraybuffer' });
-            const imageBuffer = Buffer.from(response.data);
-
-            const ocrResult = await ocrService.parseReceipt(imageBuffer);
             
-            const sanitizedText = ocrResult.text.replace(/[`*_]/g, ' ').substring(0, 150);
+            const ocrResult = await ocrService.parseReceipt(Buffer.from(response.data));
             
-            // Store results in state to avoid large callback_data
-            userState[msg.chat.id] = { 
+            // Save to state
+            userState[chatId] = { 
                 type: 'wait_confirm', 
                 amt: ocrResult.amount, 
                 cat: ocrResult.category, 
                 desc: ocrResult.description,
-                t: 'expense' 
+                t: 'expense',
+                user: user
             };
 
             const statusMsg = `
-🧾 **Struk Terdeteksi!**
-**Hasil Text:**
-\`${sanitizedText}...\`
-
-**Data Transaksi:**
+🧾 **Hasil Scan Struk**
 💰 Jumlah: **Rp ${ocrResult.amount.toLocaleString('id-ID')}**
 📂 Kategori: **${ocrResult.category}**
 📝 Deskripsi: **${ocrResult.description}**
 
-Apakah sudah benar? Klik simpan atau edit jika ada yang salah.
+Apakah data sudah benar?
             `;
 
             const opts = {
                 parse_mode: 'Markdown',
                 reply_markup: {
                     inline_keyboard: [
-                        [{ text: '✅ Ya, Simpan', callback_data: JSON.stringify({ a: 'final_save' }) }],
+                        [{ text: '✅ Simpan', callback_data: JSON.stringify({ a: 'final_save' }) }],
                         [
-                            { text: '💰 Ubah Nominal', callback_data: JSON.stringify({ a: 'edit_amt' }) },
-                            { text: '📂 Ubah Kategori', callback_data: JSON.stringify({ a: 'edit_cat' }) }
+                            { text: '💰 Ubah Rp', callback_data: JSON.stringify({ a: 'edit_amt' }) },
+                            { text: '📂 Ubah Kat', callback_data: JSON.stringify({ a: 'edit_cat' }) }
                         ],
-                        [
-                            { text: '📝 Ubah Deskripsi', callback_data: JSON.stringify({ a: 'edit_desc' }) },
-                            { text: '❌ Abaikan', callback_data: JSON.stringify({ a: 'ignore' }) }
-                        ]
+                        [{ text: '❌ Batal', callback_data: JSON.stringify({ a: 'ignore' }) }]
                     ]
                 }
             };
-            bot.sendMessage(msg.chat.id, statusMsg, opts);
+            bot.sendMessage(chatId, statusMsg, opts);
         } catch (error) {
-            console.error("Bot OCR Error:", error);
-            bot.sendMessage(msg.chat.id, "❌ Gagal memproses gambar.");
+            console.error("OCR Error:", error);
+            bot.sendMessage(chatId, "❌ Gagal membaca gambar.");
         }
     });
 
+    // Callback Query Handler
     bot.on('callback_query', async (query) => {
         const chatId = query.message.chat.id;
+        const data = JSON.parse(query.data);
+        const state = userState[chatId];
+
+        // Ensure User is still linked (paranoid check)
+        const user = state?.user || await getUser(chatId);
+        if (!user) {
+            bot.answerCallbackQuery(query.id, { text: "Auth Error" });
+            return;
+        }
+
         try {
-            const data = JSON.parse(query.data);
-            const state = userState[chatId];
-
-            if (data.a === 'help') {
-                bot.answerCallbackQuery(query.id);
-                bot.sendMessage(chatId, "Bantuan:\n- Gunakan tombol untuk input manual.\n- Kirim foto struk untuk input otomatis.\n- Gunakan perintah /start untuk ke menu utama.");
-                return;
-            }
-
-            // --- MANUAL FLOW BUTTONS ---
-            if (data.a === 'btn_in' || data.a === 'btn_out') {
-                bot.answerCallbackQuery(query.id);
-                userState[chatId] = { type: 'wait_amt', t: data.a === 'btn_in' ? 'income' : 'expense' };
-                bot.sendMessage(chatId, `Silakan ketik **Nominal** ${data.a === 'btn_in' ? 'pemasukan' : 'pengeluaran'}:`);
-                return;
-            }
-
-            if (data.a === 'set_cat') {
-                bot.answerCallbackQuery(query.id);
-                if (!state) return;
-                userState[chatId] = { ...state, type: 'wait_desc', cat: data.cat };
-                bot.sendMessage(chatId, `📂 Kategori: **${data.cat}**\n\nTerakhir, ketik **Deskripsi** singkat (atau ketik \`skip\`):`, { parse_mode: 'Markdown' });
-                return;
-            }
-
-            // --- COMMON & OCR ACTIONS ---
+            // General Actions
             if (data.a === 'ignore') {
                 delete userState[chatId];
-                bot.answerCallbackQuery(query.id, { text: "Dibatalkan." });
-                bot.editMessageText("❌ Transaksi dibatalkan.", { chat_id: chatId, message_id: query.message.message_id });
+                bot.answerCallbackQuery(query.id, { text: "Batal." });
+                bot.deleteMessage(chatId, query.message.message_id);
                 return;
             }
 
-            if (data.a === 'final_save') {
-                if (!state) {
-                    bot.answerCallbackQuery(query.id, { text: "Sesi kadaluarsa." });
+            // --- State-based Actions ---
+            if (state) {
+                if (data.a === 'set_cat') {
+                    bot.answerCallbackQuery(query.id);
+                    userState[chatId] = { ...state, type: 'wait_desc', cat: data.cat };
+                    bot.sendMessage(chatId, `📂 **${data.cat}** terpilih.\nKetik **Deskripsi** transaksi:`);
                     return;
                 }
-                bot.answerCallbackQuery(query.id, { text: "Menyimpan..." });
-                await transactionService.createTransaction({
-                    user_id: appUserId,
-                    date: new Date(),
-                    type: state.t,
-                    category: state.cat,
-                    amount: state.amt,
-                    description: state.desc || "Input via Bot",
-                    payment_method: 'Cash',
-                    account: 'Cash Account',
-                    status: 'done'
-                });
-                delete userState[chatId];
-                bot.editMessageText(`✅ **Tersimpan!**\n💰 Rp ${state.amt.toLocaleString('id-ID')}\n📂 ${state.cat}\n📝 ${state.desc || '-'}`, {
-                    chat_id: chatId,
-                    message_id: query.message.message_id,
-                    parse_mode: 'Markdown'
-                });
+
+                if (data.a === 'final_save') {
+                    bot.answerCallbackQuery(query.id, { text: "Menyimpan..." });
+                    await transactionService.createTransaction({
+                        user_id: user.id, // Linked User
+                        date: new Date(),
+                        type: state.t,
+                        category: state.cat,
+                        amount: state.amt,
+                        description: state.desc || "Bot Input",
+                        payment_method: 'Cash',
+                        account: 'Cash Account',
+                        status: 'done'
+                    });
+                    delete userState[chatId];
+                    bot.editMessageText(`✅ **Tersimpan!**\n💰 Rp ${state.amt.toLocaleString('id-ID')}\n📂 ${state.cat}`, {
+                        chat_id: chatId,
+                        message_id: query.message.message_id,
+                        parse_mode: 'Markdown'
+                    });
+                    return;
+                }
+
+
+                // OCR / Editing branch
+                if (data.a === 'edit_amt') {
+                    bot.answerCallbackQuery(query.id);
+                    userState[chatId] = { ...state, type: 'edit_amt' };
+                    bot.sendMessage(chatId, "Ketik nominal baru:");
+                    return;
+                }
+                if (data.a === 'edit_cat') {
+                    bot.answerCallbackQuery(query.id);
+                    const cats = ['Makanan', 'Transportasi', 'Belanja', 'Lainnya'];
+                    const buttons = cats.map(c => ([{ text: c, callback_data: JSON.stringify({ a: 'save_cat', c }) }]));
+                    bot.sendMessage(chatId, "Pilih kategori:", { reply_markup: { inline_keyboard: buttons }});
+                    return;
+                }
+                if (data.a === 'save_cat') {
+                    state.cat = data.c;
+                    bot.answerCallbackQuery(query.id, { text: "Updated" });
+                    // Go back to confirmation
+                    userState[chatId] = { ...state, type: 'wait_confirm' };
+                    bot.sendMessage(chatId, `Kategori diubah: ${data.c}. Klik Simpan di pesan sebelumnya atau kirim pesan apapun untuk konfirmasi ulang.`);
+                    // Ideally we should edit the original message but we might have lost reference easily if we sent new message.
+                    // For simplicity, let's just trigger save if they click save on the original message? 
+                    // No the original message text won't update.
+                    // Let's re-send confirmation
+                    const statusMsg = `
+Updated:
+💰 Rp ${state.amt.toLocaleString('id-ID')}
+📂 ${state.cat}
+                    `;
+                     bot.sendMessage(chatId, statusMsg, {
+                        reply_markup: {
+                            inline_keyboard: [[{ text: '✅ Simpan', callback_data: JSON.stringify({ a: 'final_save' }) }]]
+                        }
+                    });
+                }
+            } else {
+                 bot.answerCallbackQuery(query.id, { text: "Sesi habis/kadaluarsa." });
             }
 
-            if (data.a === 'edit_amt') {
-                bot.answerCallbackQuery(query.id);
-                if (!state) return;
-                userState[chatId] = { ...state, type: 'edit_amt' };
-                bot.sendMessage(chatId, `Ketik nominal baru untuk **${state.cat}**:`);
-            }
-
-            if (data.a === 'edit_cat') {
-                bot.answerCallbackQuery(query.id);
-                if (!state) return;
-                const categories = ['Makanan', 'Transportasi', 'Belanja', 'Hiburan', 'Tagihan', 'Lainnya'];
-                const buttons = categories.map(c => ([{
-                    text: c,
-                    callback_data: JSON.stringify({ a: 'final_save_cat', cat: c })
-                }]));
-                bot.sendMessage(chatId, `Pilih kategori baru:`, { reply_markup: { inline_keyboard: buttons } });
-            }
-
-            if (data.a === 'final_save_cat') {
-                if (!state) return;
-                state.cat = data.cat;
-                bot.answerCallbackQuery(query.id, { text: "Kategori diubah." });
-                // We could just save or ask to confirm. Let's save for faster flow.
-                await transactionService.createTransaction({
-                    user_id: appUserId,
-                    date: new Date(),
-                    type: state.t,
-                    category: state.cat,
-                    amount: state.amt,
-                    description: state.desc || "Input via Bot",
-                    payment_method: 'Cash',
-                    account: 'Cash Account',
-                    status: 'done'
-                });
-                delete userState[chatId];
-                bot.sendMessage(chatId, `✅ **Tersimpan!**\n💰 Rp ${state.amt.toLocaleString('id-ID')}\n📂 ${state.cat}\n📝 ${state.desc || '-'}`);
-            }
-
-            if (data.a === 'edit_desc') {
-                bot.answerCallbackQuery(query.id);
-                if (!state) return;
-                userState[chatId] = { ...state, type: 'edit_desc' };
-                bot.sendMessage(chatId, `Ketik deskripsi baru untuk **Rp ${state.amt.toLocaleString('id-ID')}**:`);
-            }
-
-        } catch (error) {
-            console.error("Callback Error:", error);
-            bot.answerCallbackQuery(query.id, { text: "Error." });
+        } catch (err) {
+            console.error("Callback Error", err);
         }
     });
 
     bot.on('polling_error', (error) => {
-        console.error("Telegram Polling Error:", error.code);
+        // Suppress common polling errors
+        // console.error(error.code); 
     });
 };
 
-module.exports = { init, processUpdate };
+module.exports = { 
+    init, 
+    processUpdate,
+    storeVerificationCode: (code, data) => {
+        verificationCodes.set(code, data);
+        console.log(`🔑 Verification code stored: ${code} for user ${data.userId}`);
+        // Auto-cleanup after expiry
+        setTimeout(() => {
+            if (verificationCodes.has(code)) {
+                verificationCodes.delete(code);
+                console.log(`🗑️ Verification code expired and removed: ${code}`);
+            }
+        }, 5 * 60 * 1000);
+    }
+};

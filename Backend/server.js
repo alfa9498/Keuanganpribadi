@@ -7,6 +7,7 @@ const { Server } = require("socket.io");
 const userController = require("./controllers/userController");
 const transactionController = require("./controllers/transactionController");
 const notificationController = require("./controllers/notificationController");
+const telegramBotService = require("./services/telegramBotService");
 
 const app = express();
 const server = http.createServer(app);
@@ -72,6 +73,8 @@ app.post("/login", userController.login);
 app.post("/register", userController.register);
 app.get("/me", userController.me);
 app.post("/logout", userController.logout);
+app.get("/telegram-link", userController.generateTelegramLink);
+app.get("/telegram-verification-code", userController.generateVerificationCode);
 
 // Forgot Password
 app.post("/forgot-password", userController.requestPasswordReset);
@@ -91,7 +94,8 @@ app.put("/notifications/:id/read", notificationController.markAsRead);
 app.put("/notifications/mark-all-read", notificationController.markAllAsRead);
 
 // Telegram Webhook Endpoint
-app.post("/api/telegram-webhook", (req, res) => {
+app.post("/telegram-webhook", (req, res) => {
+  console.log("📥 WEBHOOK POST RECEIVED ON /telegram-webhook");
   telegramBotService.processUpdate(req.body);
   res.sendStatus(200);
 });
@@ -123,10 +127,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-const telegramBotService = require("./services/telegramBotService");
-
 // Start Telegram Bot
 try {
+  // We'll call init manually or let processUpdate do it
   telegramBotService.init();
 } catch (error) {
   console.error("⚠️ Failed to initialize Telegram Bot:", error.message);

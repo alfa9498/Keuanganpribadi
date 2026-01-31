@@ -13,9 +13,13 @@ const db = mysql.createPool({
     minVersion: 'TLSv1.2'
   } : null,
   waitForConnections: true,
-  connectionLimit: 5, // Reduced for serverless
+  connectionLimit: 10, // Increased for better concurrency
   queueLimit: 0,
-  connectTimeout: 10000 // 10 seconds
+  connectTimeout: 20000, // 20 seconds for TiDB Cloud
+  acquireTimeout: 20000, // 20 seconds to acquire connection from pool
+  timeout: 20000, // Query timeout
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0
 });
 
 

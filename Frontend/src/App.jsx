@@ -10,6 +10,7 @@ import { ReportDashboardOrganism } from './components/organisms/ReportDashboardO
 import { ForgotPasswordOrganism } from './components/organisms/ForgotPasswordOrganism';
 import { VerifyOtpOrganism } from './components/organisms/VerifyOtpOrganism';
 import { ResetPasswordOrganism } from './components/organisms/ResetPasswordOrganism';
+import { TelegramConnectOrganism } from './components/organisms/TelegramConnectOrganism';
 import { MainLayoutTemplate } from './components/templates/MainLayoutTemplate';
 
 import { NotificationProvider } from './context/NotificationContext';
@@ -204,6 +205,7 @@ function App() {
         {activeTab === 'transaction-new' && <TransactionFormOrganism user={user} setSection={setActiveTab} onSuccess={() => setActiveTab('transaction-list')} />}
         {activeTab === 'filter' && <ReportDashboardOrganism user={user} />}
         {activeTab === 'accounts' && <AccountDashboardOrganism user={user} />}
+        {activeTab === 'telegram' && <TelegramConnectOrganism user={user} />}
       </MainLayoutTemplate>
     </NotificationProvider>
   );
