@@ -20,6 +20,7 @@ import { API_URL } from "../../config/api";
 
 export const ReportDashboardOrganism = ({ user }) => {
   const [allTransactions, setAllTransactions] = useState([]);
+  const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterRange, setFilterRange] = useState("30D");
   const [filterCategory, setFilterCategory] = useState("");
@@ -86,7 +87,10 @@ export const ReportDashboardOrganism = ({ user }) => {
   };
 
   useEffect(() => {
-    if (user?.id) fetchTransactions();
+    if (user?.id) {
+      fetchTransactions();
+      fetchAccounts();
+    }
   }, [user]);
 
   const fetchTransactions = async () => {
@@ -99,6 +103,23 @@ export const ReportDashboardOrganism = ({ user }) => {
       }
     } catch (err) {
       console.error("Failed to fetch transactions:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAccounts = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await fetch(`${API_URL}/accounts?user_id=${user.id}`, {
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setAccounts(result.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch accounts:", err);
     } finally {
       setLoading(false);
     }
@@ -478,6 +499,7 @@ export const ReportDashboardOrganism = ({ user }) => {
             <AccountFilter
               currentAccount={filterAccount}
               onAccountChange={setFilterAccount}
+              accounts={accounts}
             />
             <CategoryFilter
               currentCategory={filterCategory}
