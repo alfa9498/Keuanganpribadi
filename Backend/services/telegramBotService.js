@@ -126,6 +126,14 @@ const init = () => {
       if (codeData && codeData.expires > Date.now()) {
         console.log("✅ Valid verification code found");
         try {
+          // Clear any existing user with this chat ID to prevent Duplicate Entry
+          await db
+            .promise()
+            .query(
+              "UPDATE users SET telegram_chat_id = NULL WHERE telegram_chat_id = ?",
+              [chatId.toString()],
+            );
+
           const [result] = await db
             .promise()
             .query(
@@ -358,6 +366,14 @@ Klik simpan di bawah:
         const decoded = jwt.verify(payload, JWT_SECRET);
         console.log("✅ JWT verified successfully:", decoded);
         const userId = decoded.id;
+
+        // Clear any existing user with this chat ID to prevent Duplicate Entry
+        await db
+          .promise()
+          .query(
+            "UPDATE users SET telegram_chat_id = NULL WHERE telegram_chat_id = ?",
+            [chatId.toString()],
+          );
 
         // Update DB
         const [result] = await db
