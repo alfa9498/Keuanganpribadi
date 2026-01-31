@@ -12,6 +12,7 @@ import { VerifyOtpOrganism } from "./components/organisms/VerifyOtpOrganism";
 import { ResetPasswordOrganism } from "./components/organisms/ResetPasswordOrganism";
 // TelegramConnectOrganism removed
 import { MainLayoutTemplate } from "./components/templates/MainLayoutTemplate";
+import { AuthContainer } from "./components/templates/AuthContainer";
 
 import { NotificationProvider } from "./context/NotificationContext";
 import { API_URL, SOCKET_URL } from "./config/api";
@@ -138,7 +139,7 @@ function App() {
   if (!user) {
     return (
       <NotificationProvider>
-        <div className="min-h-screen bg-slate-100 font-inter flex flex-col justify-center py-10 px-4">
+        <AuthContainer activeTab={activeTab}>
           {activeTab === "register" ? (
             <RegisterFormOrganism
               onRegisterSuccess={handleRegisterSuccess}
@@ -150,9 +151,7 @@ function App() {
               onSwitchToRegister={() => setActiveTab("register")}
               onForgotPassword={() => setActiveTab("forgot-password")}
             />
-          ) : null}
-
-          {activeTab === "forgot-password" && (
+          ) : activeTab === "forgot-password" ? (
             <ForgotPasswordOrganism
               onSwitchToLogin={() => setActiveTab("login")}
               onSuccess={(email) => {
@@ -160,9 +159,7 @@ function App() {
                 setActiveTab("verify-otp");
               }}
             />
-          )}
-
-          {activeTab === "verify-otp" && (
+          ) : activeTab === "verify-otp" ? (
             <VerifyOtpOrganism
               email={resetEmail}
               onBack={() => setActiveTab("forgot-password")}
@@ -171,16 +168,14 @@ function App() {
                 setActiveTab("reset-password");
               }}
             />
-          )}
-
-          {activeTab === "reset-password" && (
+          ) : activeTab === "reset-password" ? (
             <ResetPasswordOrganism
               email={resetEmail}
               otp={resetOtp}
               onSuccess={() => setActiveTab("login")}
             />
-          )}
-        </div>
+          ) : null}
+        </AuthContainer>
       </NotificationProvider>
     );
   }
