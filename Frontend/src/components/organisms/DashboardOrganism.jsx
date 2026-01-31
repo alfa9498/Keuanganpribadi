@@ -180,8 +180,8 @@ const renderActiveShape = (props) => {
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
         textAnchor={textAnchor}
-        fill="#fff"
-        className="text-xs font-bold"
+        fill="currentColor"
+        className="text-xs font-bold fill-slate-700 dark:fill-white"
       >
         {name}
       </text>
@@ -744,8 +744,8 @@ export const DashboardOrganism = ({
           y={ey}
           dy={4}
           textAnchor={textAnchor}
-          fill="#fff"
-          className="text-xs font-bold"
+          fill="currentColor"
+          className="text-xs font-bold fill-slate-700 dark:fill-white"
         >
           {name}
         </text>
@@ -1014,17 +1014,34 @@ export const DashboardOrganism = ({
         </BentoCard>
 
         {/* 7. Top Expenses Pie */}
-        <BentoCard className="col-span-1 md:col-span-1 row-span-2 bg-slate-900 border border-slate-800 !p-6 flex flex-col justify-between relative overflow-hidden">
+        <BentoCard className="col-span-1 md:col-span-1 row-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-6 flex flex-col justify-between relative overflow-hidden">
           <div>
             <h3 className="text-lg font-semibold text-white mb-1">
               Top Pengeluaran
             </h3>
-            <p className="text-slate-400 text-xs">Dominasi budget Anda</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs">
+              Dominasi budget Anda
+            </p>
           </div>
           <div className="h-[200px] w-full relative flex-1">
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
+                  <Tooltip
+                    formatter={(value) => formatCurrency(value)}
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "none",
+                      boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                    }}
+                  />
+                  <Legend
+                    layout="horizontal"
+                    verticalAlign="bottom"
+                    align="center"
+                    iconType="circle"
+                    wrapperStyle={{ fontSize: "10px", paddingTop: "20px" }}
+                  />
                   <Pie
                     activeIndex={activeIndex}
                     activeShape={renderActiveShape}
@@ -1057,8 +1074,10 @@ export const DashboardOrganism = ({
                 <span className="text-[10px] text-slate-500 block uppercase tracking-wider">
                   Total
                 </span>
-                <span className="text-white font-bold text-lg">
-                  {pieData.length}
+                <span className="text-slate-800 dark:text-white font-bold text-sm">
+                  {formatCurrency(
+                    pieData.reduce((acc, curr) => acc + curr.value, 0),
+                  )}
                 </span>
               </div>
             )}
