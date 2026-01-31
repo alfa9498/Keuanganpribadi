@@ -542,18 +542,29 @@ Contoh:
     }
 
     delete userState[chatId];
-    try {
-      bot.sendMessage(chatId, "⏳ Membaca struk... (OCR)");
 
+    // Send processing message
+    const processingMsg = await bot.sendMessage(
+      chatId,
+      "⏳ Membaca struk... (OCR)\n\n_Proses ini mungkin memakan waktu 5-10 detik_",
+      { parse_mode: "Markdown" },
+    );
+
+    try {
       const photo = msg.photo[msg.photo.length - 1];
       const fileLink = await bot.getFileLink(photo.file_id);
       const response = await axios.get(fileLink, {
         responseType: "arraybuffer",
+        timeout: 8000, // 8 seconds max
       });
 
-      const ocrResult = await ocrService.parseReceipt(
-        Buffer.from(response.data),
+      // OCR with timeout
+      const ocrPromise = ocrService.parseReceipt(Buffer.from(response.data));
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("OCR timeout")), 15000),
       );
+
+      const ocrResult = await Promise.race([ocrPromise, timeoutPromise]);
 
       // Save to state
       userState[chatId] = {
@@ -603,10 +614,32 @@ Apakah data sudah benar?
           ],
         },
       };
+
+      // Delete processing message
+      try {
+        await bot.deleteMessage(chatId, processingMsg.message_id);
+      } catch (e) {}
+
       bot.sendMessage(chatId, statusMsg, opts);
     } catch (error) {
       console.error("OCR Error:", error);
-      bot.sendMessage(chatId, "❌ Gagal membaca gambar.");
+
+      // Delete processing message
+      try {
+        await bot.deleteMessage(chatId, processingMsg.message_id);
+      } catch (e) {}
+
+      // Better error message with manual input instructions
+      bot.sendMessage(
+        chatId,
+        "❌ **Gagal membaca gambar.**\n\n" +
+          "Silakan gunakan input manual:\n\n" +
+          "**Pengeluaran:**\n" +
+          "`/out [nominal] [kategori] [deskripsi]`\n\n" +
+          "**Contoh:**\n" +
+          "`/out 15000 Makanan Makan Siang`",
+        { parse_mode: "Markdown" },
+      );
     }
   });
 
