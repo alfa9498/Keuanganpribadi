@@ -162,11 +162,20 @@ export const AccountDashboardOrganism = ({ user }) => {
       : `${API_URL}/accounts`;
     const method = editingAccount ? "PUT" : "POST";
 
+    if (!user?.id) {
+      alert("Sesi user tidak ditemukan. Silakan login kembali.");
+      return;
+    }
+
     try {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...accountForm, user_id: user.id }),
+        body: JSON.stringify({
+          ...accountForm,
+          user_id: user.id,
+          initial_balance: parseFloat(accountForm.initial_balance || 0),
+        }),
         credentials: "include",
       });
 
@@ -180,6 +189,7 @@ export const AccountDashboardOrganism = ({ user }) => {
       }
     } catch (err) {
       console.error("Error saving account:", err);
+      alert("Koneksi gagal: " + err.message);
     }
   };
 

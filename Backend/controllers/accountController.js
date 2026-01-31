@@ -1,5 +1,28 @@
 const db = require("../config/db");
 
+// Ensure accounts table exists
+const initAccountsTable = () => {
+  const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS accounts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            name VARCHAR(100) NOT NULL,
+            type VARCHAR(50) DEFAULT 'Bank',
+            icon VARCHAR(50) DEFAULT 'Landmark',
+            initial_balance DECIMAL(15, 2) DEFAULT 0.00,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE KEY idx_user_account_name (user_id, name)
+        )
+    `;
+  db.query(createTableQuery, (err) => {
+    if (err)
+      console.error("❌ Failed to ensure accounts table exists:", err.message);
+    else console.log("✅ Accounts table verified/created");
+  });
+};
+initAccountsTable();
+
 exports.getAccounts = (req, res) => {
   const { user_id } = req.query;
   if (!user_id) return res.status(400).json({ message: "User ID diperlukan" });
@@ -8,7 +31,9 @@ exports.getAccounts = (req, res) => {
   db.query(query, [user_id], (err, results) => {
     if (err) {
       console.error("Get Accounts Error:", err.message);
-      return res.status(500).json({ message: "Gagal mengambil data akun" });
+      return res
+        .status(500)
+        .json({ message: "Gagal mengambil data akun: " + err.message });
     }
     res.status(200).json({ data: results });
   });
@@ -17,7 +42,11 @@ exports.getAccounts = (req, res) => {
 exports.createAccount = (req, res) => {
   const { user_id, name, type, icon, initial_balance } = req.body;
   if (!user_id || !name)
-    return res.status(400).json({ message: "Data tidak lengkap" });
+    return res
+      .status(400)
+      .json({ message: "Data tidak lengkap (user_id dan nama diperlukan)" });
+
+  console.log("Creating account for user:", user_id, "Name:", name);
 
   const query =
     "INSERT INTO accounts (user_id, name, type, icon, initial_balance) VALUES (?, ?, ?, ?, ?)";
@@ -29,14 +58,14 @@ exports.createAccount = (req, res) => {
         console.error("Create Account Error:", err.message);
         if (err.code === "ER_DUP_ENTRY")
           return res.status(400).json({ message: "Nama akun sudah ada" });
-        return res.status(500).json({ message: "Gagal menambah akun" });
+        return res
+          .status(500)
+          .json({ message: "Gagal menambah akun: " + err.message });
       }
-      res
-        .status(201)
-        .json({
-          message: "Akun berhasil ditambah",
-          data: { id: result.insertId, ...req.body },
-        });
+      res.status(201).json({
+        message: "Akun berhasil ditambah",
+        data: { id: result.insertId, ...req.body },
+      });
     },
   );
 };
