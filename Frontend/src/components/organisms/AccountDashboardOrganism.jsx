@@ -46,14 +46,29 @@ export const AccountDashboardOrganism = ({ user }) => {
   }, [user]);
 
   const fetchAccounts = async () => {
+    if (!user?.id) return;
     try {
       const response = await fetch(`${API_URL}/accounts?user_id=${user.id}`, {
         credentials: "include",
       });
-      const result = await response.json();
-      if (response.ok) setAccounts(result.data);
+
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const result = await response.json();
+        if (response.ok) {
+          setAccounts(result.data);
+        } else {
+          console.error("API Error (Accounts):", result.message);
+        }
+      } else {
+        const text = await response.text();
+        console.error(
+          "Non-JSON response from /accounts:",
+          text.substring(0, 100),
+        );
+      }
     } catch (err) {
-      console.error("Failed to fetch accounts:", err);
+      console.error("Connection failed (Accounts):", err.message);
     }
   };
 
@@ -66,9 +81,15 @@ export const AccountDashboardOrganism = ({ user }) => {
           credentials: "include",
         },
       );
-      const result = await response.json();
-      if (response.ok) {
-        setTransactions(result.data);
+
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const result = await response.json();
+        if (response.ok) {
+          setTransactions(result.data);
+        }
+      } else {
+        console.error("Non-JSON response from /transaction");
       }
     } catch (err) {
       console.error("Failed to fetch transactions:", err);
@@ -96,14 +117,41 @@ export const AccountDashboardOrganism = ({ user }) => {
     transactions.forEach((tx) => {
       const amt = parseFloat(tx.amount);
 
-      if (tx.type === "income" && summaries[tx.account]) {
+      // Robustness: ensure summary exists or create virtual one to preserve balance
+      if (!summaries[tx.account]) {
+        summaries[tx.account] = {
+          name: tx.account + " (Belum Terdaftar)",
+          type: "Unknown",
+          icon: "HelpCircle",
+          income: 0,
+          expense: 0,
+          balance: 0,
+          transfers_in: 0,
+          transfers_out: 0,
+        };
+      }
+
+      if (tx.type === "income") {
         summaries[tx.account].income += amt;
-      } else if (tx.type === "expense" && summaries[tx.account]) {
+      } else if (tx.type === "expense") {
         summaries[tx.account].expense += amt;
       } else if (tx.type === "transfer") {
         if (summaries[tx.account]) summaries[tx.account].transfers_out += amt;
-        if (summaries[tx.to_account])
+        if (tx.to_account) {
+          if (!summaries[tx.to_account]) {
+            summaries[tx.to_account] = {
+              name: tx.to_account + " (Belum Terdaftar)",
+              type: "Unknown",
+              icon: "HelpCircle",
+              income: 0,
+              expense: 0,
+              balance: 0,
+              transfers_in: 0,
+              transfers_out: 0,
+            };
+          }
           summaries[tx.to_account].transfers_in += amt;
+        }
       }
     });
 
@@ -179,17 +227,31 @@ export const AccountDashboardOrganism = ({ user }) => {
         credentials: "include",
       });
 
+      const contentType = response.headers.get("content-type");
+      let data = {};
+
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const errorText = await response.text();
+        throw new Error(
+          `Server returned non-JSON response (${response.status}): ${errorText.substring(0, 50)}...`,
+        );
+      }
+
       if (response.ok) {
         setIsModalOpen(false);
         fetchAccounts();
         fetchTransactions();
       } else {
-        const data = await response.json();
-        alert(data.message || "Gagal menyimpan akun");
+        alert(
+          data.message ||
+            "Gagal menyimpan akun (Status: " + response.status + ")",
+        );
       }
     } catch (err) {
       console.error("Error saving account:", err);
-      alert("Koneksi gagal: " + err.message);
+      alert("⚠️ Terjadi kesalahan: " + err.message);
     }
   };
 

@@ -462,13 +462,42 @@ export const DashboardOrganism = ({
 
     allTransactions.forEach((tx) => {
       const amt = parseFloat(tx.amount);
-      if (tx.type === "income" && accMap[tx.account]) {
+
+      // Robustness: Handle transactions for accounts not in DB
+      if (!accMap[tx.account]) {
+        accMap[tx.account] = {
+          name: tx.account,
+          icon: "HelpCircle", // Fallback icon name
+          type: "Unregistered",
+          income: 0,
+          expense: 0,
+          balance: 0,
+          transfers_in: 0,
+          transfers_out: 0,
+        };
+      }
+
+      if (tx.type === "income") {
         accMap[tx.account].income += amt;
-      } else if (tx.type === "expense" && accMap[tx.account]) {
+      } else if (tx.type === "expense") {
         accMap[tx.account].expense += amt;
       } else if (tx.type === "transfer") {
-        if (accMap[tx.account]) accMap[tx.account].transfers_out += amt;
-        if (accMap[tx.to_account]) accMap[tx.to_account].transfers_in += amt;
+        accMap[tx.account].transfers_out += amt;
+        if (tx.to_account) {
+          if (!accMap[tx.to_account]) {
+            accMap[tx.to_account] = {
+              name: tx.to_account,
+              icon: "HelpCircle",
+              type: "Unregistered",
+              income: 0,
+              expense: 0,
+              balance: 0,
+              transfers_in: 0,
+              transfers_out: 0,
+            };
+          }
+          accMap[tx.to_account].transfers_in += amt;
+        }
       }
     });
 
