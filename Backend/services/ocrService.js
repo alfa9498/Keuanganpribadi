@@ -1,4 +1,4 @@
-const Tesseract = require("tesseract.js");
+const axios = require("axios");
 
 const KEYWORD_MAPPING = {
   SPBU: "Transportasi",
@@ -35,29 +35,57 @@ const KEYWORD_MAPPING = {
 
 const parseReceipt = async (imageBuffer) => {
   try {
-    console.log("🔍 Starting Tesseract.js OCR processing...");
+    console.log("🔍 Starting OCR.space OCR processing...");
     const startTime = Date.now();
 
-    // Call Tesseract OCR (supports Indonesian + English)
-    const {
-      data: { text },
-    } = await Tesseract.recognize(
-      imageBuffer,
-      "ind+eng", // Indonesian + English
+    // Get API key from environment
+    const apiKey = process.env.OCR_SPACE_API_KEY || "K87899142388957"; // Free public key (limited)
+
+    // Convert buffer to base64
+    const base64Image = `data:image/jpeg;base64,${imageBuffer.toString("base64")}`;
+
+    // Call OCR.space API
+    const formData = new URLSearchParams();
+    formData.append("base64Image", base64Image);
+    formData.append("language", "eng"); // English works well for Indonesian receipts
+    formData.append("isOverlayRequired", "false");
+    formData.append("detectOrientation", "true");
+    formData.append("scale", "true");
+    formData.append("OCREngine", "2"); // Engine 2 is more accurate
+
+    const response = await axios.post(
+      "https://api.ocr.space/parse/image",
+      formData,
       {
-        logger: (m) => {
-          if (m.status === "recognizing text") {
-            console.log(`📊 OCR Progress: ${Math.round(m.progress * 100)}%`);
-          }
+        headers: {
+          apikey: apiKey,
+          "Content-Type": "application/x-www-form-urlencoded",
         },
+        timeout: 30000, // 30 seconds timeout
       },
     );
 
     console.log(`✅ OCR completed in ${Date.now() - startTime}ms`);
+
+    if (
+      !response.data ||
+      !response.data.ParsedResults ||
+      response.data.ParsedResults.length === 0
+    ) {
+      console.log("⚠️ No text detected in image");
+      return {
+        category: "Lainnya",
+        amount: 0,
+        description: "Scan Struk (Tidak Terdeteksi)",
+        text: "",
+      };
+    }
+
+    const text = response.data.ParsedResults[0].ParsedText;
     console.log("📄 Raw OCR Text:", text);
 
     if (!text || text.trim().length === 0) {
-      console.log("⚠️ No text detected in image");
+      console.log("⚠️ Empty OCR result");
       return {
         category: "Lainnya",
         amount: 0,
@@ -165,7 +193,10 @@ const parseReceipt = async (imageBuffer) => {
       text: cleanText,
     };
   } catch (error) {
-    console.error("❌ OCR Error:", error);
+    console.error("❌ OCR Error:", error.message);
+    if (error.response) {
+      console.error("❌ OCR API Response:", error.response.data);
+    }
     throw error;
   }
 };
