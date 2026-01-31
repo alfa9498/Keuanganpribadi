@@ -225,7 +225,7 @@ export const ReportDashboardOrganism = ({ user }) => {
     const pageHeight = doc.internal.pageSize.getHeight();
 
     // 1. Professional Header & Background
-    doc.setFillColor(37, 99, 235); // Finance Primary Blue
+    doc.setFillColor(15, 23, 42); // Slate 900 (Finance Primary)
     doc.rect(0, 0, pageWidth, 40, "F");
 
     doc.setFontSize(28);
@@ -278,7 +278,7 @@ export const ReportDashboardOrganism = ({ user }) => {
 
     // 2. Summary Section - Two Columns Layout
     doc.setFontSize(14);
-    doc.setTextColor(30, 41, 59);
+    doc.setTextColor(15, 23, 42); // Slate 900
     doc.setFont("helvetica", "bold");
     doc.text("IKHTISAR SALDO", 15, 75);
 
@@ -294,7 +294,7 @@ export const ReportDashboardOrganism = ({ user }) => {
       ],
       theme: "grid",
       headStyles: {
-        fillColor: [37, 99, 235],
+        fillColor: [15, 23, 42],
         textColor: 255,
         fontStyle: "bold",
         halign: "center",
@@ -325,7 +325,7 @@ export const ReportDashboardOrganism = ({ user }) => {
         ]),
       theme: "grid",
       headStyles: {
-        fillColor: [71, 85, 105],
+        fillColor: [51, 65, 85], // Slate 700
         textColor: 255,
         fontStyle: "bold",
         halign: "center",
@@ -345,7 +345,7 @@ export const ReportDashboardOrganism = ({ user }) => {
     // 3. Ledger (Detailed List) - New Page
     doc.addPage();
     // Repeating header style for readability
-    doc.setFillColor(30, 41, 59);
+    doc.setFillColor(15, 23, 42);
     doc.rect(0, 0, pageWidth, 15, "F");
     doc.setFontSize(10);
     doc.setTextColor(255);
@@ -388,7 +388,7 @@ export const ReportDashboardOrganism = ({ user }) => {
         lineWidth: 0.1,
       },
       headStyles: {
-        fillColor: [37, 99, 235],
+        fillColor: [15, 23, 42],
         textColor: 255,
         fontStyle: "bold",
         halign: "center",
