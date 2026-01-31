@@ -376,76 +376,78 @@ export const AccountDashboardOrganism = ({ user }) => {
         </div>
       )}
 
-      {/* Account Grid */}
       <div
         ref={gridRef}
         onMouseMove={handleGridMouseMove}
         className="chroma-grid"
       >
-        <div className="chroma-overlay" />
-        <div className="chroma-fade" />
-
         {accountSummaries.map((acc) => (
           <div
             key={acc.name}
             onMouseMove={handleCardMouseMove}
-            className="chroma-card !bg-slate-900 group"
+            className="chroma-card group"
           >
-            <div className="chroma-img-wrapper flex items-center justify-center min-h-[140px]">
-              <div className="p-5 bg-slate-800/50 rounded-2xl border border-white/5 shadow-xl transition-all group-hover:scale-110 group-hover:bg-slate-800">
+            <div className="p-6 pb-2 flex justify-between items-start">
+              <div className="p-4 bg-white/5 rounded-2xl border border-white/5 shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:bg-white/10 group-hover:border-white/10">
                 {getAccountIcon(acc.name, acc.icon)}
               </div>
-            </div>
-
-            <div className="chroma-info h-full">
-              <div className="flex flex-col gap-1 min-w-0">
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] truncate">
-                  {acc.name}
-                </h3>
-                <p className="text-2xl font-black text-white tabular-nums truncate">
-                  {formatCurrency(acc.balance)}
-                </p>
-                <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">
-                  {acc.type}
-                </span>
-              </div>
-
               <div className="flex flex-col gap-2">
                 <button
                   onClick={() => handleEditAccount(acc)}
-                  className="p-2.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all active:scale-90"
+                  className="p-2 text-slate-500 hover:text-white hover:bg-white/5 rounded-xl transition-all"
                   title={
                     acc.isUnregistered ? "Daftarkan Akun Ini" : "Edit Akun"
                   }
                 >
-                  <Pencil size={18} />
+                  <Pencil size={16} />
                 </button>
                 {!acc.isUnregistered && (
                   <button
                     onClick={() => handleDeleteAccount(acc.id)}
-                    className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all active:scale-90"
+                    className="p-2 text-slate-500 hover:text-rose-500 hover:bg-rose-500/5 rounded-xl transition-all"
                     title="Hapus Akun"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                   </button>
                 )}
               </div>
             </div>
 
-            <div className="space-y-3 pt-4 border-t border-white/5 mx-4 mb-4">
-              <div className="flex justify-between items-center text-[11px]">
-                <span className="text-slate-500 flex items-center gap-1.5 font-medium">
+            <div className="px-6 py-4 flex-1">
+              <div className="flex flex-col gap-0.5">
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] truncate">
+                  {acc.name}
+                </h3>
+                <p className="text-3xl font-black text-white tabular-nums truncate leading-tight">
+                  {formatCurrency(acc.balance)}
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest px-0.5">
+                    {acc.type}
+                  </span>
+                  {acc.isUnregistered && (
+                    <span className="text-[8px] text-rose-400 font-bold uppercase tracking-widest bg-rose-500/10 px-2 py-0.5 rounded-full">
+                      Unregistered
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3 p-6 pt-4 border-t border-white/5 bg-black/20">
+              <div className="flex justify-between items-center text-[10px]">
+                <span className="text-slate-500 flex items-center gap-1.5 font-bold uppercase tracking-wider">
                   <TrendingUp size={12} className="text-emerald-500" /> Income
                 </span>
-                <span className="font-bold text-emerald-500">
+                <span className="font-bold text-emerald-500 tabular-nums">
                   +{formatCurrency(acc.income + acc.transfers_in)}
                 </span>
               </div>
-              <div className="flex justify-between items-center text-[11px]">
-                <span className="text-slate-500 flex items-center gap-1.5 font-medium">
+              <div className="flex justify-between items-center text-[10px]">
+                <span className="text-slate-500 flex items-center gap-1.5 font-bold uppercase tracking-wider">
                   <TrendingDown size={12} className="text-rose-500" /> Expense
                 </span>
-                <span className="font-bold text-rose-500">
+                <span className="font-bold text-rose-500 tabular-nums">
                   -{formatCurrency(acc.expense + acc.transfers_out)}
                 </span>
               </div>
