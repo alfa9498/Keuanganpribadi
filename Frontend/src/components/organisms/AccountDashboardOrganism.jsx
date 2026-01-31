@@ -11,6 +11,7 @@ import {
   Pencil,
   Trash2,
   X,
+  HelpCircle,
 } from "lucide-react";
 import { StatCard } from "../molecules/StatCard";
 import { Modal } from "../molecules/Modal";
@@ -36,7 +37,40 @@ export const AccountDashboardOrganism = ({ user }) => {
     { name: "Coins", icon: <Coins size={20} /> },
     { name: "CreditCard", icon: <CreditCard size={20} /> },
     { name: "TrendingUp", icon: <TrendingUp size={20} /> },
+    { name: "HelpCircle", icon: <HelpCircle size={20} /> },
   ];
+
+  const getAccountIcon = (name, iconName) => {
+    if (iconName === "Landmark")
+      return <Landmark size={14} className="text-blue-500" />;
+    if (iconName === "Wallet")
+      return <Wallet size={14} className="text-indigo-500" />;
+    if (iconName === "Coins")
+      return <Coins size={14} className="text-amber-500" />;
+    if (iconName === "CreditCard")
+      return <CreditCard size={14} className="text-slate-500" />;
+    if (iconName === "TrendingUp")
+      return <TrendingUp size={14} className="text-emerald-500" />;
+    if (iconName === "HelpCircle")
+      return <HelpCircle size={14} className="text-rose-500" />;
+
+    const n = name?.toUpperCase() || "";
+    if (
+      n.includes("BCA") ||
+      n.includes("MANDIRI") ||
+      n.includes("BNI") ||
+      n.includes("BANK")
+    )
+      return <Landmark size={14} className="text-blue-500" />;
+    if (
+      n.includes("GOPAY") ||
+      n.includes("OVO") ||
+      n.includes("DANA") ||
+      n.includes("WALLET")
+    )
+      return <Wallet size={14} className="text-indigo-500" />;
+    return <Coins size={14} className="text-amber-500" />;
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -120,7 +154,9 @@ export const AccountDashboardOrganism = ({ user }) => {
       // Robustness: ensure summary exists or create virtual one to preserve balance
       if (!summaries[tx.account]) {
         summaries[tx.account] = {
-          name: tx.account + " (Belum Terdaftar)",
+          name: tx.account + " (BELUM TERDAFTAR)",
+          originalName: tx.account,
+          isUnregistered: true,
           type: "Unknown",
           icon: "HelpCircle",
           income: 0,
@@ -140,7 +176,9 @@ export const AccountDashboardOrganism = ({ user }) => {
         if (tx.to_account) {
           if (!summaries[tx.to_account]) {
             summaries[tx.to_account] = {
-              name: tx.to_account + " (Belum Terdaftar)",
+              name: tx.to_account + " (BELUM TERDAFTAR)",
+              originalName: tx.to_account,
+              isUnregistered: true,
               type: "Unknown",
               icon: "HelpCircle",
               income: 0,
@@ -176,14 +214,24 @@ export const AccountDashboardOrganism = ({ user }) => {
   };
 
   const handleEditAccount = (acc) => {
-    const fullAccount = accounts.find((a) => a.id === acc.id);
-    setEditingAccount(fullAccount);
-    setAccountForm({
-      name: fullAccount.name,
-      type: fullAccount.type,
-      icon: fullAccount.icon,
-      initial_balance: fullAccount.initial_balance,
-    });
+    if (acc.isUnregistered) {
+      setEditingAccount(null); // Treat as NEW account
+      setAccountForm({
+        name: acc.originalName,
+        type: "Bank",
+        icon: "Landmark",
+        initial_balance: 0,
+      });
+    } else {
+      const fullAccount = accounts.find((a) => a.id === acc.id);
+      setEditingAccount(fullAccount);
+      setAccountForm({
+        name: fullAccount.name,
+        type: fullAccount.type,
+        icon: fullAccount.icon,
+        initial_balance: fullAccount.initial_balance,
+      });
+    }
     setIsModalOpen(true);
   };
 
@@ -263,26 +311,6 @@ export const AccountDashboardOrganism = ({ user }) => {
     }).format(amount);
   };
 
-  const getAccountIcon = (name) => {
-    if (
-      [
-        "BCA",
-        "Mandiri",
-        "Permata",
-        "BNI",
-        "BSI",
-        "Muamalat",
-        "Tabungan BNI Anak",
-      ].includes(name)
-    )
-      return <Landmark className="text-blue-500" />;
-    if (["Gopay", "OVO", "Dana"].includes(name))
-      return <Wallet className="text-indigo-500" />;
-    if (["Bareksa", "Treasury"].includes(name))
-      return <TrendingUp className="text-emerald-500" />;
-    return <Coins className="text-amber-500" />;
-  };
-
   if (loading)
     return (
       <div className="p-10 text-center text-slate-500">
@@ -345,15 +373,21 @@ export const AccountDashboardOrganism = ({ user }) => {
                   <button
                     onClick={() => handleEditAccount(acc)}
                     className="p-1.5 text-slate-400 hover:text-blue-500 transition-colors"
+                    title={
+                      acc.isUnregistered ? "Daftarkan Akun Ini" : "Edit Akun"
+                    }
                   >
                     <Pencil size={16} />
                   </button>
-                  <button
-                    onClick={() => handleDeleteAccount(acc.id)}
-                    className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  {!acc.isUnregistered && (
+                    <button
+                      onClick={() => handleDeleteAccount(acc.id)}
+                      className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
+                      title="Hapus Akun"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
                 </div>
               </div>
 

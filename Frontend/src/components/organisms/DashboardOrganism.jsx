@@ -31,6 +31,7 @@ import {
   TrendingUp,
   CreditCard,
   X,
+  HelpCircle,
 } from "lucide-react";
 import { API_URL } from "../../config/api";
 
@@ -45,6 +46,8 @@ const getAccountIcon = (name, iconName) => {
     return <CreditCard size={14} className="text-slate-500" />;
   if (iconName === "TrendingUp")
     return <TrendingUp size={14} className="text-emerald-500" />;
+  if (iconName === "HelpCircle")
+    return <HelpCircle size={14} className="text-rose-500" />;
 
   const n = name?.toUpperCase() || "";
   if (
@@ -466,7 +469,7 @@ export const DashboardOrganism = ({
       // Robustness: Handle transactions for accounts not in DB
       if (!accMap[tx.account]) {
         accMap[tx.account] = {
-          name: tx.account,
+          name: tx.account + " (BELUM TERDAFTAR)",
           icon: "HelpCircle", // Fallback icon name
           type: "Unregistered",
           income: 0,
@@ -486,7 +489,7 @@ export const DashboardOrganism = ({
         if (tx.to_account) {
           if (!accMap[tx.to_account]) {
             accMap[tx.to_account] = {
-              name: tx.to_account,
+              name: tx.to_account + " (BELUM TERDAFTAR)",
               icon: "HelpCircle",
               type: "Unregistered",
               income: 0,
