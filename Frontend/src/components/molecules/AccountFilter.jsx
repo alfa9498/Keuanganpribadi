@@ -1,23 +1,11 @@
 import React from "react";
 import { CreditCard, Wallet } from "lucide-react";
 
-export const AccountFilter = ({ currentAccount, onAccountChange }) => {
-  const ACCOUNTS = [
-    "Cash Account",
-    "BCA",
-    "BNI",
-    "BSI",
-    "Muamalat",
-    "Permata",
-    "Mandiri",
-    "Gopay",
-    "OVO",
-    "Dana",
-    "Bareksa",
-    "Treasury",
-    "Tabungan BNI Anak",
-  ];
-
+export const AccountFilter = ({
+  currentAccount,
+  onAccountChange,
+  accounts = [],
+}) => {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="relative group w-full">
@@ -27,13 +15,13 @@ export const AccountFilter = ({ currentAccount, onAccountChange }) => {
           className="appearance-none bg-white text-slate-700 text-sm font-bold py-2.5 pl-10 pr-10 rounded-2xl border border-slate-200 hover:border-finance-primary/50 focus:outline-none focus:ring-4 focus:ring-finance-primary/10 transition-all cursor-pointer w-full md:min-w-[160px] shadow-sm hover:shadow-md"
         >
           <option value="">Semua Akun</option>
-          {ACCOUNTS.map((acc) => (
+          {accounts.map((acc) => (
             <option
-              key={acc}
-              value={acc}
+              key={acc.id}
+              value={acc.name}
               className="text-slate-700 font-medium"
             >
-              {acc}
+              {acc.name}
             </option>
           ))}
         </select>

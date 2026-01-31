@@ -34,28 +34,36 @@ import {
 } from "lucide-react";
 import { API_URL } from "../../config/api";
 
-const ACCOUNTS = [
-  "Cash Account",
-  "BCA",
-  "BNI",
-  "BSI",
-  "Muamalat",
-  "Permata",
-  "Mandiri",
-  "Gopay",
-  "OVO",
-  "Dana",
-  "Bareksa",
-  "Treasury",
-  "Tabungan BNI Anak",
-];
-const DASHBOARD_ACCOUNTS = [
-  "BSI",
-  "BCA",
-  "BNI",
-  "Permata",
-  "Tabungan BNI Anak",
-];
+const getAccountIcon = (name, iconName) => {
+  if (iconName === "Landmark")
+    return <Landmark size={14} className="text-blue-500" />;
+  if (iconName === "Wallet")
+    return <Wallet size={14} className="text-indigo-500" />;
+  if (iconName === "Coins")
+    return <Coins size={14} className="text-amber-500" />;
+  if (iconName === "CreditCard")
+    return <CreditCard size={14} className="text-slate-500" />;
+  if (iconName === "TrendingUp")
+    return <TrendingUp size={14} className="text-emerald-500" />;
+
+  const n = name?.toUpperCase() || "";
+  if (
+    n.includes("BCA") ||
+    n.includes("MANDIRI") ||
+    n.includes("BNI") ||
+    n.includes("BSI") ||
+    n.includes("BANK")
+  )
+    return <Landmark size={14} className="text-blue-500" />;
+  if (
+    n.includes("GOPAY") ||
+    n.includes("OVO") ||
+    n.includes("DANA") ||
+    n.includes("WALLET")
+  )
+    return <Wallet size={14} className="text-indigo-500" />;
+  return <Coins size={14} className="text-amber-500" />;
+};
 
 const expenseCategories = {
   Makanan: ["Makanan", "Makan & Minum", "Sarapan", "Jajan Harian"],
@@ -110,15 +118,7 @@ const expenseCategories = {
   Lainnya: ["Lainnya"],
 };
 
-const getAccountIcon = (name) => {
-  if (["BCA", "Mandiri", "Permata", "BNI", "BSI", "Muamalat"].includes(name))
-    return <Landmark size={14} className="text-blue-500" />;
-  if (["Gopay", "OVO", "Dana"].includes(name))
-    return <Wallet size={14} className="text-indigo-500" />;
-  if (["Bareksa", "Treasury"].includes(name))
-    return <TrendingUp size={14} className="text-emerald-500" />;
-  return <Coins size={14} className="text-amber-500" />;
-};
+// getAccountIcon removed from here and moved above as per previous chunk.
 
 const renderActiveShape = (props) => {
   const RADIAN = Math.PI / 180;
@@ -252,6 +252,7 @@ export const DashboardOrganism = ({
     remainingPiutang: 0,
   });
   const [accountSummaries, setAccountSummaries] = useState([]);
+  const [accounts, setAccounts] = useState([]);
   const [debtModal, setDebtModal] = useState({
     show: false,
     type: "",
@@ -294,7 +295,10 @@ export const DashboardOrganism = ({
   };
 
   useEffect(() => {
-    if (user?.id) fetchTransactions();
+    if (user?.id) {
+      fetchTransactions();
+      fetchAccounts();
+    }
   }, [user]);
 
   useEffect(() => {
@@ -307,7 +311,20 @@ export const DashboardOrganism = ({
       );
       processData(filtered);
     }
-  }, [filterRange, filterCategory, filterAccount, allTransactions]);
+  }, [filterRange, filterCategory, filterAccount, allTransactions, accounts]);
+
+  const fetchAccounts = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await fetch(`${API_URL}/accounts?user_id=${user.id}`, {
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (response.ok) setAccounts(result.data);
+    } catch (error) {
+      console.error("Failed to fetch accounts:", error);
+    }
+  };
 
   const fetchTransactions = async () => {
     try {
@@ -428,13 +445,15 @@ export const DashboardOrganism = ({
       });
     });
 
-    // Account balance logic using ALL TRANSACTIONS for true balance (ignoring time filter for balance)
-    const accMap = ACCOUNTS.reduce((acc, name) => {
-      acc[name] = {
-        name,
+    // Account balance logic using accounts from DB
+    const accMap = accounts.reduce((acc, account) => {
+      acc[account.name] = {
+        name: account.name,
+        icon: account.icon,
+        type: account.type,
         income: 0,
         expense: 0,
-        balance: 0,
+        balance: parseFloat(account.initial_balance || 0),
         transfers_in: 0,
         transfers_out: 0,
       };
@@ -457,10 +476,13 @@ export const DashboardOrganism = ({
       .map((acc) => ({
         ...acc,
         balance:
-          acc.income + acc.transfers_in - (acc.expense + acc.transfers_out),
+          acc.balance +
+          acc.income +
+          acc.transfers_in -
+          (acc.expense + acc.transfers_out),
       }))
-      .filter((acc) => DASHBOARD_ACCOUNTS.includes(acc.name))
-      .filter((acc) => (filterAccount ? acc.name === filterAccount : true)); // Filter logic
+      .sort((a, b) => b.balance - a.balance)
+      .filter((acc) => (filterAccount ? acc.name === filterAccount : true));
     setAccountSummaries(accList);
 
     // Hutang & Piutang Logic (Always based on ALL transactions for current status)
@@ -935,7 +957,7 @@ export const DashboardOrganism = ({
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm">
-                    {getAccountIcon(acc.name)}
+                    {getAccountIcon(acc.name, acc.icon)}
                   </div>
                   <div>
                     <p className="text-[11px] font-bold text-slate-400 uppercase leading-none mb-1">

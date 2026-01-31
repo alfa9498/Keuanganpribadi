@@ -21,6 +21,7 @@ export const HeaderOrganism = ({
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
+  const [accounts, setAccounts] = useState([]);
   const notifRef = useRef(null);
 
   // Fetch unread notification count
@@ -106,6 +107,22 @@ export const HeaderOrganism = ({
     }
   };
 
+  // Fetch all accounts
+  const fetchAccounts = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await fetch(`${API_URL}/accounts?user_id=${user.id}`, {
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setAccounts(result.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch accounts:", error);
+    }
+  };
+
   // Format timestamp to relative time
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
@@ -138,9 +155,13 @@ export const HeaderOrganism = ({
   // Fetch on mount and when dropdown opens
   useEffect(() => {
     fetchUnreadCount();
+    fetchAccounts();
 
     // Poll every 30 seconds
-    const interval = setInterval(fetchUnreadCount, 30000);
+    const interval = setInterval(() => {
+      fetchUnreadCount();
+      fetchAccounts();
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [user?.id]);
@@ -209,6 +230,7 @@ export const HeaderOrganism = ({
                 <AccountFilter
                   currentAccount={filterAccount}
                   onAccountChange={setFilterAccount}
+                  accounts={accounts}
                 />
                 <div className="h-6 w-[1px] bg-slate-200 mx-1"></div>
                 <TimeFilter
@@ -237,6 +259,7 @@ export const HeaderOrganism = ({
                       <AccountFilter
                         currentAccount={filterAccount}
                         onAccountChange={setFilterAccount}
+                        accounts={accounts}
                       />
                     </div>
                     <div className="space-y-1.5">
