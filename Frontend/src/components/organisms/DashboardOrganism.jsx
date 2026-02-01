@@ -33,8 +33,10 @@ import {
   CreditCard,
   X,
   HelpCircle,
+  Tag,
 } from "lucide-react";
 import { API_URL } from "../../config/api";
+import { LanyardSlider } from "../organisms/LanyardSlider";
 
 const getAccountIcon = (name, iconName) => {
   if (iconName === "Landmark")
@@ -755,107 +757,48 @@ export const DashboardOrganism = ({
 
   return (
     <div className="w-full max-w-[1600px] p-4 md:p-6 space-y-4 animate-fade-in font-inter">
+      {/* Lanyard Summary Slider */}
+      <LanyardSlider
+        items={[
+          {
+            title: "Total Pemasukan",
+            value: formatCurrency(summary.income),
+            type: "income",
+          },
+          {
+            title: "Total Pengeluaran",
+            value: formatCurrency(summary.expense),
+            type: "expense",
+          },
+          {
+            title: "Saldo Bersih",
+            value: formatCurrency(summary.balance),
+            type: "balance",
+          },
+          {
+            title:
+              debtSummary.remainingHutang > 0
+                ? "Hutang Belum Lunas"
+                : "Status Hutang",
+            value:
+              debtSummary.remainingHutang > 0
+                ? formatCurrency(debtSummary.remainingHutang)
+                : "Lunas",
+            type: "debt",
+          },
+          {
+            title: "Piutang Aktif",
+            value: formatCurrency(debtSummary.remainingPiutang),
+            type: "receivable",
+          },
+        ].filter((item) => {
+          if (item.type === "receivable" && debtSummary.remainingPiutang <= 0)
+            return false;
+          return true;
+        })}
+      />
+
       <BentoGrid>
-        {/* 1. Stat Card: Income */}
-        <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800">
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
-            Total Pemasukan
-          </p>
-          <h3 className="text-2xl font-black text-emerald-500 mt-2">
-            {formatCurrency(summary.income)}
-          </h3>
-          <div className="text-[10px] text-slate-400 mt-1">
-            Keuangan masuk periode ini
-          </div>
-        </BentoCard>
-
-        {/* 2. Stat Card: Expense */}
-        <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800">
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
-            Total Pengeluaran
-          </p>
-          <h3 className="text-2xl font-black text-rose-500 mt-2">
-            {formatCurrency(summary.expense)}
-          </h3>
-          <div className="text-[10px] text-slate-400 mt-1">
-            Keuangan keluar periode ini
-          </div>
-        </BentoCard>
-
-        {/* 3. Stat Card: Balance */}
-        <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800">
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
-            Saldo Bersih
-          </p>
-          <h3
-            className={`text-2xl font-black mt-2 ${summary.balance >= 0 ? "text-blue-500" : "text-rose-600"}`}
-          >
-            {formatCurrency(summary.balance)}
-          </h3>
-          <div className="text-[10px] text-slate-400 mt-1">
-            Selisih masuk & keluar
-          </div>
-        </BentoCard>
-
-        {/* 4. Debt Status */}
-        <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800 relative overflow-hidden group">
-          {debtSummary.remainingHutang > 0 ? (
-            <>
-              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                <TrendingUp size={80} className="text-rose-500" />
-              </div>
-              <p className="text-rose-500 text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                <TrendingUp size={16} /> Hutang Belum Lunas
-              </p>
-              <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
-                {formatCurrency(debtSummary.remainingHutang)}
-              </h3>
-              <button
-                onClick={() => handleOpenDebtModal("hutang")}
-                className="text-xs text-rose-500 underline mt-2 relative z-10 font-bold"
-              >
-                Lihat Detail
-              </button>
-            </>
-          ) : (
-            <>
-              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Wallet size={80} className="text-blue-500" />
-              </div>
-              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
-                Status Hutang
-              </p>
-              <h3 className="text-2xl font-black text-emerald-500 mt-2 relative z-10">
-                Semua Lunas
-              </h3>
-              <div className="text-[10px] text-slate-400 mt-1 relative z-10">
-                Luar biasa! Tidak ada hutang aktif
-              </div>
-            </>
-          )}
-        </BentoCard>
-
-        {/* 4b. Receivable Status (Piutang) */}
-        {debtSummary.remainingPiutang > 0 && (
-          <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Coins size={80} className="text-emerald-500" />
-            </div>
-            <p className="text-emerald-500 text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-              <Coins size={16} /> Piutang Aktif
-            </p>
-            <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
-              {formatCurrency(debtSummary.remainingPiutang)}
-            </h3>
-            <button
-              onClick={() => handleOpenDebtModal("piutang")}
-              className="text-xs text-emerald-500 underline mt-2 relative z-10 font-bold"
-            >
-              Lihat Detail
-            </button>
-          </BentoCard>
-        )}
-
         {/* 5. Main Trend Chart (Big) */}
         <BentoCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-slate-900 !p-0 border border-slate-800 overflow-hidden relative">
           <div className="p-6 relative z-10">

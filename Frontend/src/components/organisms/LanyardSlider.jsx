@@ -1,0 +1,65 @@
+import React, { useRef, useEffect } from "react";
+import { LanyardCard } from "../molecules/LanyardCard";
+
+export const LanyardSlider = ({ items, className = "" }) => {
+  const scrollRef = useRef(null);
+
+  // Duplicating items for the "infinite" feel
+  const duplicatedItems = [...items, ...items, ...items];
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      // Start in the middle set of items
+      const middle = Math.floor(duplicatedItems.length / 3);
+      const scrollItem = scrollRef.current.children[middle];
+      if (scrollItem) {
+        scrollRef.current.scrollLeft =
+          scrollItem.offsetLeft -
+          scrollRef.current.offsetWidth / 2 +
+          scrollItem.offsetWidth / 2;
+      }
+    }
+  }, [items]);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, offsetWidth } = scrollRef.current;
+
+    // Logic to snap back to the middle section if we scroll too far in either direction
+    const segmentWidth = scrollWidth / 3;
+
+    if (scrollLeft < segmentWidth * 0.5) {
+      scrollRef.current.scrollLeft += segmentWidth;
+    } else if (scrollLeft > segmentWidth * 1.5) {
+      scrollRef.current.scrollLeft -= segmentWidth;
+    }
+  };
+
+  return (
+    <div className={`relative w-full overflow-hidden py-4 ${className}`}>
+      {/* Decorative overhead strap rail */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent z-0 mt-4" />
+
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex overflow-x-auto gap-2 scrollbar-hide px-[10%] py-4 snap-x snap-proximity scroll-smooth"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        {duplicatedItems.map((item, index) => (
+          <div key={`${item.type}-${index}`} className="snap-center">
+            <LanyardCard
+              title={item.title}
+              value={item.value}
+              type={item.type}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Fade Gradients for visual depth */}
+      <div className="absolute top-0 bottom-0 left-0 w-24 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent pointer-events-none z-10" />
+      <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent pointer-events-none z-10" />
+    </div>
+  );
+};
