@@ -27,7 +27,7 @@ export const AuthContainer = ({ children, activeTab }) => {
                   damping: 30,
                   duration: 0.5,
                 }}
-                className="w-full h-full p-8 md:p-12 flex flex-col justify-center"
+                className="w-full h-full p-6 md:p-12 flex flex-col justify-center"
               >
                 {children}
               </motion.div>

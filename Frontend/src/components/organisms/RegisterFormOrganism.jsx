@@ -76,7 +76,7 @@ export const RegisterFormOrganism = ({
 
   return (
     <div className="w-full">
-      <div className="text-center mb-10">
+      <div className="text-center mb-6 md:mb-10">
         <div className="inline-flex items-center justify-center p-3 bg-sky-500/10 rounded-2xl border border-sky-500/20 mb-4">
           <img
             src="/logo.png"
@@ -88,7 +88,7 @@ export const RegisterFormOrganism = ({
             FinVeda
           </div>
         </div>
-        <h2 className="text-3xl font-black text-white tracking-tight">
+        <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
           Create Account
         </h2>
         <p className="text-slate-400 mt-2 text-sm">
@@ -96,7 +96,7 @@ export const RegisterFormOrganism = ({
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
         <div className="space-y-1.5">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
             Full Name
@@ -107,7 +107,7 @@ export const RegisterFormOrganism = ({
             value={formData.fullName}
             onChange={handleChange}
             placeholder="John Doe"
-            className={`w-full bg-slate-950/50 border ${errors.fullName ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm`}
+            className={`w-full bg-slate-950/50 border ${errors.fullName ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm`}
           />
         </div>
 
@@ -122,7 +122,7 @@ export const RegisterFormOrganism = ({
               value={formData.email}
               onChange={handleChange}
               placeholder="john@example.com"
-              className={`w-full bg-slate-950/50 border ${errors.email ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm`}
+              className={`w-full bg-slate-950/50 border ${errors.email ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm`}
             />
           </div>
 
@@ -136,7 +136,7 @@ export const RegisterFormOrganism = ({
               value={formData.phone}
               onChange={handleChange}
               placeholder="0812..."
-              className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm"
+              className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm"
             />
           </div>
         </div>
@@ -149,7 +149,7 @@ export const RegisterFormOrganism = ({
             name="gender"
             value={formData.gender}
             onChange={handleChange}
-            className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm appearance-none"
+            className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-2.5 text-white focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm appearance-none"
           >
             <option value="male">Male</option>
             <option value="female">Female</option>
@@ -167,7 +167,7 @@ export const RegisterFormOrganism = ({
               value={formData.password}
               onChange={handleChange}
               placeholder="••••••••"
-              className={`w-full bg-slate-950/50 border ${errors.password ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm pr-12`}
+              className={`w-full bg-slate-950/50 border ${errors.password ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm pr-12`}
             />
             <button
               type="button"
@@ -190,7 +190,7 @@ export const RegisterFormOrganism = ({
               value={formData.confirmPassword}
               onChange={handleChange}
               placeholder="••••••••"
-              className={`w-full bg-slate-950/50 border ${errors.confirmPassword ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm pr-12`}
+              className={`w-full bg-slate-950/50 border ${errors.confirmPassword ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm pr-12`}
             />
             <button
               type="button"
@@ -205,14 +205,14 @@ export const RegisterFormOrganism = ({
         <Button
           type="submit"
           variant="primary"
-          className="w-full py-4 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-sky-500/20 transition-all active:scale-95 mt-4"
+          className="w-full py-3.5 md:py-4 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-sky-500/20 transition-all active:scale-95 mt-4"
           disabled={loading}
         >
           {loading ? "Registering..." : "Complete Registration"}
         </Button>
       </form>
 
-      <div className="mt-8 text-center">
+      <div className="mt-6 md:mt-8 text-center">
         <p className="text-slate-500 text-sm">
           Already a member?{" "}
           <button

@@ -52,7 +52,7 @@ export const LoginFormOrganism = ({
 
   return (
     <div className="w-full">
-      <div className="text-center mb-10">
+      <div className="text-center mb-6 md:mb-10">
         <div className="inline-flex items-center justify-center p-3 bg-sky-500/10 rounded-2xl border border-sky-500/20 mb-4">
           <img
             src="/logo.png"
@@ -64,7 +64,7 @@ export const LoginFormOrganism = ({
             FinVeda
           </div>
         </div>
-        <h2 className="text-3xl font-black text-white tracking-tight">
+        <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
           Welcome Back
         </h2>
         <p className="text-slate-400 mt-2 text-sm">
@@ -117,7 +117,7 @@ export const LoginFormOrganism = ({
               onChange={handleChange}
               placeholder="••••••••"
               required
-              className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all pr-12"
+              className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all pr-12"
             />
             <button
               type="button"
@@ -132,14 +132,14 @@ export const LoginFormOrganism = ({
         <Button
           type="submit"
           variant="primary"
-          className="w-full py-4 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-sky-500/20 transition-all active:scale-95"
+          className="w-full py-3 md:py-4 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-sky-500/20 transition-all active:scale-95"
           disabled={loading}
         >
           {loading ? "Authenticating..." : "Sign In Now"}
         </Button>
       </form>
 
-      <div className="mt-10 text-center">
+      <div className="mt-6 md:mt-10 text-center">
         <p className="text-slate-500 text-sm">
           New here?{" "}
           <button
