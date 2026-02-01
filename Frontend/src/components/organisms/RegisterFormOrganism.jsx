@@ -3,12 +3,14 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "../atoms/Button";
 import { Card } from "../atoms/Card";
 import { FormField } from "../molecules/FormField";
+import { useNotification } from "../../context/NotificationContext";
 import { API_URL } from "../../config/api";
 
 export const RegisterFormOrganism = ({
   onRegisterSuccess,
   onSwitchToLogin,
 }) => {
+  const { showNotification } = useNotification();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -61,14 +63,14 @@ export const RegisterFormOrganism = ({
       const result = await response.json();
 
       if (response.ok) {
-        alert("Registration successful! Please login.");
+        showNotification("Pendaftaran berhasil! Silakan login.", "success");
         onRegisterSuccess();
       } else {
-        alert(result.message || "Registration failed");
+        showNotification(result.message || "Pendaftaran gagal", "error");
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to connect to server");
+      showNotification("Gagal terhubung ke server", "error");
     } finally {
       setLoading(false);
     }

@@ -3,9 +3,11 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "../atoms/Button";
 import { Card } from "../atoms/Card";
 import { FormField } from "../molecules/FormField";
+import { useNotification } from "../../context/NotificationContext";
 import { API_URL } from "../../config/api";
 
 export const ResetPasswordOrganism = ({ email, otp, onSuccess }) => {
+  const { showNotification } = useNotification();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,7 +35,7 @@ export const ResetPasswordOrganism = ({ email, otp, onSuccess }) => {
       const result = await response.json();
 
       if (response.ok) {
-        alert("Password berhasil diubah, silakan login.");
+        showNotification("Password berhasil diubah, silakan login.", "success");
         onSuccess();
       } else {
         setError(result.message);

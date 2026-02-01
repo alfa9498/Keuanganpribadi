@@ -15,13 +15,19 @@ import {
 } from "lucide-react";
 import { StatCard } from "../molecules/StatCard";
 import { Modal } from "../molecules/Modal";
+import { Button } from "../atoms/Button";
+import { useNotification } from "../../context/NotificationContext";
 import { API_URL } from "../../config/api";
 
 export const AccountDashboardOrganism = ({ user }) => {
+  const { showNotification } = useNotification();
   const [transactions, setTransactions] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [accountToDelete, setAccountToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
   const [accountForm, setAccountForm] = useState({
     name: "",
@@ -254,19 +260,37 @@ export const AccountDashboardOrganism = ({ user }) => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteAccount = async (id) => {
-    if (!window.confirm("Apakah Anda yakin ingin menghapus akun ini?")) return;
+  const handleDeleteClick = (acc) => {
+    setAccountToDelete(acc);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteAccount = async () => {
+    if (!accountToDelete) return;
+    setIsDeleting(true);
     try {
-      const response = await fetch(`${API_URL}/accounts/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${API_URL}/accounts/${accountToDelete.id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
       if (response.ok) {
+        showNotification("Akun berhasil dihapus!", "success");
         fetchAccounts();
         fetchTransactions();
+        setIsDeleteModalOpen(false);
+      } else {
+        const data = await response.json();
+        showNotification(`Gagal menghapus akun: ${data.message}`, "error");
       }
     } catch (err) {
       console.error("Failed to delete account:", err);
+      showNotification(`Error: ${err.message}`, "error");
+    } finally {
+      setIsDeleting(false);
+      setAccountToDelete(null);
     }
   };
 
@@ -278,7 +302,10 @@ export const AccountDashboardOrganism = ({ user }) => {
     const method = editingAccount ? "PUT" : "POST";
 
     if (!user?.id) {
-      alert("Sesi user tidak ditemukan. Silakan login kembali.");
+      showNotification(
+        "Sesi user tidak ditemukan. Silakan login kembali.",
+        "error",
+      );
       return;
     }
 
@@ -311,14 +338,15 @@ export const AccountDashboardOrganism = ({ user }) => {
         fetchAccounts();
         fetchTransactions();
       } else {
-        alert(
+        showNotification(
           data.message ||
             "Gagal menyimpan akun (Status: " + response.status + ")",
+          "error",
         );
       }
     } catch (err) {
       console.error("Error saving account:", err);
-      alert("⚠️ Terjadi kesalahan: " + err.message);
+      showNotification("⚠️ Terjadi kesalahan: " + err.message, "error");
     }
   };
 
@@ -403,7 +431,7 @@ export const AccountDashboardOrganism = ({ user }) => {
                 </button>
                 {!acc.isUnregistered && (
                   <button
-                    onClick={() => handleDeleteAccount(acc.id)}
+                    onClick={() => handleDeleteClick(acc)}
                     className="p-2 text-slate-500 hover:text-rose-500 hover:bg-rose-500/5 rounded-xl transition-all"
                     title="Hapus Akun"
                   >
@@ -553,6 +581,52 @@ export const AccountDashboardOrganism = ({ user }) => {
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Hapus Akun"
+      >
+        <div className="flex flex-col items-center text-center p-4">
+          <div className="w-16 h-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mb-4">
+            <Trash2 size={32} />
+          </div>
+          <h4 className="text-xl font-bold text-slate-800 mb-2">
+            Hapus Akun Ini?
+          </h4>
+          <p className="text-slate-500 mb-6">
+            Tindakan ini akan menghapus akun{" "}
+            <span className="font-extrabold text-slate-900">
+              {accountToDelete?.name}
+            </span>{" "}
+            secara permanen. Transaksi yang terkait dengan akun ini mungkin akan
+            terpengaruh.
+          </p>
+          <div className="flex gap-3 w-full">
+            <Button
+              variant="ghost"
+              className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl py-3 font-bold"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              Batal
+            </Button>
+            <Button
+              variant="danger"
+              className="flex-1 flex items-center justify-center gap-2 rounded-xl py-3 font-bold shadow-lg shadow-rose-500/20"
+              onClick={confirmDeleteAccount}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <Trash2 size={18} />
+              )}
+              Hapus Akun
+            </Button>
+          </div>
+        </div>
       </Modal>
 
       {/* Recent Transfers Section */}
