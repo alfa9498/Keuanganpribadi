@@ -785,47 +785,55 @@ export const DashboardOrganism = ({
   return (
     <div className="w-full max-w-[1600px] p-4 md:p-6 space-y-4 animate-fade-in font-inter">
       {/* Lanyard Summary Slider */}
-      <LanyardSlider
-        items={[
-          {
-            title: "Total Pemasukan",
-            value: formatCurrency(summary.income),
-            type: "income",
-          },
-          {
-            title: "Total Pengeluaran",
-            value: formatCurrency(summary.expense),
-            type: "expense",
-          },
-          {
-            title: "Saldo Bersih",
-            value: formatCurrency(summary.balance),
-            type: "balance",
-          },
-          {
-            title:
-              debtSummary.remainingHutang > 0
-                ? "Hutang Belum Lunas"
-                : "Status Hutang",
-            value:
-              debtSummary.remainingHutang > 0
-                ? formatCurrency(debtSummary.remainingHutang)
-                : "Lunas",
-            type: "debt",
-            details: debtSummary.hutangDetails,
-          },
-          {
-            title: "Piutang Aktif",
-            value: formatCurrency(debtSummary.remainingPiutang),
-            type: "receivable",
-            details: debtSummary.piutangDetails,
-          },
-        ].filter((item) => {
-          if (item.type === "receivable" && debtSummary.remainingPiutang <= 0)
-            return false;
-          return true;
-        })}
-      />
+      {React.useMemo(
+        () => (
+          <LanyardSlider
+            items={[
+              {
+                title: "Total Pemasukan",
+                value: formatCurrency(summary.income),
+                type: "income",
+              },
+              {
+                title: "Total Pengeluaran",
+                value: formatCurrency(summary.expense),
+                type: "expense",
+              },
+              {
+                title: "Saldo Bersih",
+                value: formatCurrency(summary.balance),
+                type: "balance",
+              },
+              {
+                title:
+                  debtSummary.remainingHutang > 0
+                    ? "Hutang Belum Lunas"
+                    : "Status Hutang",
+                value:
+                  debtSummary.remainingHutang > 0
+                    ? formatCurrency(debtSummary.remainingHutang)
+                    : "Lunas",
+                type: "debt",
+                details: debtSummary.hutangDetails,
+              },
+              {
+                title: "Piutang Aktif",
+                value: formatCurrency(debtSummary.remainingPiutang),
+                type: "receivable",
+                details: debtSummary.piutangDetails,
+              },
+            ].filter((item) => {
+              if (
+                item.type === "receivable" &&
+                debtSummary.remainingPiutang <= 0
+              )
+                return false;
+              return true;
+            })}
+          />
+        ),
+        [summary, debtSummary],
+      )}
 
       <BentoGrid>
         {/* 5. Main Trend Chart (Big) */}

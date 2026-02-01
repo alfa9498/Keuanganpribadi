@@ -27,15 +27,16 @@ export const LanyardSlider = ({ items, className = "" }) => {
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
-    const { scrollLeft, scrollWidth, offsetWidth } = scrollRef.current;
-
-    // Logic to snap back to the middle section if we scroll too far in either direction
+    const { scrollLeft, scrollWidth } = scrollRef.current;
     const segmentWidth = scrollWidth / 3;
 
-    if (scrollLeft < segmentWidth * 0.5) {
-      scrollRef.current.scrollLeft += segmentWidth;
-    } else if (scrollLeft > segmentWidth * 1.5) {
-      scrollRef.current.scrollLeft -= segmentWidth;
+    // Jump forward if scrolled into the first segment
+    if (scrollLeft < 10) {
+      scrollRef.current.scrollLeft = segmentWidth;
+    }
+    // Jump backward if scrolled into the third segment
+    else if (scrollLeft > segmentWidth * 2) {
+      scrollRef.current.scrollLeft = segmentWidth;
     }
   };
 
@@ -47,7 +48,7 @@ export const LanyardSlider = ({ items, className = "" }) => {
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex overflow-x-auto gap-12 scrollbar-hide px-[15%] py-8 snap-x snap-mandatory scroll-smooth"
+        className="flex overflow-x-auto gap-12 scrollbar-hide px-[15%] py-8 snap-x snap-mandatory"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {duplicatedItems.map((item, index) => (
