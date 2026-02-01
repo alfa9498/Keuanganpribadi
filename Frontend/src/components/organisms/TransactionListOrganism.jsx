@@ -6,6 +6,7 @@ import { Modal } from "../molecules/Modal";
 import { ImportExcelOrganism } from "./ImportExcelOrganism";
 import { TransactionFormOrganism } from "./TransactionFormOrganism";
 import { TimeFilter } from "../molecules/TimeFilter";
+import { API_URL } from "../../config/api";
 import { CategoryFilter } from "../molecules/CategoryFilter";
 import { AccountFilter } from "../molecules/AccountFilter";
 
@@ -22,6 +23,26 @@ export const TransactionListOrganism = ({
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [activeListTab, setActiveListTab] = useState("all"); // all, income, expense
   const [refreshKey, setRefreshKey] = useState(0);
+  const [accounts, setAccounts] = useState([]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchAccounts();
+    }
+  }, [user?.id]);
+
+  const fetchAccounts = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await fetch(`${API_URL}/accounts?user_id=${user.id}`, {
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (response.ok) setAccounts(result.data);
+    } catch (error) {
+      console.error("Failed to fetch accounts:", error);
+    }
+  };
 
   return (
     <div className="w-full max-w-[1600px] p-4 space-y-4 animate-fade-in">
@@ -69,6 +90,7 @@ export const TransactionListOrganism = ({
           <AccountFilter
             currentAccount={filterAccount}
             onAccountChange={setFilterAccount}
+            accounts={accounts}
           />
           <CategoryFilter
             currentCategory={filterCategory}
