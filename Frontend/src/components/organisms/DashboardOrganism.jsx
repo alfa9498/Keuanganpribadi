@@ -261,6 +261,7 @@ export const DashboardOrganism = ({
   });
   const [accountSummaries, setAccountSummaries] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [debtModal, setDebtModal] = useState({
     show: false,
     type: "",
@@ -301,6 +302,12 @@ export const DashboardOrganism = ({
 
     setDebtModal({ show: true, type, title, data: relevantData });
   };
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (user?.id) {
@@ -1083,7 +1090,12 @@ export const DashboardOrganism = ({
               <BarChart
                 layout="vertical"
                 data={barDataMain}
-                margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                margin={{
+                  top: 5,
+                  right: isMobile ? 10 : 30,
+                  left: isMobile ? 0 : 40,
+                  bottom: 5,
+                }}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -1094,8 +1106,8 @@ export const DashboardOrganism = ({
                 <YAxis
                   dataKey="name"
                   type="category"
-                  width={100}
-                  tick={{ fill: "#94a3b8", fontSize: 11 }}
+                  width={isMobile ? 60 : 100}
+                  tick={{ fill: "#94a3b8", fontSize: isMobile ? 9 : 11 }}
                   tickLine={false}
                   axisLine={false}
                 />
@@ -1138,7 +1150,12 @@ export const DashboardOrganism = ({
               <BarChart
                 layout="vertical"
                 data={barDataSub}
-                margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                margin={{
+                  top: 5,
+                  right: isMobile ? 10 : 30,
+                  left: isMobile ? 0 : 40,
+                  bottom: 5,
+                }}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -1149,8 +1166,8 @@ export const DashboardOrganism = ({
                 <YAxis
                   dataKey="name"
                   type="category"
-                  width={100}
-                  tick={{ fill: "#94a3b8", fontSize: 11 }}
+                  width={isMobile ? 60 : 100}
+                  tick={{ fill: "#94a3b8", fontSize: isMobile ? 9 : 11 }}
                   tickLine={false}
                   axisLine={false}
                 />
