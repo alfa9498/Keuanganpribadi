@@ -90,7 +90,7 @@ export const LoginFormOrganism = ({
               value={formData.email}
               onChange={handleChange}
               placeholder="name@company.com"
-              required
+              autoComplete="off"
               className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-3.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all"
             />
           </div>
@@ -116,7 +116,7 @@ export const LoginFormOrganism = ({
               value={formData.password}
               onChange={handleChange}
               placeholder="••••••••"
-              required
+              autoComplete="off"
               className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all pr-12"
             />
             <button
