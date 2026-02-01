@@ -379,7 +379,7 @@ export const AccountDashboardOrganism = ({ user }) => {
       <div
         ref={gridRef}
         onMouseMove={handleGridMouseMove}
-        className="chroma-grid"
+        className="chroma-grid chroma-grid-mobile-scroll"
       >
         {accountSummaries.map((acc) => (
           <div
