@@ -3,6 +3,7 @@ import { Button } from "../atoms/Button";
 import { StatCard } from "../molecules/StatCard";
 import { BentoGrid, BentoCard } from "../atoms/BentoGrid";
 import { AnimatedList } from "../atoms/AnimatedList";
+import { InfiniteMarquee } from "../atoms/InfiniteMarquee";
 
 import {
   AreaChart,
@@ -1001,43 +1002,38 @@ export const DashboardOrganism = ({
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none z-0"></div>
         </BentoCard>
 
-        {/* 6. Accounts List (Scrollable) */}
-        <BentoCard className="col-span-1 md:col-span-1 row-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-0 overflow-hidden flex flex-col">
-          <div className="p-6 pb-2">
+        {/* 6. Accounts List (Infinite Marquee Ribbon) */}
+        <BentoCard className="col-span-1 md:col-span-4 lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-0 overflow-hidden flex flex-col md:flex-row items-center">
+          <div className="p-6 md:pr-10 border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800 shrink-0 w-full md:w-auto">
             <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
               <Wallet className="text-blue-500" size={18} />
               Akun Saya
             </h3>
             <p className="text-slate-400 text-xs">Saldo real-time</p>
           </div>
-          <div className="flex-1 overflow-hidden">
-            <AnimatedList
-              items={accountSummaries}
-              onItemSelect={(acc) => console.log("Selected account:", acc)}
-              showGradients
-              enableArrowNavigation
-              displayScrollbar
-              className="h-[400px]"
-              renderItem={(acc) => (
-                <div className="flex items-center justify-between p-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm">
-                      {getAccountIcon(acc.name, acc.icon)}
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-bold text-slate-400 uppercase leading-none mb-1">
-                        {acc.name}
-                      </p>
-                      <p
-                        className={`text-sm font-black leading-none ${acc.balance >= 0 ? "text-slate-800 dark:text-white" : "text-rose-500"}`}
-                      >
-                        {formatCurrency(acc.balance)}
-                      </p>
-                    </div>
+          <div className="flex-1 w-full overflow-hidden py-4 md:py-0">
+            <InfiniteMarquee speed={30} className="w-full">
+              {accountSummaries.map((acc, index) => (
+                <div
+                  key={acc.id || index}
+                  className="flex items-center gap-3 px-6 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800/50 hover:border-blue-500/30 transition-colors shrink-0"
+                >
+                  <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
+                    {getAccountIcon(acc.name, acc.icon)}
+                  </div>
+                  <div className="whitespace-nowrap">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase leading-none mb-1">
+                      {acc.name}
+                    </p>
+                    <p
+                      className={`text-sm font-black leading-none ${acc.balance >= 0 ? "text-slate-800 dark:text-white" : "text-rose-500"}`}
+                    >
+                      {formatCurrency(acc.balance)}
+                    </p>
                   </div>
                 </div>
-              )}
-            />
+              ))}
+            </InfiniteMarquee>
           </div>
         </BentoCard>
 
