@@ -2,7 +2,7 @@ const db = require("../config/db");
 const jwt = require("jsonwebtoken");
 const { sendEmail, sendWhatsApp } = require("../services/notificationService");
 
-const JWT_SECRET = "your_jwt_secret_key"; // In production, use environment variable
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key"; // In production, use environment variable
 
 exports.register = (req, res) => {
   const { fullName, email, phone, password, gender } = req.body;
@@ -78,7 +78,7 @@ exports.login = (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: true, // MUST be true for Vercel (HTTPS)
-      sameSite: "none", // Needed for cross-site (preview to prod)
+      sameSite: "lax", // Better for same-domain (Lax instead of None)
       maxAge: 3600000, // 1 hour
     });
 

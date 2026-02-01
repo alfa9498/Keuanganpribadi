@@ -52,6 +52,11 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
+// Verify Env Secrets
+if (process.env.VERCEL === "1" && !process.env.JWT_SECRET) {
+  console.warn("⚠️ WARNING: JWT_SECRET is not set in environment variables!");
+}
+
 // Request Logger
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
