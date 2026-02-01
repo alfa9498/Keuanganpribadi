@@ -797,7 +797,7 @@ export const DashboardOrganism = ({
           </div>
         </BentoCard>
 
-        {/* 4. Debt Status / Account Summary Mini */}
+        {/* 4. Debt Status */}
         <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800 relative overflow-hidden group">
           {debtSummary.remainingHutang > 0 ? (
             <>
@@ -817,41 +817,64 @@ export const DashboardOrganism = ({
                 Lihat Detail
               </button>
             </>
-          ) : debtSummary.remainingPiutang > 0 ? (
-            <>
-              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Coins size={80} className="text-emerald-500" />
-              </div>
-              <p className="text-emerald-500 text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                <Coins size={16} /> Piutang Aktif
-              </p>
-              <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
-                {formatCurrency(debtSummary.remainingPiutang)}
-              </h3>
-              <button
-                onClick={() => handleOpenDebtModal("piutang")}
-                className="text-xs text-emerald-500 underline mt-2 relative z-10 font-bold"
-              >
-                Lihat Detail
-              </button>
-            </>
           ) : (
             <>
               <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Landmark size={80} className="text-blue-500" />
+                <Wallet size={80} className="text-blue-500" />
               </div>
-              <p className="text-slate-500 text-sm font-medium uppercase tracking-wider flex items-center gap-2">
-                <Landmark size={16} /> Total Akun
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
+                Status Hutang
               </p>
-              <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
-                {accountSummaries.length} Akun Terdaftar
+              <h3 className="text-2xl font-black text-emerald-500 mt-2 relative z-10">
+                Semua Lunas
               </h3>
-              <div className="text-[10px] text-slate-400 mt-1">
-                Keuangan terpantau aman
+              <div className="text-[10px] text-slate-400 mt-1 relative z-10">
+                Luar biasa! Tidak ada hutang aktif
               </div>
             </>
           )}
         </BentoCard>
+
+        {/* 4b. Receivable Status (Piutang) */}
+        {(debtSummary.remainingPiutang > 0 ||
+          debtSummary.remainingHutang > 0) && (
+          <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800 relative overflow-hidden group">
+            {debtSummary.remainingPiutang > 0 ? (
+              <>
+                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Coins size={80} className="text-emerald-500" />
+                </div>
+                <p className="text-emerald-500 text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+                  <Coins size={16} /> Piutang Aktif
+                </p>
+                <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
+                  {formatCurrency(debtSummary.remainingPiutang)}
+                </h3>
+                <button
+                  onClick={() => handleOpenDebtModal("piutang")}
+                  className="text-xs text-emerald-500 underline mt-2 relative z-10 font-bold"
+                >
+                  Lihat Detail
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Landmark size={80} className="text-blue-500" />
+                </div>
+                <p className="text-slate-500 text-sm font-medium uppercase tracking-wider flex items-center gap-2">
+                  <Landmark size={16} /> Total Akun
+                </p>
+                <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
+                  {accountSummaries.length} Akun Terdaftar
+                </h3>
+                <div className="text-[10px] text-slate-400 mt-1">
+                  Keuangan terpantau aman
+                </div>
+              </>
+            )}
+          </BentoCard>
+        )}
 
         {/* 5. Main Trend Chart (Big) */}
         <BentoCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-slate-900 !p-0 border border-slate-800 overflow-hidden relative">
@@ -1184,6 +1207,66 @@ export const DashboardOrganism = ({
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+          </div>
+        </BentoCard>
+        {/* 10. Recent Transactions List */}
+        <BentoCard className="col-span-1 md:col-span-2 lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-0 overflow-hidden flex flex-col min-h-[400px]">
+          <div className="p-6 pb-2">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+              <Calendar className="text-emerald-500" size={18} />
+              Transaksi Terbaru
+            </h3>
+            <p className="text-slate-400 text-xs">5 aktifitas terakhir</p>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <AnimatedList
+              items={recentTransactions}
+              onItemSelect={(tx) => console.log("Selected transaction:", tx)}
+              showGradients
+              enableArrowNavigation
+              displayScrollbar
+              className="h-[320px]"
+              renderItem={(tx) => (
+                <div className="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`p-2 rounded-xl ${tx.type === "income" ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"}`}
+                    >
+                      {tx.type === "income" ? (
+                        <TrendingUp size={20} />
+                      ) : (
+                        <CreditCard size={20} />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-700 dark:text-slate-200">
+                        {tx.description || tx.category}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        {new Date(tx.date).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                        {" • "}
+                        {tx.account}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p
+                      className={`font-black ${tx.type === "income" ? "text-emerald-500" : "text-rose-500"}`}
+                    >
+                      {tx.type === "income" ? "+" : "-"}{" "}
+                      {formatCurrency(tx.amount)}
+                    </p>
+                    <p className="text-[10px] text-slate-400 uppercase tracking-wider">
+                      {tx.category}
+                    </p>
+                  </div>
+                </div>
+              )}
+            />
           </div>
         </BentoCard>
       </BentoGrid>
