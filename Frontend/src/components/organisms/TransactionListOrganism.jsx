@@ -46,13 +46,13 @@ export const TransactionListOrganism = ({
 
   return (
     <div className="w-full max-w-[1600px] p-4 space-y-4 animate-fade-in">
-      <div className="flex flex-col gap-6 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm transition-all">
-        <div className="flex flex-col xl:flex-row justify-between items-center gap-6">
+      <div className="flex flex-col gap-4 md:gap-6 bg-white p-4 md:p-5 rounded-3xl border border-slate-100 shadow-sm transition-all">
+        <div className="flex flex-col xl:flex-row justify-between items-center gap-4 md:gap-6">
           {/* Top Row / Left: Type Tabs */}
-          <div className="flex bg-slate-100 p-1.5 rounded-2xl w-full xl:w-auto overflow-x-auto shadow-inner">
+          <div className="flex flex-wrap bg-slate-100 p-1.5 rounded-2xl w-full xl:w-auto shadow-inner">
             <button
               onClick={() => setActiveListTab("all")}
-              className={`flex-1 xl:flex-none px-6 py-2.5 text-sm font-black rounded-xl transition-all whitespace-nowrap ${
+              className={`flex-1 xl:flex-none px-4 md:px-6 py-2.5 text-xs md:text-sm font-black rounded-xl transition-all whitespace-nowrap ${
                 activeListTab === "all"
                   ? "bg-white text-finance-primary shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
@@ -62,7 +62,7 @@ export const TransactionListOrganism = ({
             </button>
             <button
               onClick={() => setActiveListTab("income")}
-              className={`flex-1 xl:flex-none px-6 py-2.5 text-sm font-black rounded-xl transition-all whitespace-nowrap ${
+              className={`flex-1 xl:flex-none px-4 md:px-6 py-2.5 text-xs md:text-sm font-black rounded-xl transition-all whitespace-nowrap ${
                 activeListTab === "income"
                   ? "bg-white text-emerald-600 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
@@ -72,7 +72,7 @@ export const TransactionListOrganism = ({
             </button>
             <button
               onClick={() => setActiveListTab("expense")}
-              className={`flex-1 xl:flex-none px-6 py-2.5 text-sm font-black rounded-xl transition-all whitespace-nowrap ${
+              className={`flex-1 xl:flex-none px-4 md:px-6 py-2.5 text-xs md:text-sm font-black rounded-xl transition-all whitespace-nowrap ${
                 activeListTab === "expense"
                   ? "bg-white text-rose-600 shadow-sm"
                   : "text-slate-500 hover:text-slate-700"
@@ -83,14 +83,14 @@ export const TransactionListOrganism = ({
           </div>
 
           {/* Top Row / Right: Actions */}
-          <div className="flex gap-3 w-full xl:w-auto justify-center xl:justify-end">
+          <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
             <Button
               onClick={() => setIsAddOpen(true)}
               variant="primary"
-              className="flex-1 xl:flex-none group flex items-center justify-center gap-2 px-6 py-3 rounded-2xl transition-all shadow-lg shadow-finance-primary/20 hover:scale-[1.02] active:scale-95 bg-slate-900 border-none"
+              className="flex-1 group flex items-center justify-center gap-2 px-6 py-3 rounded-2xl transition-all shadow-lg shadow-finance-primary/20 hover:scale-[1.02] active:scale-95 bg-slate-900 border-none"
             >
               <Plus size={18} className="text-white" />
-              <span className="font-bold whitespace-nowrap text-white">
+              <span className="font-bold whitespace-nowrap text-white text-sm">
                 Add Transaction
               </span>
             </Button>
@@ -98,10 +98,12 @@ export const TransactionListOrganism = ({
             <Button
               onClick={() => setIsImportOpen(true)}
               variant="ghost"
-              className="xl:flex-none group flex items-center justify-center gap-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100/50 px-6 py-3 rounded-2xl transition-all active:scale-95"
+              className="flex-1 group flex items-center justify-center gap-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100/50 px-6 py-3 rounded-2xl transition-all active:scale-95"
             >
               <FileUp size={18} />
-              <span className="font-bold whitespace-nowrap">Import</span>
+              <span className="font-bold whitespace-nowrap text-sm">
+                Import
+              </span>
             </Button>
           </div>
         </div>
