@@ -52,7 +52,7 @@ export const DoubleLanyardSlider = ({
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex overflow-x-auto scrollbar-hide px-2 md:px-[8%] py-4 snap-x snap-mandatory"
+        className="flex overflow-x-auto scrollbar-hide px-0 md:px-[8%] py-4 snap-x snap-mandatory"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         <div
@@ -62,7 +62,7 @@ export const DoubleLanyardSlider = ({
           }}
         >
           {duplicatedItems.map((acc, index) => (
-            <div key={`${acc.id}-${index}`} className="snap-center px-2">
+            <div key={`${acc.id}-${index}`} className="snap-center">
               {acc.isFiller ? (
                 <div className="w-64 h-80 opacity-0 pointer-events-none" />
               ) : (
