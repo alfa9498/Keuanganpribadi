@@ -54,9 +54,12 @@ const init = () => {
 
   // Initialize Bot instance if not exists
   if (!bot) {
-    bot = new TelegramBot(token, { polling: !process.env.VERCEL });
+    // CRITICAL: Never use polling in Vercel/serverless
+    const usePolling =
+      process.env.VERCEL !== "1" && process.env.NODE_ENV !== "production";
+    bot = new TelegramBot(token, { polling: usePolling });
     console.log(
-      `🤖 Telegram Bot instance created (Polling: ${!process.env.VERCEL})`,
+      `🤖 Telegram Bot instance created (Polling: ${usePolling}, Vercel: ${process.env.VERCEL})`,
     );
   }
 
@@ -74,10 +77,21 @@ const init = () => {
   if (webhookHost && process.env.VERCEL === "1") {
     const webhookUrl = `${webhookHost}/telegram-webhook`;
     console.log(`🤖 Setting/Ensuring Webhook: ${webhookUrl}`);
+
+    // Delete any existing webhook first to avoid conflicts
     bot
-      .setWebHook(webhookUrl)
+      .deleteWebHook()
+      .then(() => {
+        console.log("🗑️ Deleted old webhook");
+        return bot.setWebHook(webhookUrl);
+      })
       .then((res) =>
-        console.log("✅ Webhook Response:", res, "for URL:", webhookUrl),
+        console.log(
+          "✅ Webhook Set Successfully:",
+          res,
+          "for URL:",
+          webhookUrl,
+        ),
       )
       .catch((err) => console.error("❌ Webhook Error:", err.message));
   } else if (!process.env.VERCEL) {
