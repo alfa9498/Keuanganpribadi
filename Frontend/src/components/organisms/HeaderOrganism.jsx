@@ -283,79 +283,79 @@ export const HeaderOrganism = ({
             </>
           )}
 
-          {/* Notification Bell - Always visible for balance */}
-          <div className="relative" ref={notifRef}>
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative flex h-9 w-9 items-center justify-center rounded-full border-[0.5px] border-slate-200 bg-slate-50 hover:text-finance-primary hover:bg-slate-100 transition-colors"
-            >
-              {notificationCount > 0 && (
+          {/* Notification Bell - Only show when there are notifications */}
+          {notificationCount > 0 && (
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative flex h-9 w-9 items-center justify-center rounded-full border-[0.5px] border-slate-200 bg-slate-50 hover:text-finance-primary hover:bg-slate-100 transition-colors"
+              >
                 <span className="absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-red-500">
                   <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
                 </span>
-              )}
-              <Bell size={18} />
-            </button>
+                <Bell size={18} />
+              </button>
 
-            {/* Notification Dropdown */}
-            {showNotifications && (
-              <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-slate-200 animate-fade-in max-h-[500px] flex flex-col">
-                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-slate-800">
-                      Notifications
-                    </h3>
-                    <p className="text-xs text-slate-500">
-                      {notificationCount} unread
-                    </p>
-                  </div>
-                  {notificationCount > 0 && (
-                    <button
-                      onClick={markAllAsRead}
-                      className="text-xs text-finance-primary hover:underline font-medium"
-                    >
-                      Mark all as read
-                    </button>
-                  )}
-                </div>
-
-                <div className="overflow-y-auto flex-1">
-                  {notifications.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-slate-400 text-sm">
-                      No notifications yet
+              {/* Notification Dropdown */}
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-slate-200 animate-fade-in max-h-[500px] flex flex-col">
+                  <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold text-slate-800">
+                        Notifications
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        {notificationCount} unread
+                      </p>
                     </div>
-                  ) : (
-                    notifications.map((notif) => (
-                      <div
-                        key={notif.id}
-                        className={`px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer group ${!notif.is_read ? "bg-blue-50/50" : ""}`}
-                        onClick={() => !notif.is_read && markAsRead(notif.id)}
+                    {notificationCount > 0 && (
+                      <button
+                        onClick={markAllAsRead}
+                        className="text-xs text-finance-primary hover:underline font-medium"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-medium text-slate-800 truncate">
-                                {notif.title}
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="overflow-y-auto flex-1">
+                    {notifications.length === 0 ? (
+                      <div className="px-4 py-8 text-center text-slate-400 text-sm">
+                        No notifications yet
+                      </div>
+                    ) : (
+                      notifications.map((notif) => (
+                        <div
+                          key={notif.id}
+                          className={`px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer group ${!notif.is_read ? "bg-blue-50/50" : ""}`}
+                          onClick={() => !notif.is_read && markAsRead(notif.id)}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-medium text-slate-800 truncate">
+                                  {notif.title}
+                                </p>
+                                {!notif.is_read && (
+                                  <span className="h-2 w-2 rounded-full bg-finance-primary flex-shrink-0"></span>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-600 mt-1 line-clamp-2">
+                                {notif.message}
                               </p>
-                              {!notif.is_read && (
-                                <span className="h-2 w-2 rounded-full bg-finance-primary flex-shrink-0"></span>
-                              )}
+                              <p className="text-xs text-slate-400 mt-1">
+                                {formatTimeAgo(notif.created_at)}
+                              </p>
                             </div>
-                            <p className="text-xs text-slate-600 mt-1 line-clamp-2">
-                              {notif.message}
-                            </p>
-                            <p className="text-xs text-slate-400 mt-1">
-                              {formatTimeAgo(notif.created_at)}
-                            </p>
                           </div>
                         </div>
-                      </div>
-                    ))
-                  )}
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </header>
