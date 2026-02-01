@@ -1,6 +1,17 @@
-import React from "react";
-import { motion, useSpring, useTransform } from "framer-motion";
-import { TrendingUp, Coins, Wallet, Landmark, CreditCard } from "lucide-react";
+import {
+  motion,
+  useSpring,
+  useTransform,
+  AnimatePresence,
+} from "framer-motion";
+import {
+  TrendingUp,
+  Coins,
+  Wallet,
+  Landmark,
+  CreditCard,
+  ChevronRight,
+} from "lucide-react";
 
 export const LanyardCard = ({
   title,
@@ -8,7 +19,9 @@ export const LanyardCard = ({
   type,
   icon: CustomIcon,
   className = "",
+  details = [],
 }) => {
+  const [isHovered, setIsHovered] = React.useState(false);
   // Spring physics for swinging effect
   const x = useSpring(0, { stiffness: 100, damping: 10 });
   const rotate = useTransform(x, [-50, 50], [-15, 15]);
@@ -62,6 +75,14 @@ export const LanyardCard = ({
 
   const theme = getTheme();
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   return (
     <div
       className={`relative flex flex-col items-center pt-10 min-w-[200px] select-none ${className}`}
@@ -74,13 +95,47 @@ export const LanyardCard = ({
 
       {/* The Card */}
       <motion.div
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         style={{ rotate, x }}
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.5}
         whileHover={{ scale: 1.05 }}
-        className={`w-56 h-72 rounded-[3rem] bg-white dark:bg-slate-900 border ${theme.border} shadow-2xl flex flex-col items-center p-8 text-center justify-between cursor-grab active:cursor-grabbing overflow-hidden`}
+        className={`w-56 h-72 rounded-[3rem] bg-white dark:bg-slate-900 border ${theme.border} shadow-2xl flex flex-col items-center p-8 text-center justify-between cursor-grab active:cursor-grabbing overflow-hidden relative`}
       >
+        <AnimatePresence>
+          {isHovered && details && details.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 10 }}
+              className="absolute inset-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-6 flex flex-col overflow-y-auto"
+            >
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
+                Detail Breakdown
+              </p>
+              <div className="space-y-3">
+                {details.map((item, idx) => (
+                  <div key={idx} className="flex flex-col items-start gap-1">
+                    <div className="flex items-center gap-1.5 w-full">
+                      <ChevronRight size={10} className={theme.color} />
+                      <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 line-clamp-1 text-left flex-1">
+                        {item.name}
+                      </span>
+                    </div>
+                    <span className={`text-xs font-black ${theme.color} pl-4`}>
+                      {formatCurrency(item.amount)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-auto pt-4 text-[9px] text-slate-400 italic">
+                * Geser kartu untuk melihat kartu lain
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         {/* Decorative Hole */}
         <div className="absolute top-4 w-8 h-2 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700" />
 

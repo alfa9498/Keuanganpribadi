@@ -56,6 +56,7 @@ export const LanyardSlider = ({ items, className = "" }) => {
               title={item.title}
               value={item.value}
               type={item.type}
+              details={item.details}
             />
           </div>
         ))}

@@ -256,6 +256,8 @@ export const DashboardOrganism = ({
   const [debtSummary, setDebtSummary] = useState({
     remainingHutang: 0,
     remainingPiutang: 0,
+    hutangDetails: [],
+    piutangDetails: [],
   });
   const [accountSummaries, setAccountSummaries] = useState([]);
   const [accounts, setAccounts] = useState([]);
@@ -521,6 +523,8 @@ export const DashboardOrganism = ({
     setAccountSummaries(accList);
 
     // Hutang & Piutang Logic (Always based on ALL transactions for current status)
+    const hutangMap = {};
+    const piutangMap = {};
     let totalHutangReceived = 0;
     let totalHutangPaid = 0;
     let totalPiutangGiven = 0;
@@ -528,19 +532,42 @@ export const DashboardOrganism = ({
 
     allTransactions.forEach((tx) => {
       const amt = parseFloat(tx.amount);
-      if (tx.type === "income" && tx.category === "Hutang")
+      const desc = tx.description || tx.category || "Tanpa Keterangan";
+
+      if (tx.type === "income" && tx.category === "Hutang") {
         totalHutangReceived += amt;
-      if (tx.type === "expense" && tx.category === "Cicilan / Hutang")
+        hutangMap[desc] = (hutangMap[desc] || 0) + amt;
+      }
+      if (tx.type === "expense" && tx.category === "Cicilan / Hutang") {
         totalHutangPaid += amt;
-      if (tx.type === "expense" && tx.category === "Piutang")
+        // Subtract from debt if description matches (simplistic but better than nothing)
+        // Or we can just list current outstanding if we have a way to track "to whom"
+        // For now, let's keep it simple: group income "Hutang" by desc, and subtract "Cicilan" by desc
+        hutangMap[desc] = (hutangMap[desc] || 0) - amt;
+      }
+      if (tx.type === "expense" && tx.category === "Piutang") {
         totalPiutangGiven += amt;
-      if (tx.type === "income" && tx.category === "Piutang")
+        piutangMap[desc] = (piutangMap[desc] || 0) + amt;
+      }
+      if (tx.type === "income" && tx.category === "Piutang") {
         totalPiutangReceived += amt;
+        piutangMap[desc] = (piutangMap[desc] || 0) - amt;
+      }
     });
+
+    const hutangDetails = Object.keys(hutangMap)
+      .map((name) => ({ name, amount: hutangMap[name] }))
+      .filter((d) => d.amount > 0);
+
+    const piutangDetails = Object.keys(piutangMap)
+      .map((name) => ({ name, amount: piutangMap[name] }))
+      .filter((d) => d.amount > 0);
 
     setDebtSummary({
       remainingHutang: Math.max(0, totalHutangReceived - totalHutangPaid),
       remainingPiutang: Math.max(0, totalPiutangGiven - totalPiutangReceived),
+      hutangDetails,
+      piutangDetails,
     });
 
     // Sort by date old -> new for Chart
@@ -785,11 +812,13 @@ export const DashboardOrganism = ({
                 ? formatCurrency(debtSummary.remainingHutang)
                 : "Lunas",
             type: "debt",
+            details: debtSummary.hutangDetails,
           },
           {
             title: "Piutang Aktif",
             value: formatCurrency(debtSummary.remainingPiutang),
             type: "receivable",
+            details: debtSummary.piutangDetails,
           },
         ].filter((item) => {
           if (item.type === "receivable" && debtSummary.remainingPiutang <= 0)
