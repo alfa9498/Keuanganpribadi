@@ -35,17 +35,17 @@ export const BaseFilterDropdown = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 bg-white text-slate-700 text-sm font-bold py-2.5 px-4 rounded-xl border border-slate-200 hover:border-finance-primary/50 focus:outline-none focus:ring-4 focus:ring-finance-primary/10 transition-all cursor-pointer w-full md:min-w-[170px] shadow-sm hover:shadow-md active:scale-95"
+        className="flex items-center gap-3 bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold py-2.5 px-4 rounded-2xl border border-slate-200 hover:border-finance-primary/50 focus:outline-none focus:ring-4 focus:ring-finance-primary/10 transition-all cursor-pointer w-full md:min-w-[170px] shadow-sm hover:shadow-md active:scale-95 justify-between"
       >
-        {Icon && (
-          <Icon
-            size={16}
-            className={isOpen ? "text-finance-primary" : "text-slate-400"}
-          />
-        )}
-        <span className="flex-1 text-left truncate">
-          {selectedOptionLabel || placeholder}
-        </span>
+        <div className="flex items-center gap-3 truncate">
+          {Icon && (
+            <Icon
+              size={16}
+              className={isOpen ? "text-finance-primary" : "text-slate-400"}
+            />
+          )}
+          <span className="truncate">{selectedOptionLabel || placeholder}</span>
+        </div>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
