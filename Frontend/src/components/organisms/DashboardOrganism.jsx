@@ -753,106 +753,134 @@ export const DashboardOrganism = ({
     );
   };
 
+  const SummaryCard = ({ children, index, className = "" }) => (
+    <div
+      className={`md:contents scroll-stack-card-wrapper`}
+      style={{ top: `${80 + index * 20}px`, zIndex: index }}
+    >
+      <div
+        className={`scroll-stack-card md:!p-0 md:bg-transparent md:border-0 md:shadow-none md:m-0 md:min-h-0 ${className}`}
+      >
+        {children}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="w-full max-w-[1600px] pt-0 px-0 md:px-6 pb-4 md:pb-6 space-y-4 animate-fade-in font-inter">
+    <div className="w-full max-w-[1600px] pt-0 px-0 md:px-6 pb-4 md:pb-6 space-y-0 md:space-y-4 animate-fade-in font-inter">
+      {/* Scroll Stack Container for Mobile */}
+      <div className="md:contents scroll-stack-scroller">
+        <div className="md:contents scroll-stack-inner flex flex-col px-4 md:px-0">
+          <BentoGrid className="!gap-0 md:!gap-4">
+            {/* 1. Stat Card: Income */}
+            <SummaryCard index={0}>
+              <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800 h-full">
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
+                  Total Pemasukan
+                </p>
+                <h3 className="text-2xl font-black text-emerald-500 mt-2">
+                  {formatCurrency(summary.income)}
+                </h3>
+                <div className="text-[10px] text-slate-400 mt-1">
+                  Keuangan masuk periode ini
+                </div>
+              </BentoCard>
+            </SummaryCard>
+
+            {/* 2. Stat Card: Expense */}
+            <SummaryCard index={1}>
+              <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800 h-full">
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
+                  Total Pengeluaran
+                </p>
+                <h3 className="text-2xl font-black text-rose-500 mt-2">
+                  {formatCurrency(summary.expense)}
+                </h3>
+                <div className="text-[10px] text-slate-400 mt-1">
+                  Keuangan keluar periode ini
+                </div>
+              </BentoCard>
+            </SummaryCard>
+
+            {/* 3. Stat Card: Balance */}
+            <SummaryCard index={2}>
+              <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800 h-full">
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
+                  Saldo Bersih
+                </p>
+                <h3
+                  className={`text-2xl font-black mt-2 ${summary.balance >= 0 ? "text-blue-500" : "text-rose-600"}`}
+                >
+                  {formatCurrency(summary.balance)}
+                </h3>
+                <div className="text-[10px] text-slate-400 mt-1">
+                  Selisih masuk & keluar
+                </div>
+              </BentoCard>
+            </SummaryCard>
+
+            {/* 4. Debt Status / Account Summary Mini */}
+            <SummaryCard index={3}>
+              <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800 relative overflow-hidden group h-full">
+                {debtSummary.remainingHutang > 0 ? (
+                  <>
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <TrendingUp size={80} className="text-rose-500" />
+                    </div>
+                    <p className="text-rose-500 text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+                      <TrendingUp size={16} /> Hutang Belum Lunas
+                    </p>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
+                      {formatCurrency(debtSummary.remainingHutang)}
+                    </h3>
+                    <button
+                      onClick={() => handleOpenDebtModal("hutang")}
+                      className="text-xs text-rose-500 underline mt-2 relative z-10 font-bold"
+                    >
+                      Lihat Detail
+                    </button>
+                  </>
+                ) : debtSummary.remainingPiutang > 0 ? (
+                  <>
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <Coins size={80} className="text-emerald-500" />
+                    </div>
+                    <p className="text-emerald-500 text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+                      <Coins size={16} /> Piutang Aktif
+                    </p>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
+                      {formatCurrency(debtSummary.remainingPiutang)}
+                    </h3>
+                    <button
+                      onClick={() => handleOpenDebtModal("piutang")}
+                      className="text-xs text-emerald-500 underline mt-2 relative z-10 font-bold"
+                    >
+                      Lihat Detail
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <Landmark size={80} className="text-blue-500" />
+                    </div>
+                    <p className="text-slate-500 text-sm font-medium uppercase tracking-wider flex items-center gap-2">
+                      <Landmark size={16} /> Total Akun
+                    </p>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
+                      {accountSummaries.length} Akun Terdaftar
+                    </h3>
+                    <div className="text-[10px] text-slate-400 mt-1">
+                      Keuangan terpantau aman
+                    </div>
+                  </>
+                )}
+              </BentoCard>
+            </SummaryCard>
+          </BentoGrid>
+        </div>
+      </div>
+
       <BentoGrid>
-        {/* 1. Stat Card: Income */}
-        <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800">
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
-            Total Pemasukan
-          </p>
-          <h3 className="text-2xl font-black text-emerald-500 mt-2">
-            {formatCurrency(summary.income)}
-          </h3>
-          <div className="text-[10px] text-slate-400 mt-1">
-            Keuangan masuk periode ini
-          </div>
-        </BentoCard>
-
-        {/* 2. Stat Card: Expense */}
-        <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800">
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
-            Total Pengeluaran
-          </p>
-          <h3 className="text-2xl font-black text-rose-500 mt-2">
-            {formatCurrency(summary.expense)}
-          </h3>
-          <div className="text-[10px] text-slate-400 mt-1">
-            Keuangan keluar periode ini
-          </div>
-        </BentoCard>
-
-        {/* 3. Stat Card: Balance */}
-        <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800">
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">
-            Saldo Bersih
-          </p>
-          <h3
-            className={`text-2xl font-black mt-2 ${summary.balance >= 0 ? "text-blue-500" : "text-rose-600"}`}
-          >
-            {formatCurrency(summary.balance)}
-          </h3>
-          <div className="text-[10px] text-slate-400 mt-1">
-            Selisih masuk & keluar
-          </div>
-        </BentoCard>
-
-        {/* 4. Debt Status / Account Summary Mini */}
-        <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800 relative overflow-hidden group">
-          {debtSummary.remainingHutang > 0 ? (
-            <>
-              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                <TrendingUp size={80} className="text-rose-500" />
-              </div>
-              <p className="text-rose-500 text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                <TrendingUp size={16} /> Hutang Belum Lunas
-              </p>
-              <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
-                {formatCurrency(debtSummary.remainingHutang)}
-              </h3>
-              <button
-                onClick={() => handleOpenDebtModal("hutang")}
-                className="text-xs text-rose-500 underline mt-2 relative z-10 font-bold"
-              >
-                Lihat Detail
-              </button>
-            </>
-          ) : debtSummary.remainingPiutang > 0 ? (
-            <>
-              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Coins size={80} className="text-emerald-500" />
-              </div>
-              <p className="text-emerald-500 text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                <Coins size={16} /> Piutang Aktif
-              </p>
-              <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
-                {formatCurrency(debtSummary.remainingPiutang)}
-              </h3>
-              <button
-                onClick={() => handleOpenDebtModal("piutang")}
-                className="text-xs text-emerald-500 underline mt-2 relative z-10 font-bold"
-              >
-                Lihat Detail
-              </button>
-            </>
-          ) : (
-            <>
-              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Landmark size={80} className="text-blue-500" />
-              </div>
-              <p className="text-slate-500 text-sm font-medium uppercase tracking-wider flex items-center gap-2">
-                <Landmark size={16} /> Total Akun
-              </p>
-              <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
-                {accountSummaries.length} Akun Terdaftar
-              </h3>
-              <div className="text-[10px] text-slate-400 mt-1">
-                Keuangan terpantau aman
-              </div>
-            </>
-          )}
-        </BentoCard>
-
         {/* 5. Main Trend Chart (Big) */}
         <BentoCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-slate-900 !p-0 border border-slate-800 overflow-hidden relative">
           <div className="p-6 relative z-10">
