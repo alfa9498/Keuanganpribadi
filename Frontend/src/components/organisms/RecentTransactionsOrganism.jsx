@@ -427,71 +427,82 @@ export const RecentTransactionsOrganism = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead className="sticky top-0 z-10 bg-white shadow-sm">
-            <tr className="border-y border-slate-100/80 text-slate-500 text-[11px] uppercase tracking-wider font-semibold">
-              {[
-                { key: "date", label: "Tanggal" },
-                { key: "category", label: "Kategori" },
-                { key: "description", label: "Deskripsi" },
-                { key: "payment_method", label: "Metode", hideOnSmall: true },
-                { key: "account", label: "Akun", hideOnSmall: true },
-                { key: "status", label: "Status", hideOnSmall: true },
-                { key: "amount", label: "Jumlah", align: "right" },
-              ].map((col) => (
-                <th
-                  key={col.key}
-                  className={`py-3 px-4 cursor-pointer hover:bg-slate-50 transition-colors select-none ${col.align === "right" ? "text-right" : ""} ${col.hideOnSmall ? "hidden lg:table-cell" : ""}`}
-                  onClick={() => requestSort(col.key)}
-                >
-                  <div
-                    className={`flex items-center gap-1.5 ${col.align === "right" ? "justify-end" : ""}`}
-                  >
-                    {col.label}
-                    {sortConfig.key === col.key ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp size={12} className="text-finance-primary" />
-                      ) : (
-                        <ChevronDown
-                          size={12}
-                          className="text-finance-primary"
-                        />
-                      )
-                    ) : (
-                      <ArrowUpDown
-                        size={12}
-                        className="text-slate-300 group-hover:text-slate-400 transition-colors"
-                      />
-                    )}
-                  </div>
-                </th>
-              ))}
-              <th className="py-3 px-4 text-center">
-                <div className="flex items-center justify-center gap-2">
-                  Aksi
-                  {isExpanded && (
-                    <button
-                      onClick={() => {
-                        setRowsPerPage(10);
-                        setIsExpanded(false);
-                        setCurrentPage(1);
-                      }}
-                      className="flex items-center gap-1 px-2 py-0.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-full text-[10px] font-bold transition-all shadow-sm"
-                      title="Minimize back to 10"
-                    >
-                      <ChevronUp size={12} />
-                      MIN
-                    </button>
+      <div className="overflow-x-auto border-t border-slate-300">
+        <table className="w-full text-left border-collapse table-fixed min-w-[1000px]">
+          <thead className="sticky top-0 z-20 shadow-sm">
+            <tr className="text-[11px] font-black text-slate-700 bg-slate-200 border-b border-slate-300 uppercase tracking-tight">
+              <th
+                className="px-4 py-2 border-r border-slate-300 w-32 cursor-pointer hover:bg-slate-300 transition-colors"
+                onClick={() => requestSort("date")}
+              >
+                <div className="flex items-center gap-1.5">
+                  Tanggal
+                  {sortConfig.key === "date" && (
+                    <ChevronDown
+                      size={12}
+                      className={`transition-transform ${sortConfig.direction === "asc" ? "rotate-180" : ""}`}
+                    />
                   )}
                 </div>
               </th>
+              <th
+                className="px-4 py-2 border-r border-slate-300 w-48 cursor-pointer hover:bg-slate-300 transition-colors"
+                onClick={() => requestSort("category")}
+              >
+                <div className="flex items-center gap-1.5">
+                  Kategori
+                  {sortConfig.key === "category" && (
+                    <ChevronDown
+                      size={12}
+                      className={`transition-transform ${sortConfig.direction === "asc" ? "rotate-180" : ""}`}
+                    />
+                  )}
+                </div>
+              </th>
+              <th
+                className="px-4 py-2 border-r border-slate-300 w-64 cursor-pointer hover:bg-slate-300 transition-colors"
+                onClick={() => requestSort("description")}
+              >
+                <div className="flex items-center gap-1.5">
+                  Deskripsi
+                  {sortConfig.key === "description" && (
+                    <ChevronDown
+                      size={12}
+                      className={`transition-transform ${sortConfig.direction === "asc" ? "rotate-180" : ""}`}
+                    />
+                  )}
+                </div>
+              </th>
+              <th className="px-4 py-2 border-r border-slate-300 hidden lg:table-cell w-32">
+                Metode
+              </th>
+              <th className="px-4 py-2 border-r border-slate-300 hidden lg:table-cell w-32">
+                Akun
+              </th>
+              <th className="px-4 py-2 border-r border-slate-300 hidden xl:table-cell w-24 text-center">
+                Status
+              </th>
+              <th
+                className="px-4 py-2 border-r border-slate-300 w-40 text-right cursor-pointer hover:bg-slate-300 transition-colors"
+                onClick={() => requestSort("amount")}
+              >
+                <div className="flex items-center justify-end gap-1.5">
+                  Jumlah
+                  {sortConfig.key === "amount" && (
+                    <ChevronDown
+                      size={12}
+                      className={`transition-transform ${sortConfig.direction === "asc" ? "rotate-180" : ""}`}
+                    />
+                  )}
+                </div>
+              </th>
+              <th className="px-4 py-2 text-center w-28">Aksi</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-50 relative">
+          <tbody className="text-[12px] font-medium tabular-nums divide-y divide-slate-300">
             {isLoading && (
-              <tr className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center">
-                <td colSpan="8" className="py-20 text-center">
+              <tr>
+                <td colSpan="8" className="py-20 text-center bg-white/50">
                   <Loader2
                     className="animate-spin text-finance-primary mx-auto"
                     size={40}
@@ -500,98 +511,76 @@ export const RecentTransactionsOrganism = ({
               </tr>
             )}
             {backendTransactions.length > 0 ? (
-              backendTransactions.map((tx) => {
+              backendTransactions.map((tx, idx) => {
                 return (
                   <tr
                     key={tx.id}
-                    className="group hover:bg-indigo-50/30 transition-all duration-200"
+                    className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50/80"} hover:bg-blue-50/50 transition-colors group`}
                   >
-                    <td className="py-4 px-4 text-slate-700 whitespace-nowrap text-sm">
-                      <span className="font-medium">
-                        {new Date(tx.date).toLocaleDateString("id-ID", {
-                          day: "2-digit",
-                          month: "short",
-                        })}
-                      </span>
-                      <span className="text-slate-400 ml-1 text-[11px]">
-                        {new Date(tx.date).getFullYear()}
-                      </span>
+                    <td className="px-4 py-2 border-r border-slate-200 text-slate-800 font-bold whitespace-nowrap">
+                      {new Date(tx.date).toLocaleDateString("id-ID", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
                     </td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-2">
-                        {tx.type === "income" ? (
-                          <TrendingUp
-                            size={16}
-                            className="text-emerald-600 flex-shrink-0"
-                          />
-                        ) : (
-                          <TrendingDown
-                            size={16}
-                            className="text-rose-600 flex-shrink-0"
-                          />
-                        )}
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-slate-800 leading-tight">
-                            {getCategoryGroup(tx.category) || tx.category}
-                          </span>
-                          {getCategoryGroup(tx.category) &&
-                            getCategoryGroup(tx.category) !== tx.category && (
-                              <span className="text-[10px] text-slate-400 font-medium leading-tight">
-                                {tx.category}
-                              </span>
-                            )}
-                        </div>
+                    <td className="px-4 py-2 border-r border-slate-200">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div
+                          className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${tx.type === "income" ? "bg-emerald-500" : "bg-rose-500"}`}
+                        />
+                        <span className="font-bold text-slate-900 truncate">
+                          {tx.category}
+                        </span>
                       </div>
                     </td>
-                    <td
-                      className="py-4 px-4 text-slate-600 max-w-xs text-sm truncate group-hover:text-slate-900 transition-colors"
-                      title={tx.description}
-                    >
-                      {tx.description || (
-                        <span className="text-slate-300 italic">No notes</span>
-                      )}
+                    <td className="px-4 py-2 border-r border-slate-200 text-slate-600 truncate max-w-sm italic">
+                      {tx.description || "-"}
                     </td>
-                    <td className="py-4 px-4 text-slate-500 text-xs font-medium hidden lg:table-cell">
-                      <span className="bg-slate-100 px-2 py-1 rounded-md">
+                    <td className="px-4 py-2 border-r border-slate-200 text-slate-500 text-[10px] hidden lg:table-cell uppercase">
+                      <span className="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
                         {tx.payment_method}
                       </span>
                     </td>
-                    <td className="py-4 px-4 text-slate-600 font-bold text-xs hidden lg:table-cell">
+                    <td className="px-4 py-2 border-r border-slate-200 text-slate-700 font-bold hidden lg:table-cell">
                       {tx.account}
                     </td>
-                    <td className="py-4 px-4 hidden lg:table-cell">
-                      <Badge
-                        variant={tx.status === "done" ? "info" : "warning"}
-                        className="rounded-md font-bold"
-                      >
-                        {tx.status === "done" ? "DONE" : "PENDING"}
-                      </Badge>
+                    <td className="px-4 py-2 border-r border-slate-200 text-center hidden xl:table-cell">
+                      {tx.status === "done" ? (
+                        <span className="text-[9px] font-black text-slate-400">
+                          DONE
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-black text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
+                          PENDING
+                        </span>
+                      )}
                     </td>
                     <td
-                      className={`py-4 px-4 text-right text-sm font-medium tabular-nums ${
+                      className={`px-4 py-2 border-r border-slate-200 text-right font-black ${
                         tx.type === "income"
                           ? "text-emerald-600"
                           : "text-rose-600"
                       }`}
                     >
-                      {tx.type === "expense" ? "-" : "+"}
+                      {tx.type === "income" ? "+" : "-"}
                       {formatCurrency(tx.amount)}
                     </td>
-                    <td className="py-4 px-4 text-center">
-                      <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <td className="px-4 py-2 text-center">
+                      <div className="flex items-center justify-center gap-1">
                         <button
                           onClick={() => handleEditClick(tx)}
-                          className="p-1.5 text-slate-400 hover:text-finance-primary hover:bg-finance-primary/10 rounded-lg transition-all"
+                          className="p-1 text-slate-400 hover:text-finance-primary hover:bg-finance-primary/10 rounded transition-all"
                           title="Edit"
                         >
-                          <Edit size={16} />
+                          <Edit size={14} />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(tx)}
-                          className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
+                          className="p-1 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded transition-all"
                           title="Delete"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </td>
@@ -605,9 +594,6 @@ export const RecentTransactionsOrganism = ({
                     <Inbox size={48} strokeWidth={1} className="mb-2" />
                     <p className="text-sm font-medium">
                       Tidak ada transaksi ditemukan
-                    </p>
-                    <p className="text-xs mt-1">
-                      Coba sesuaikan filter atau pencarian Anda
                     </p>
                   </div>
                 </td>
