@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run dev --prefix Frontend",
+    "dev:all": "concurrently \"npm run dev --prefix Frontend\" \"node Backend/server.js\"",
     "build": "npm install --prefix Frontend && npm run build --prefix Frontend"
   },
   "dependencies": {
@@ -19,5 +20,8 @@
     "nodemailer": "^7.0.12",
     "socket.io": "^4.8.3",
     "tesseract.js": "^7.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
