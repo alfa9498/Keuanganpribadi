@@ -46,17 +46,17 @@ export const DoubleLanyardSlider = ({
   return (
     <div className={`relative w-full overflow-hidden py-6 ${className}`}>
       {/* Decorative overhead strap rails - two rows */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent z-0 mt-8 opacity-50" />
-      <div className="absolute top-[45%] left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent z-0 mt-8 opacity-50" />
+      <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent z-0 mt-8 opacity-40" />
+      <div className="absolute top-[45%] left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent z-0 mt-8 opacity-40" />
 
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex overflow-x-auto scrollbar-hide px-[5%] py-4 snap-x snap-mandatory"
+        className="flex overflow-x-auto scrollbar-hide px-4 md:px-[5%] py-4 snap-x snap-mandatory"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         <div
-          className="grid grid-rows-2 grid-flow-col gap-x-12 gap-y-4"
+          className="grid grid-rows-2 grid-flow-col gap-x-8 md:gap-x-12 gap-y-6 md:gap-y-4"
           style={{
             gridTemplateColumns: `repeat(${Math.ceil(duplicatedItems.length / 2)}, min-content)`,
           }}
@@ -72,6 +72,7 @@ export const DoubleLanyardSlider = ({
                   getAccountIcon={getAccountIcon}
                   onEdit={onEdit}
                   onDelete={onDelete}
+                  className="scale-[0.9] md:scale-100 origin-top"
                 />
               )}
             </div>
@@ -79,9 +80,9 @@ export const DoubleLanyardSlider = ({
         </div>
       </div>
 
-      {/* Fade Gradients for visual depth */}
-      <div className="absolute top-0 bottom-0 left-0 w-32 bg-gradient-to-r from-slate-100 dark:from-slate-950/50 to-transparent pointer-events-none z-10" />
-      <div className="absolute top-0 bottom-0 right-0 w-32 bg-gradient-to-l from-slate-100 dark:from-slate-950/50 to-transparent pointer-events-none z-10" />
+      {/* Fade Gradients for visual depth - Significantly reduced on mobile */}
+      <div className="absolute top-0 bottom-0 left-0 w-8 md:w-48 bg-gradient-to-r from-slate-100 dark:from-slate-950/40 to-transparent pointer-events-none z-10" />
+      <div className="absolute top-0 bottom-0 right-0 w-8 md:w-48 bg-gradient-to-l from-slate-100 dark:from-slate-950/40 to-transparent pointer-events-none z-10" />
     </div>
   );
 };
