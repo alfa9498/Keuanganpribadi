@@ -213,7 +213,15 @@ function App() {
           />
         )}
         {activeTab === "transaction-list" && (
-          <TransactionListOrganism user={user} />
+          <TransactionListOrganism
+            user={user}
+            filterRange={filterRange}
+            setFilterRange={setFilterRange}
+            filterCategory={filterCategory}
+            setFilterCategory={setFilterCategory}
+            filterAccount={filterAccount}
+            setFilterAccount={setFilterAccount}
+          />
         )}
         {activeTab === "transaction-new" && (
           <TransactionFormOrganism

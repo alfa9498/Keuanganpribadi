@@ -32,6 +32,9 @@ export const RecentTransactionsOrganism = ({
   fixedType = null,
   title = "Transaksi Terakhir",
   filterCategory: externalCategory,
+  onCategoryChange: externalCategoryChange,
+  filterAccount: externalAccount,
+  onAccountChange: externalAccountChange,
   filterRange = "ALL",
   onRangeChange,
 }) => {
@@ -41,6 +44,17 @@ export const RecentTransactionsOrganism = ({
   const [selectedAccount, setSelectedAccount] = useState("");
   const activeCategory =
     externalCategory !== undefined ? externalCategory : selectedCategory;
+  const onCategoryChange =
+    externalCategoryChange !== undefined
+      ? externalCategoryChange
+      : setSelectedCategory;
+
+  const activeAccount =
+    externalAccount !== undefined ? externalAccount : selectedAccount;
+  const onAccountChange =
+    externalAccountChange !== undefined
+      ? externalAccountChange
+      : setSelectedAccount;
   const [sortConfig, setSortConfig] = useState({
     key: "date",
     direction: "desc",
@@ -214,7 +228,7 @@ export const RecentTransactionsOrganism = ({
         user_id: user.id,
         search: searchTerm,
         category: categoryParam,
-        account: selectedAccount, // Add account filter
+        account: activeAccount, // Add account filter
         sortBy: sortConfig.key,
         sortOrder: sortConfig.direction,
         page: currentPage,
@@ -256,7 +270,7 @@ export const RecentTransactionsOrganism = ({
     user?.id,
     searchTerm,
     activeCategory,
-    selectedAccount,
+    activeAccount,
     sortConfig,
     currentPage,
     rowsPerPage,
@@ -287,7 +301,7 @@ export const RecentTransactionsOrganism = ({
   // Reset page when filtering or sorting
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, activeCategory, selectedAccount, sortConfig]);
+  }, [searchTerm, activeCategory, activeAccount, sortConfig]);
 
   // Handlers
   const handleEditClick = (tx) => {
@@ -380,12 +394,12 @@ export const RecentTransactionsOrganism = ({
           {externalCategory === undefined && (
             <>
               <CategoryFilter
-                currentCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
+                currentCategory={activeCategory}
+                onCategoryChange={onCategoryChange}
               />
               <AccountFilter
-                currentAccount={selectedAccount}
-                onAccountChange={setSelectedAccount}
+                currentAccount={activeAccount}
+                onAccountChange={onAccountChange}
               />
             </>
           )}
