@@ -79,31 +79,31 @@ export const LanyardCard = ({
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.5}
         whileHover={{ scale: 1.05 }}
-        className={`w-44 h-56 rounded-[2.5rem] bg-white dark:bg-slate-900 border ${theme.border} shadow-2xl flex flex-col items-center p-6 text-center justify-between cursor-grab active:cursor-grabbing overflow-hidden`}
+        className={`w-56 h-72 rounded-[3rem] bg-white dark:bg-slate-900 border ${theme.border} shadow-2xl flex flex-col items-center p-8 text-center justify-between cursor-grab active:cursor-grabbing overflow-hidden`}
       >
         {/* Decorative Hole */}
-        <div className="absolute top-4 w-6 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700" />
+        <div className="absolute top-4 w-8 h-2 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700" />
 
-        <div className={`mt-4 p-3 rounded-full ${theme.bg}`}>
+        <div className={`mt-6 p-4 rounded-full ${theme.bg}`}>
           {CustomIcon ? (
-            <CustomIcon className={theme.color} size={24} />
+            <CustomIcon className={theme.color} size={32} />
           ) : (
             theme.icon
           )}
         </div>
 
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
             {title}
           </p>
           <h3
-            className={`text-xl font-black ${theme.color} break-words leading-tight px-2`}
+            className={`text-2xl font-black ${theme.color} break-words leading-tight px-2`}
           >
             {value}
           </h3>
         </div>
 
-        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-2">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: "100%" }}

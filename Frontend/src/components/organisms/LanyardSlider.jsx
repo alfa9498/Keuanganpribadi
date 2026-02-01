@@ -9,15 +9,19 @@ export const LanyardSlider = ({ items, className = "" }) => {
 
   useEffect(() => {
     if (scrollRef.current) {
-      // Start in the middle set of items
-      const middle = Math.floor(duplicatedItems.length / 3);
-      const scrollItem = scrollRef.current.children[middle];
-      if (scrollItem) {
-        scrollRef.current.scrollLeft =
-          scrollItem.offsetLeft -
-          scrollRef.current.offsetWidth / 2 +
-          scrollItem.offsetWidth / 2;
-      }
+      // Small delay to ensure layout is calculated
+      setTimeout(() => {
+        const middle = Math.floor(duplicatedItems.length / 3);
+        const scrollItem = scrollRef.current.children[middle];
+        if (scrollItem) {
+          const scrollContainer = scrollRef.current;
+          const centerPosition =
+            scrollItem.offsetLeft -
+            scrollContainer.offsetWidth / 2 +
+            scrollItem.offsetWidth / 2;
+          scrollContainer.scrollLeft = centerPosition;
+        }
+      }, 100);
     }
   }, [items]);
 
@@ -43,7 +47,7 @@ export const LanyardSlider = ({ items, className = "" }) => {
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex overflow-x-auto gap-2 scrollbar-hide px-[10%] py-4 snap-x snap-proximity scroll-smooth"
+        className="flex overflow-x-auto gap-12 scrollbar-hide px-[15%] py-8 snap-x snap-mandatory scroll-smooth"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {duplicatedItems.map((item, index) => (
