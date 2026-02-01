@@ -484,107 +484,220 @@ export const ReportDashboardOrganism = ({ user }) => {
   return (
     <div className="w-full max-w-[1600px] p-4 space-y-6 animate-fade-in font-inter text-slate-800">
       {/* Header & Filters */}
-      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-2">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-800">
-            Financial Report
-          </h2>
-          <p className="text-sm text-slate-500">
-            View and download your financial statements
-          </p>
+      {/* Header & Filters Section */}
+      <div className="flex flex-col gap-6 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm transition-all hover:shadow-md">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+          <div className="space-y-1">
+            <h2 className="text-3xl font-black text-slate-800 tracking-tight">
+              Financial Report
+            </h2>
+            <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
+              <FileText size={16} className="text-slate-400" />
+              View and download your financial statements
+            </p>
+          </div>
+
+          <div className="flex gap-3 w-full lg:w-auto">
+            <button
+              onClick={exportToPDF}
+              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-900 text-white hover:bg-black rounded-2xl transition-all shadow-xl shadow-slate-900/10 text-sm font-black active:scale-95"
+            >
+              <Download size={18} />
+              <span>EXPORT PDF</span>
+            </button>
+            <button
+              onClick={fetchTransactions}
+              className="p-3.5 bg-slate-50 text-slate-600 hover:bg-slate-100 rounded-2xl border border-slate-100 transition-all active:scale-95"
+              title="Refresh Data"
+            >
+              <RefreshCw size={18} />
+            </button>
+          </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto items-center">
-          <div className="flex flex-wrap gap-2">
+        {/* Cohesive Filter Bar */}
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 pt-6 border-t border-slate-50">
+          <div className="w-full sm:w-auto">
             <AccountFilter
               currentAccount={filterAccount}
               onAccountChange={setFilterAccount}
               accounts={accounts}
             />
+          </div>
+          <div className="w-full sm:w-auto">
             <CategoryFilter
               currentCategory={filterCategory}
               onCategoryChange={setFilterCategory}
             />
+          </div>
+          <div className="w-full sm:w-auto">
             <TimeFilter
               currentRange={filterRange}
               onRangeChange={setFilterRange}
             />
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={fetchTransactions}
-              className="p-2 bg-white text-slate-400 hover:text-finance-primary rounded-lg border border-slate-200 transition-all hover:border-finance-primary"
-              title="Refresh Data"
-            >
-              <RefreshCw size={18} />
-            </button>
 
-            {(filterCategory || filterAccount || filterRange !== "ALL") && (
-              <button
-                onClick={() => {
-                  setFilterCategory("");
-                  setFilterAccount("");
-                  setFilterRange("ALL");
-                }}
-                className="px-3 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-bold transition-all"
-              >
-                Reset
-              </button>
-            )}
-
+          {(filterCategory || filterAccount || filterRange !== "ALL") && (
             <button
-              onClick={exportToPDF}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white hover:bg-black rounded-lg transition-all shadow-lg shadow-slate-900/10 text-xs font-bold"
+              onClick={() => {
+                setFilterCategory("");
+                setFilterAccount("");
+                setFilterRange("ALL");
+              }}
+              className="text-[11px] font-black text-rose-500 hover:text-rose-600 bg-rose-50 px-4 py-2 rounded-full transition-all uppercase tracking-widest"
             >
-              <Download size={16} />
-              <span>PDF</span>
+              Reset Filters
             </button>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Summary Cards (Simple) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Income */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Total Income
+      {/* Summary Cards - Grid on Desktop, Slider/Swap on Mobile */}
+      <div className="relative">
+        {/* Desktop View: Grid */}
+        <div className="hidden md:grid grid-cols-3 gap-6">
+          {/* Income Card */}
+          <div className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300">
+            <div className="flex justify-between items-start mb-4">
+              <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                <TrendingUp size={28} />
+              </div>
+              <Badge
+                variant="success"
+                className="font-black text-[10px] tracking-widest"
+              >
+                INCOME
+              </Badge>
+            </div>
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+              Total Pemasukan
             </p>
-            <p className="text-lg font-bold text-emerald-600 mt-1">
+            <p className="text-3xl font-black text-emerald-600 tabular-nums">
               {formatCurrency(summary.income)}
             </p>
           </div>
-          <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600">
-            <TrendingUp size={20} />
-          </div>
-        </div>
-        {/* Expense */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Total Expense
+
+          {/* Expense Card */}
+          <div className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-500/5 transition-all duration-300">
+            <div className="flex justify-between items-start mb-4">
+              <div className="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                <TrendingDown size={28} />
+              </div>
+              <Badge
+                variant="danger"
+                className="font-black text-[10px] tracking-widest"
+              >
+                EXPENSE
+              </Badge>
+            </div>
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+              Total Pengeluaran
             </p>
-            <p className="text-lg font-bold text-rose-600 mt-1">
+            <p className="text-3xl font-black text-rose-600 tabular-nums">
               {formatCurrency(summary.expense)}
             </p>
           </div>
-          <div className="w-10 h-10 bg-rose-50 rounded-full flex items-center justify-center text-rose-600">
-            <TrendingDown size={20} />
-          </div>
-        </div>
-        {/* Balance */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Net Balance
+
+          {/* Balance Card */}
+          <div className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300">
+            <div className="flex justify-between items-start mb-4">
+              <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                <Wallet size={28} />
+              </div>
+              <Badge
+                variant="primary"
+                className="font-black text-[10px] tracking-widest"
+              >
+                NET BALANCE
+              </Badge>
+            </div>
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+              Saldo Bersih
             </p>
-            <p className="text-lg font-bold text-blue-600 mt-1">
+            <p className="text-3xl font-black text-blue-600 tabular-nums">
               {formatCurrency(summary.balance)}
             </p>
           </div>
-          <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
-            <Wallet size={20} />
+        </div>
+
+        {/* Mobile View: Horizontal Carousel (Card Swap) */}
+        <div className="md:hidden">
+          <div className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory px-4 -mx-4 gap-4 pb-4">
+            {/* Mobile Income Card */}
+            <div className="min-w-[85%] snap-center bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
+                  <TrendingUp size={24} />
+                </div>
+                <div>
+                  <Badge
+                    variant="success"
+                    className="font-black text-[8px] tracking-widest"
+                  >
+                    INCOME
+                  </Badge>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Total Pemasukan
+                  </p>
+                </div>
+              </div>
+              <p className="text-2xl font-black text-emerald-600 tabular-nums">
+                {formatCurrency(summary.income)}
+              </p>
+            </div>
+
+            {/* Mobile Expense Card */}
+            <div className="min-w-[85%] snap-center bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center">
+                  <TrendingDown size={24} />
+                </div>
+                <div>
+                  <Badge
+                    variant="danger"
+                    className="font-black text-[8px] tracking-widest"
+                  >
+                    EXPENSE
+                  </Badge>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Total Pengeluaran
+                  </p>
+                </div>
+              </div>
+              <p className="text-2xl font-black text-rose-600 tabular-nums">
+                {formatCurrency(summary.expense)}
+              </p>
+            </div>
+
+            {/* Mobile Balance Card */}
+            <div className="min-w-[85%] snap-center bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
+                  <Wallet size={24} />
+                </div>
+                <div>
+                  <Badge
+                    variant="primary"
+                    className="font-black text-[8px] tracking-widest"
+                  >
+                    NET BALANCE
+                  </Badge>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Saldo Bersih
+                  </p>
+                </div>
+              </div>
+              <p className="text-2xl font-black text-blue-600 tabular-nums">
+                {formatCurrency(summary.balance)}
+              </p>
+            </div>
+          </div>
+
+          {/* Mobile Swipe Indicator */}
+          <div className="flex justify-center gap-1.5 mt-2">
+            <div className="w-8 h-1 bg-emerald-500/20 rounded-full" />
+            <div className="w-4 h-1 bg-slate-200 rounded-full" />
+            <div className="w-4 h-1 bg-slate-200 rounded-full" />
           </div>
         </div>
       </div>

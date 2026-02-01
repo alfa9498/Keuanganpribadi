@@ -52,17 +52,17 @@ export const DoubleLanyardSlider = ({
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex overflow-x-auto scrollbar-hide px-4 md:px-[5%] py-4 snap-x snap-mandatory"
+        className="flex overflow-x-auto scrollbar-hide px-2 md:px-[8%] py-4 snap-x snap-mandatory"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         <div
-          className="grid grid-rows-2 grid-flow-col gap-x-8 md:gap-x-12 gap-y-6 md:gap-y-4"
+          className="grid grid-rows-2 grid-flow-col gap-x-6 md:gap-x-12 gap-y-6 md:gap-y-4 mx-auto"
           style={{
             gridTemplateColumns: `repeat(${Math.ceil(duplicatedItems.length / 2)}, min-content)`,
           }}
         >
           {duplicatedItems.map((acc, index) => (
-            <div key={`${acc.id}-${index}`} className="snap-center">
+            <div key={`${acc.id}-${index}`} className="snap-center px-2">
               {acc.isFiller ? (
                 <div className="w-64 h-80 opacity-0 pointer-events-none" />
               ) : (
@@ -80,9 +80,9 @@ export const DoubleLanyardSlider = ({
         </div>
       </div>
 
-      {/* Fade Gradients for visual depth - Significantly reduced on mobile */}
-      <div className="absolute top-0 bottom-0 left-0 w-8 md:w-48 bg-gradient-to-r from-slate-100 dark:from-slate-950/40 to-transparent pointer-events-none z-10" />
-      <div className="absolute top-0 bottom-0 right-0 w-8 md:w-48 bg-gradient-to-l from-slate-100 dark:from-slate-950/40 to-transparent pointer-events-none z-10" />
+      {/* Fade Gradients for visual depth - Minimal opacity on mobile to avoid covering cards */}
+      <div className="absolute top-0 bottom-0 left-0 w-6 md:w-48 bg-gradient-to-r from-slate-100 dark:from-slate-950/20 to-transparent pointer-events-none z-10" />
+      <div className="absolute top-0 bottom-0 right-0 w-6 md:w-48 bg-gradient-to-l from-slate-100 dark:from-slate-950/20 to-transparent pointer-events-none z-10" />
     </div>
   );
 };

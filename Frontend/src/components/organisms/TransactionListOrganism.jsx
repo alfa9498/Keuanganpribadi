@@ -46,77 +46,87 @@ export const TransactionListOrganism = ({
 
   return (
     <div className="w-full max-w-[1600px] p-4 space-y-4 animate-fade-in">
-      <div className="flex flex-col xl:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-        {/* Left: Type Tabs */}
-        <div className="flex bg-slate-100 p-1 rounded-xl w-full xl:w-auto overflow-x-auto">
-          <button
-            onClick={() => setActiveListTab("all")}
-            className={`px-6 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap ${
-              activeListTab === "all"
-                ? "bg-white text-finance-primary shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
-            }`}
-          >
-            Semua
-          </button>
-          <button
-            onClick={() => setActiveListTab("income")}
-            className={`px-6 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap ${
-              activeListTab === "income"
-                ? "bg-white text-emerald-600 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
-            }`}
-          >
-            Pemasukan
-          </button>
-          <button
-            onClick={() => setActiveListTab("expense")}
-            className={`px-6 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap ${
-              activeListTab === "expense"
-                ? "bg-white text-rose-600 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
-            }`}
-          >
-            Pengeluaran
-          </button>
+      <div className="flex flex-col gap-6 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm transition-all">
+        <div className="flex flex-col xl:flex-row justify-between items-center gap-6">
+          {/* Top Row / Left: Type Tabs */}
+          <div className="flex bg-slate-100 p-1.5 rounded-2xl w-full xl:w-auto overflow-x-auto shadow-inner">
+            <button
+              onClick={() => setActiveListTab("all")}
+              className={`flex-1 xl:flex-none px-6 py-2.5 text-sm font-black rounded-xl transition-all whitespace-nowrap ${
+                activeListTab === "all"
+                  ? "bg-white text-finance-primary shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              Semua
+            </button>
+            <button
+              onClick={() => setActiveListTab("income")}
+              className={`flex-1 xl:flex-none px-6 py-2.5 text-sm font-black rounded-xl transition-all whitespace-nowrap ${
+                activeListTab === "income"
+                  ? "bg-white text-emerald-600 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              Pemasukan
+            </button>
+            <button
+              onClick={() => setActiveListTab("expense")}
+              className={`flex-1 xl:flex-none px-6 py-2.5 text-sm font-black rounded-xl transition-all whitespace-nowrap ${
+                activeListTab === "expense"
+                  ? "bg-white text-rose-600 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              Pengeluaran
+            </button>
+          </div>
+
+          {/* Top Row / Right: Actions */}
+          <div className="flex gap-3 w-full xl:w-auto justify-center xl:justify-end">
+            <Button
+              onClick={() => setIsAddOpen(true)}
+              variant="primary"
+              className="flex-1 xl:flex-none group flex items-center justify-center gap-2 px-6 py-3 rounded-2xl transition-all shadow-lg shadow-finance-primary/20 hover:scale-[1.02] active:scale-95 bg-slate-900 border-none"
+            >
+              <Plus size={18} className="text-white" />
+              <span className="font-bold whitespace-nowrap text-white">
+                Add Transaction
+              </span>
+            </Button>
+
+            <Button
+              onClick={() => setIsImportOpen(true)}
+              variant="ghost"
+              className="xl:flex-none group flex items-center justify-center gap-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100/50 px-6 py-3 rounded-2xl transition-all active:scale-95"
+            >
+              <FileUp size={18} />
+              <span className="font-bold whitespace-nowrap">Import</span>
+            </Button>
+          </div>
         </div>
 
-        {/* Center: Global Filters */}
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <TimeFilter
-            currentRange={filterRange}
-            onRangeChange={setFilterRange}
-          />
-          <AccountFilter
-            currentAccount={filterAccount}
-            onAccountChange={setFilterAccount}
-            accounts={accounts}
-          />
-          <CategoryFilter
-            currentCategory={filterCategory}
-            onCategoryChange={setFilterCategory}
-          />
-        </div>
-
-        {/* Right: Actions */}
-        <div className="flex gap-2 w-full xl:w-auto justify-end">
-          <Button
-            onClick={() => setIsAddOpen(true)}
-            variant="primary"
-            className="group flex items-center gap-2 px-4 py-2 rounded-xl transition-all shadow-lg shadow-finance-primary/20 hover:scale-105"
-          >
-            <Plus size={18} />
-            <span className="font-bold whitespace-nowrap">Add Transaction</span>
-          </Button>
-
-          <Button
-            onClick={() => setIsImportOpen(true)}
-            variant="ghost"
-            className="group flex items-center gap-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100 px-4 py-2 rounded-xl transition-all"
-          >
-            <FileUp size={18} />
-            <span className="font-bold whitespace-nowrap">Import Data</span>
-          </Button>
+        {/* Bottom Row / Center: Global Filters */}
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 pt-4 border-t border-slate-50">
+          <div className="w-full sm:w-auto">
+            <TimeFilter
+              currentRange={filterRange}
+              onRangeChange={setFilterRange}
+            />
+          </div>
+          <div className="w-full sm:w-auto">
+            <AccountFilter
+              currentAccount={filterAccount}
+              onAccountChange={setFilterAccount}
+              accounts={accounts}
+            />
+          </div>
+          <div className="w-full sm:w-auto">
+            <CategoryFilter
+              currentCategory={filterCategory}
+              onCategoryChange={setFilterCategory}
+            />
+          </div>
         </div>
       </div>
 
