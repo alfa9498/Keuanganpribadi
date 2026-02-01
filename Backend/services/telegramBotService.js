@@ -12,6 +12,78 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 // Store verification codes temporarily (in production, use Redis)
 const verificationCodes = new Map(); // Map<code, {userId, fullName, expires}>
 
+// --- DATA KATEGORI (Sync dengan Frontend) ---
+const expenseCategories = {
+  "Survival (Kebutuhan)": [
+    "Makanan",
+    "Makan & Minum",
+    "Sarapan",
+    "Jajan Harian",
+    "Transportasi",
+    "Bensin",
+    "Parkir",
+    "Ojol / Taksi Online",
+    "Tagihan",
+    "Listrik",
+    "Internet",
+    "Pulsa",
+    "Air",
+    "Kesehatan",
+    "Obat",
+    "Sewa",
+    "Orang Tua",
+  ],
+  "Optional (Keinginan)": [
+    "Belanja",
+    "Belanja Bulanan",
+    "Shopping",
+    "Laundry",
+    "Hiburan",
+    "Nongkrong",
+    "Jalan-jalan",
+  ],
+  "Culture (Kultur)": ["Pendidikan", "Buku / Alat Tulis", "Kursus"],
+  "Extra (Tak Terduga)": [
+    "Hadiah",
+    "Ulang Tahun",
+    "Nikahan",
+    "Keuangan",
+    "Tabungan",
+    "Investasi",
+    "Hutang",
+    "Cicilan",
+    "Lainnya",
+  ],
+};
+
+const incomeCategories = [
+  "Gaji",
+  "Bonus",
+  "Hadiah",
+  "Penjualan",
+  "Investasi",
+  "Lainnya",
+];
+
+// Helper to generate buttons from array
+const createButtons = (items, actionPrefix) => {
+  return items.reduce((acc, curr, i) => {
+    if (i % 2 === 0)
+      acc.push([
+        {
+          text: curr,
+          callback_data: JSON.stringify({ a: actionPrefix, val: curr }),
+        },
+      ]);
+    else
+      acc[acc.length - 1].push({
+        text: curr,
+        callback_data: JSON.stringify({ a: actionPrefix, val: curr }),
+      });
+    return acc;
+  }, []);
+};
+
 let bot = null;
 
 // External Trigger for Webhooks
@@ -242,38 +314,30 @@ const init = () => {
         const amt = parseInt(text.replace(/\D/g, ""));
         if (!isNaN(amt) && amt > 0) {
           userState[chatId] = { ...state, type: "wait_cat", amt };
-          const categories = [
-            "Makanan",
-            "Transportasi",
-            "Belanja",
-            "Hiburan",
-            "Tagihan",
-            "Lainnya",
-          ];
-          const buttons = categories.reduce((acc, curr, i) => {
-            if (i % 2 === 0)
-              acc.push([
-                {
-                  text: curr,
-                  callback_data: JSON.stringify({ a: "set_cat", cat: curr }),
-                },
-              ]);
-            else
-              acc[acc.length - 1].push({
-                text: curr,
-                callback_data: JSON.stringify({ a: "set_cat", cat: curr }),
-              });
-            return acc;
-          }, []);
 
-          bot.sendMessage(
-            chatId,
-            `💰 Nominal: **Rp ${amt.toLocaleString("id-ID")}**\n\nSekarang pilih **Kategori**:`,
-            {
-              reply_markup: { inline_keyboard: buttons },
-              parse_mode: "Markdown",
-            },
-          );
+          let buttons = [];
+          let msgText = "";
+
+          if (state.t === "income") {
+            // INCOME: Show categories directly
+            buttons = createButtons(incomeCategories, "set_cat");
+            msgText = `💰 Nominal: **Rp ${amt.toLocaleString("id-ID")}** (Pemasukan)\n\nPilih **Kategori**:`;
+          } else {
+            // EXPENSE: Show GROUPS first
+            const groups = Object.keys(expenseCategories);
+            buttons = groups.map((g) => [
+              {
+                text: g,
+                callback_data: JSON.stringify({ a: "pick_group", val: g }),
+              },
+            ]);
+            msgText = `💰 Nominal: **Rp ${amt.toLocaleString("id-ID")}** (Pengeluaran)\n\nPilih **Kelompok Kategori**:`;
+          }
+
+          bot.sendMessage(chatId, msgText, {
+            reply_markup: { inline_keyboard: buttons },
+            parse_mode: "Markdown",
+          });
         } else {
           bot.sendMessage(
             chatId,
@@ -681,14 +745,95 @@ Apakah data sudah benar?
 
       // --- State-based Actions ---
       if (state) {
-        if (data.a === "set_cat") {
+        // HANDLE GROUP SELECTION (NEW)
+        if (data.a === "pick_group") {
           bot.answerCallbackQuery(query.id);
-          userState[chatId] = { ...state, type: "wait_desc", cat: data.cat };
-          bot.sendMessage(
-            chatId,
-            `📂 **${data.cat}** terpilih.\nKetik **Deskripsi** transaksi:`,
+          const groupName = data.val;
+          const nextAction = data.next || "set_cat"; // Dynamic next action
+          const subCats = expenseCategories[groupName] || [];
+
+          // Generate buttons for sub-categories
+          const buttons = createButtons(subCats, nextAction);
+
+          // Edit message to show sub-categories
+          bot.editMessageText(
+            `📂 Kelompok: **${groupName}**\n\nPilih Kategori Detail:`,
+            {
+              chat_id: chatId,
+              message_id: query.message.message_id,
+              reply_markup: { inline_keyboard: buttons },
+              parse_mode: "Markdown",
+            },
           );
           return;
+        }
+
+        if (data.a === "set_cat") {
+          const selectedCat = data.val || data.cat;
+          bot.answerCallbackQuery(query.id);
+          userState[chatId] = { ...state, type: "wait_desc", cat: selectedCat };
+          bot.sendMessage(
+            chatId,
+            `📂 **${selectedCat}** terpilih.\nKetik **Deskripsi** transaksi:`,
+          );
+          return;
+        }
+
+        if (data.a === "edit_amt") {
+          bot.answerCallbackQuery(query.id);
+          userState[chatId] = { ...state, type: "edit_amt" };
+          bot.sendMessage(chatId, "Ketik nominal baru:");
+          return;
+        }
+
+        if (data.a === "edit_cat") {
+          bot.answerCallbackQuery(query.id);
+          let buttons = [];
+          if (state.t === "income") {
+            buttons = createButtons(incomeCategories, "save_cat");
+          } else {
+            // Groups for Expenses, pointing next to save_cat
+            const groups = Object.keys(expenseCategories);
+            buttons = groups.map((g) => [
+              {
+                text: g,
+                callback_data: JSON.stringify({
+                  a: "pick_group",
+                  val: g,
+                  next: "save_cat",
+                }),
+              },
+            ]);
+          }
+          bot.sendMessage(chatId, "Pilih kategori baru:", {
+            reply_markup: { inline_keyboard: buttons },
+          });
+          return;
+        }
+
+        if (data.a === "save_cat") {
+          state.cat = data.val || data.c; // Support both format
+          bot.answerCallbackQuery(query.id, { text: "Updated" });
+          // Go back to confirmation
+          userState[chatId] = { ...state, type: "wait_confirm" };
+
+          const statusMsg = `
+Updated:
+💰 Rp ${state.amt.toLocaleString("id-ID")}
+📂 ${state.cat}
+                    `;
+          bot.sendMessage(chatId, statusMsg, {
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  {
+                    text: "✅ Simpan",
+                    callback_data: JSON.stringify({ a: "final_save" }),
+                  },
+                ],
+              ],
+            },
+          });
         }
 
         if (data.a === "final_save") {
@@ -714,56 +859,6 @@ Apakah data sudah benar?
             },
           );
           return;
-        }
-
-        // OCR / Editing branch
-        if (data.a === "edit_amt") {
-          bot.answerCallbackQuery(query.id);
-          userState[chatId] = { ...state, type: "edit_amt" };
-          bot.sendMessage(chatId, "Ketik nominal baru:");
-          return;
-        }
-        if (data.a === "edit_cat") {
-          bot.answerCallbackQuery(query.id);
-          const cats = ["Makanan", "Transportasi", "Belanja", "Lainnya"];
-          const buttons = cats.map((c) => [
-            { text: c, callback_data: JSON.stringify({ a: "save_cat", c }) },
-          ]);
-          bot.sendMessage(chatId, "Pilih kategori:", {
-            reply_markup: { inline_keyboard: buttons },
-          });
-          return;
-        }
-        if (data.a === "save_cat") {
-          state.cat = data.c;
-          bot.answerCallbackQuery(query.id, { text: "Updated" });
-          // Go back to confirmation
-          userState[chatId] = { ...state, type: "wait_confirm" };
-          bot.sendMessage(
-            chatId,
-            `Kategori diubah: ${data.c}. Klik Simpan di pesan sebelumnya atau kirim pesan apapun untuk konfirmasi ulang.`,
-          );
-          // Ideally we should edit the original message but we might have lost reference easily if we sent new message.
-          // For simplicity, let's just trigger save if they click save on the original message?
-          // No the original message text won't update.
-          // Let's re-send confirmation
-          const statusMsg = `
-Updated:
-💰 Rp ${state.amt.toLocaleString("id-ID")}
-📂 ${state.cat}
-                    `;
-          bot.sendMessage(chatId, statusMsg, {
-            reply_markup: {
-              inline_keyboard: [
-                [
-                  {
-                    text: "✅ Simpan",
-                    callback_data: JSON.stringify({ a: "final_save" }),
-                  },
-                ],
-              ],
-            },
-          });
         }
       }
     } catch (err) {
