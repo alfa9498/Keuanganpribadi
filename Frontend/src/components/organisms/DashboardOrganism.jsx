@@ -1124,7 +1124,8 @@ export const DashboardOrganism = ({
                 />
                 <Bar
                   dataKey="value"
-                  fill="#8B5CF6"
+                  fill="#1e293b"
+                  stroke="#334155"
                   radius={[0, 4, 4, 0]}
                   barSize={20}
                 >
@@ -1184,7 +1185,8 @@ export const DashboardOrganism = ({
                 />
                 <Bar
                   dataKey="value"
-                  fill="#EC4899"
+                  fill="#1e293b"
+                  stroke="#334155"
                   radius={[0, 4, 4, 0]}
                   barSize={20}
                 >
