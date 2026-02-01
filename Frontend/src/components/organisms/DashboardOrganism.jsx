@@ -836,43 +836,23 @@ export const DashboardOrganism = ({
         </BentoCard>
 
         {/* 4b. Receivable Status (Piutang) */}
-        {(debtSummary.remainingPiutang > 0 ||
-          debtSummary.remainingHutang > 0) && (
+        {debtSummary.remainingPiutang > 0 && (
           <BentoCard className="col-span-1 bg-white dark:bg-slate-900 rounded-3xl !p-6 border border-slate-200 dark:border-slate-800 relative overflow-hidden group">
-            {debtSummary.remainingPiutang > 0 ? (
-              <>
-                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Coins size={80} className="text-emerald-500" />
-                </div>
-                <p className="text-emerald-500 text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                  <Coins size={16} /> Piutang Aktif
-                </p>
-                <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
-                  {formatCurrency(debtSummary.remainingPiutang)}
-                </h3>
-                <button
-                  onClick={() => handleOpenDebtModal("piutang")}
-                  className="text-xs text-emerald-500 underline mt-2 relative z-10 font-bold"
-                >
-                  Lihat Detail
-                </button>
-              </>
-            ) : (
-              <>
-                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Landmark size={80} className="text-blue-500" />
-                </div>
-                <p className="text-slate-500 text-sm font-medium uppercase tracking-wider flex items-center gap-2">
-                  <Landmark size={16} /> Total Akun
-                </p>
-                <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
-                  {accountSummaries.length} Akun Terdaftar
-                </h3>
-                <div className="text-[10px] text-slate-400 mt-1">
-                  Keuangan terpantau aman
-                </div>
-              </>
-            )}
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Coins size={80} className="text-emerald-500" />
+            </div>
+            <p className="text-emerald-500 text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+              <Coins size={16} /> Piutang Aktif
+            </p>
+            <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2 relative z-10">
+              {formatCurrency(debtSummary.remainingPiutang)}
+            </h3>
+            <button
+              onClick={() => handleOpenDebtModal("piutang")}
+              className="text-xs text-emerald-500 underline mt-2 relative z-10 font-bold"
+            >
+              Lihat Detail
+            </button>
           </BentoCard>
         )}
 
@@ -999,11 +979,19 @@ export const DashboardOrganism = ({
         {/* 6. Accounts List (Scrollable) */}
         <BentoCard className="col-span-1 md:col-span-1 row-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-0 overflow-hidden flex flex-col">
           <div className="p-6 pb-2">
-            <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-              <Wallet className="text-blue-500" size={18} />
-              Akun Saya
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Wallet className="text-blue-500" size={18} />
+                Akun Saya
+              </div>
+              <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">
+                <Landmark size={10} className="text-blue-500" />
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">
+                  {accountSummaries.length} Akun
+                </span>
+              </div>
             </h3>
-            <p className="text-slate-400 text-xs">Saldo real-time</p>
+            <p className="text-slate-400 text-xs mt-1">Saldo real-time</p>
           </div>
           <div className="flex-1 overflow-hidden">
             <AnimatedList
