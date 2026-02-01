@@ -20,6 +20,7 @@ import { API_URL, SOCKET_URL } from "./config/api";
 function App() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("login"); // Default to login
+  const [loading, setLoading] = useState(true); // Loading session state
   const [filterRange, setFilterRange] = useState("30D");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterAccount, setFilterAccount] = useState("");
@@ -36,9 +37,23 @@ function App() {
       if (response.ok) {
         const result = await response.json();
         setUser(result.user);
+        // If we are on guest pages, move to dashboard
+        setActiveTab((current) =>
+          [
+            "login",
+            "register",
+            "forgot-password",
+            "verify-otp",
+            "reset-password",
+          ].includes(current)
+            ? "dashboard"
+            : current,
+        );
       }
     } catch (err) {
       console.error("Session check failed", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -141,6 +156,14 @@ function App() {
   const handleRegisterSuccess = () => {
     setActiveTab("login");
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-500"></div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
