@@ -17,6 +17,7 @@ router.delete("/groups/:id", categoryController.deleteGroup);
 // Categories (Sub Categories / Items)
 router.post("/items", categoryController.createCategory);
 router.put("/items/:id", categoryController.updateCategory);
+router.patch("/items/:id/rollover", categoryController.updateRolloverStatus);
 router.delete("/items/:id", categoryController.deleteCategory);
 
 module.exports = router;

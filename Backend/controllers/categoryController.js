@@ -12,10 +12,10 @@ exports.getCategories = async (req, res) => {
     });
   } catch (error) {
     console.error("Get Categories Error:", error);
-    res.status(500).json({ 
-      message: "Failed to fetch categories", 
+    res.status(500).json({
+      message: "Failed to fetch categories",
       error: error.message,
-      stack: error.stack 
+      stack: error.stack,
     });
   }
 };
@@ -83,6 +83,22 @@ exports.deleteCategory = async (req, res) => {
     const categoryId = req.params.id;
     await categoryService.deleteCategory(userId, categoryId);
     res.json({ message: "Category deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateRolloverStatus = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const categoryId = req.params.id;
+    const { is_rollover } = req.body;
+    const result = await categoryService.updateRolloverStatus(
+      userId,
+      categoryId,
+      is_rollover,
+    );
+    res.json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

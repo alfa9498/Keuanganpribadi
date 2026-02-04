@@ -107,8 +107,14 @@ async function seedCategories() {
       );
 
       if (existing[0].count > 0) {
-        console.log("   ⚠️ Categories already exist. Skipping...");
+        console.log(
+          `   ⚠️ Categories already exist for user ${user.id} (${existing[0].count}). Skipping...`,
+        );
         continue;
+      } else {
+        console.log(
+          `   ℹ️ No categories found for user ${user.id}. seeding...`,
+        );
       }
 
       // --- SEED EXPENSES ---

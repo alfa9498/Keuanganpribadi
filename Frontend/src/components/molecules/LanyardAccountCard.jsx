@@ -129,10 +129,10 @@ export const LanyardAccountCard = ({
       className={`relative flex flex-col items-center pt-8 min-w-[220px] select-none ${className} ${isZero ? "opacity-70 grayscale-[0.2]" : ""}`}
     >
       {/* The Strap */}
-      <div className="absolute top-0 w-[2.5px] h-10 bg-gradient-to-b from-slate-400 dark:from-slate-600 to-slate-500 dark:to-slate-700 rounded-full shadow-sm z-0" />
+      <div className="absolute top-0 w-[1.5px] h-10 bg-gradient-to-b from-slate-300 dark:from-slate-600 to-slate-400 dark:to-slate-500 z-0" />
 
       {/* The Connecting Clip */}
-      <div className="absolute top-6 w-3.5 h-3.5 rounded-full border-[3.5px] border-slate-500 bg-white dark:bg-slate-900 z-10 shadow-md" />
+      <div className="absolute top-6 w-3 h-3 rounded-full border-[2px] border-slate-400 dark:border-slate-600 bg-white dark:bg-slate-800 z-10 shadow-sm" />
 
       {/* The Card */}
       <motion.div
@@ -143,7 +143,7 @@ export const LanyardAccountCard = ({
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.4}
         whileHover={{ scale: 1.03, y: -5 }}
-        className={`w-64 h-80 rounded-[2.5rem] bg-slate-900 border ${theme.border} shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden relative cursor-grab active:cursor-grabbing`}
+        className={`w-64 h-80 rounded-[2rem] bg-slate-900/85 backdrop-blur-md border ${theme.border} shadow-[0_15px_40px_-5px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden relative cursor-grab active:cursor-grabbing`}
       >
         {/* Top Border Accent */}
         <div

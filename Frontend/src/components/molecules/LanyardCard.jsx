@@ -103,7 +103,7 @@ export const LanyardCard = ({
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.5}
         whileHover={{ scale: 1.05 }}
-        className={`w-56 h-72 rounded-[3rem] bg-white dark:bg-slate-900 border ${theme.border} shadow-2xl flex flex-col items-center p-8 text-center justify-between cursor-grab active:cursor-grabbing overflow-hidden relative`}
+        className={`w-56 h-72 rounded-[3.5rem] bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border ${theme.border} shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] flex flex-col items-center p-8 text-center justify-between cursor-grab active:cursor-grabbing overflow-hidden relative`}
       >
         <AnimatePresence>
           {isHovered && details && details.length > 0 && (

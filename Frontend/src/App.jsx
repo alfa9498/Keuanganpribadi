@@ -7,6 +7,7 @@ import { AccountDashboardOrganism } from "./components/organisms/AccountDashboar
 import { TransactionFormOrganism } from "./components/organisms/TransactionFormOrganism";
 import { TransactionListOrganism } from "./components/organisms/TransactionListOrganism";
 import CategoryManagementOrganism from "./components/organisms/CategoryManagementOrganism";
+import { BudgetPage } from "./components/organisms/BudgetPage";
 import { ReportDashboardOrganism } from "./components/organisms/ReportDashboardOrganism";
 import { ForgotPasswordOrganism } from "./components/organisms/ForgotPasswordOrganism";
 import { VerifyOtpOrganism } from "./components/organisms/VerifyOtpOrganism";
@@ -258,6 +259,7 @@ function App() {
         {activeTab === "categories" && <CategoryManagementOrganism />}
         {activeTab === "filter" && <ReportDashboardOrganism user={user} />}
         {activeTab === "accounts" && <AccountDashboardOrganism user={user} />}
+        {activeTab === "budgets" && <BudgetPage user={user} />}
         {activeTab === "telegram" && <TelegramConnectOrganism user={user} />}
         {activeTab === "guide" && <GuideOrganism />}
       </MainLayoutTemplate>

@@ -14,15 +14,17 @@ const server = http.createServer(app);
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
+    // For development, allow localhost ports 5173 and 5174
+    const devOrigins = ["http://localhost:5173", "http://localhost:5174"];
 
-    const isVercelOrigin = origin.endsWith(".vercel.app");
-    const isAllowedLocal = origin === "http://localhost:5173";
-
-    if (isAllowedLocal || isVercelOrigin) {
+    if (
+      !origin ||
+      devOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app")
+    ) {
       callback(null, true);
     } else {
+      console.warn(`[CORS Blocked] Origin: ${origin}`);
       callback(new Error("Not allowed by CORS"));
     }
   },
@@ -103,6 +105,10 @@ app.use("/accounts", accountRoutes);
 // Category Routes
 const categoryRoutes = require("./routes/categoryRoutes");
 app.use("/api/categories", categoryRoutes);
+
+// Budget Routes
+const budgetRoutes = require("./routes/budgetRoutes");
+app.use("/budgets", budgetRoutes);
 
 // Telegram Webhook Endpoint
 app.post("/telegram-webhook", (req, res) => {

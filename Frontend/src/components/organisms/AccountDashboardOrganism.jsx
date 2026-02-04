@@ -406,7 +406,7 @@ export const AccountDashboardOrganism = ({ user }) => {
       )}
 
       {/* 2nd Row: Account Lanyard Slider */}
-      <div className="w-full -mx-4 md:-mx-6 overflow-hidden">
+      <div className="w-full overflow-hidden">
         <DoubleLanyardSlider
           accounts={accountSummaries}
           formatCurrency={formatCurrency}

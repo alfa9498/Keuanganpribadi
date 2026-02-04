@@ -11,78 +11,51 @@ export const DoubleLanyardSlider = ({
 }) => {
   const scrollRef = useRef(null);
 
-  // For infinity scroll, we need a decent amount of items.
-  // We duplicate if items are few, or just always triple for safety.
-  // We need items to be even for a perfect 2-row distribution.
-  const baseItems =
+  // Ensure even number of items for 2-row grid
+  const displayItems =
     accounts.length % 2 === 0
       ? accounts
       : [...accounts, { ...accounts[0], id: "filler", isFiller: true }];
-  const duplicatedItems = [...baseItems, ...baseItems, ...baseItems];
 
-  useEffect(() => {
-    if (scrollRef.current && duplicatedItems.length > 0) {
-      // Start at the middle segment
-      setTimeout(() => {
-        const scrollContainer = scrollRef.current;
-        const segmentWidth = scrollContainer.scrollWidth / 3;
-        scrollContainer.scrollLeft = segmentWidth;
-      }, 100);
-    }
-  }, [accounts.length]);
-
-  const handleScroll = () => {
-    if (!scrollRef.current) return;
-    const { scrollLeft, scrollWidth } = scrollRef.current;
-    const segmentWidth = scrollWidth / 3;
-
-    if (scrollLeft < 10) {
-      scrollRef.current.scrollLeft = segmentWidth;
-    } else if (scrollLeft > segmentWidth * 2 - 10) {
-      scrollRef.current.scrollLeft = segmentWidth;
-    }
-  };
+  // Grid layout parameters
+  const CARD_HEIGHT = 380; // approximate height with gap
+  const RAIL_OFFSET = 32; // where the rail sits relative to card top
 
   return (
-    <div className={`relative w-full overflow-hidden py-6 ${className}`}>
-      {/* Decorative overhead strap rails - two rows */}
-      <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent z-0 mt-8 opacity-40" />
-      <div className="absolute top-[45%] left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent z-0 mt-8 opacity-40" />
-
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="flex overflow-x-auto scrollbar-hide px-0 md:px-[8%] py-4 snap-x snap-mandatory"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        <div
-          className="grid grid-rows-2 grid-flow-col gap-x-6 md:gap-x-12 gap-y-6 md:gap-y-4 mx-auto"
-          style={{
-            gridTemplateColumns: `repeat(${Math.ceil(duplicatedItems.length / 2)}, min-content)`,
-          }}
-        >
-          {duplicatedItems.map((acc, index) => (
-            <div key={`${acc.id}-${index}`} className="snap-center">
-              {acc.isFiller ? (
-                <div className="w-64 h-80 opacity-0 pointer-events-none" />
-              ) : (
-                <LanyardAccountCard
-                  account={acc}
-                  formatCurrency={formatCurrency}
-                  getAccountIcon={getAccountIcon}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                  className="scale-[0.9] md:scale-100 origin-top"
-                />
-              )}
-            </div>
-          ))}
-        </div>
+    <div className={`relative w-full py-8 ${className}`}>
+      {/* Background Rails for multiple rows - assuming max 10 rows for safety */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent opacity-40"
+            style={{ top: `${i * CARD_HEIGHT + RAIL_OFFSET}px` }}
+          />
+        ))}
       </div>
 
-      {/* Fade Gradients for visual depth */}
-      <div className="absolute top-0 bottom-0 left-0 w-16 md:w-64 bg-gradient-to-r from-slate-100 via-slate-100/50 dark:from-slate-950 dark:via-slate-950/50 to-transparent pointer-events-none z-10" />
-      <div className="absolute top-0 bottom-0 right-0 w-16 md:w-64 bg-gradient-to-l from-slate-100 via-slate-100/50 dark:from-slate-950 dark:via-slate-950/50 to-transparent pointer-events-none z-10" />
+      <div className="flex flex-nowrap md:flex-wrap overflow-x-auto md:overflow-visible justify-start md:justify-center gap-x-6 md:gap-x-8 gap-y-12 px-4 md:px-8 relative z-10 mx-auto max-w-[1248px] snap-x snap-proximity md:snap-none scrollbar-hide pb-8 md:pb-0">
+        {accounts.map((acc, index) => (
+          <div
+            key={`${acc.id}-${index}`}
+            className="flex justify-center flex-shrink-0 snap-center"
+          >
+            <LanyardAccountCard
+              account={acc}
+              formatCurrency={formatCurrency}
+              getAccountIcon={getAccountIcon}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              className="origin-top hover:z-20 transition-all duration-300"
+            />
+          </div>
+        ))}
+        {accounts.length === 0 && (
+          <div className="text-slate-500 italic text-sm py-10 w-full text-center">
+            No accounts to display.
+          </div>
+        )}
+      </div>
     </div>
   );
 };

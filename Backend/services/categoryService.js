@@ -86,11 +86,11 @@ exports.updateGroup = async (userId, groupId, data) => {
       groupId,
       userId,
     ]);
-  
+
   if (result.affectedRows === 0) {
     throw new Error("Update failed: Group not found or permission denied.");
   }
-  
+
   return { id: groupId, name };
 };
 
@@ -164,4 +164,19 @@ exports.deleteCategory = async (userId, categoryId) => {
       userId,
     ]);
   return true;
+};
+
+exports.updateRolloverStatus = async (userId, categoryId, isRollover) => {
+  const [result] = await db
+    .promise()
+    .query(
+      "UPDATE categories SET is_rollover = ? WHERE id = ? AND user_id = ?",
+      [isRollover ? 1 : 0, categoryId, userId],
+    );
+
+  if (result.affectedRows === 0) {
+    throw new Error("Update failed: Category not found or permission denied.");
+  }
+
+  return { id: categoryId, is_rollover: !!isRollover };
 };

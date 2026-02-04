@@ -18,6 +18,10 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { API_URL } from "../../config/api";
 import { fetchCategories } from "../../services/categoryService";
+import { CashFlowSankey } from "./CashFlowSankey";
+import { SpendingBreakdown } from "./SpendingBreakdown";
+import { ReportCashFlowChart } from "./ReportCashFlowChart";
+import { IncomeAnalysis } from "./IncomeAnalysis";
 
 export const ReportDashboardOrganism = ({ user }) => {
   const [allTransactions, setAllTransactions] = useState([]);
@@ -26,13 +30,19 @@ export const ReportDashboardOrganism = ({ user }) => {
   const [filterRange, setFilterRange] = useState("30D");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterAccount, setFilterAccount] = useState("");
-  const [categoriesData, setCategoriesData] = useState({ expense: [], income: [] });
+  const [categoriesData, setCategoriesData] = useState({
+    expense: [],
+    income: [],
+  });
+  const [reportTab, setReportTab] = useState("cashflow");
+
+  // ... (rest of the file until the income tab) ...
 
   // Hardcoded categories removed.
 
   const getCategoryGroup = (category) => {
-    const group = categoriesData.expense.find(g => 
-      g.subCategories.some(sub => sub.name === category)
+    const group = categoriesData.expense.find((g) =>
+      g.subCategories.some((sub) => sub.name === category),
     );
     return group ? group.name : null;
   };
@@ -152,10 +162,12 @@ export const ReportDashboardOrganism = ({ user }) => {
     if (filterCategory) {
       data = data.filter((tx) => {
         if (tx.category === filterCategory) return true;
-        
-        const group = categoriesData.expense.find(g => g.name === filterCategory);
+
+        const group = categoriesData.expense.find(
+          (g) => g.name === filterCategory,
+        );
         if (group) {
-          return group.subCategories.some(sub => sub.name === tx.category);
+          return group.subCategories.some((sub) => sub.name === tx.category);
         }
         return false;
       });
@@ -517,9 +529,7 @@ export const ReportDashboardOrganism = ({ user }) => {
 
       {/* Summary Cards - Grid on Desktop, Slider/Swap on Mobile */}
       <div className="relative">
-        {/* Desktop View: Grid */}
         <div className="hidden md:grid grid-cols-3 gap-6">
-          {/* Income Card */}
           <div className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300">
             <div className="flex justify-between items-start mb-4">
               <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
@@ -540,7 +550,6 @@ export const ReportDashboardOrganism = ({ user }) => {
             </p>
           </div>
 
-          {/* Expense Card */}
           <div className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-500/5 transition-all duration-300">
             <div className="flex justify-between items-start mb-4">
               <div className="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
@@ -561,7 +570,6 @@ export const ReportDashboardOrganism = ({ user }) => {
             </p>
           </div>
 
-          {/* Balance Card */}
           <div className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300">
             <div className="flex justify-between items-start mb-4">
               <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
@@ -583,195 +591,131 @@ export const ReportDashboardOrganism = ({ user }) => {
           </div>
         </div>
 
-        {/* Mobile View: Horizontal Carousel (Card Swap) */}
-        <div className="md:hidden">
-          <div className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory px-4 -mx-4 gap-4 pb-4">
-            {/* Mobile Income Card */}
-            <div className="min-w-[85%] snap-center bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
-                  <TrendingUp size={24} />
-                </div>
-                <div>
-                  <Badge
-                    variant="success"
-                    className="font-black text-[8px] tracking-widest"
-                  >
-                    INCOME
-                  </Badge>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Total Pemasukan
-                  </p>
-                </div>
+        {/* Mobile View Summary Cards - Vertical Stack (Monarch Style) */}
+        <div className="md:hidden flex flex-col gap-4">
+          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
+                <TrendingUp size={24} />
               </div>
-              <p className="text-2xl font-black text-emerald-600 tabular-nums">
-                {formatCurrency(summary.income)}
-              </p>
-            </div>
-
-            {/* Mobile Expense Card */}
-            <div className="min-w-[85%] snap-center bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center">
-                  <TrendingDown size={24} />
-                </div>
-                <div>
-                  <Badge
-                    variant="danger"
-                    className="font-black text-[8px] tracking-widest"
-                  >
-                    EXPENSE
-                  </Badge>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Total Pengeluaran
-                  </p>
-                </div>
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+                  Income
+                </p>
+                <p className="text-xl font-black text-emerald-600 tabular-nums">
+                  {formatCurrency(summary.income)}
+                </p>
               </div>
-              <p className="text-2xl font-black text-rose-600 tabular-nums">
-                {formatCurrency(summary.expense)}
-              </p>
-            </div>
-
-            {/* Mobile Balance Card */}
-            <div className="min-w-[85%] snap-center bg-white p-6 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
-                  <Wallet size={24} />
-                </div>
-                <div>
-                  <Badge
-                    variant="primary"
-                    className="font-black text-[8px] tracking-widest"
-                  >
-                    NET BALANCE
-                  </Badge>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Saldo Bersih
-                  </p>
-                </div>
-              </div>
-              <p className="text-2xl font-black text-blue-600 tabular-nums">
-                {formatCurrency(summary.balance)}
-              </p>
             </div>
           </div>
 
-          {/* Mobile Swipe Indicator */}
-          <div className="flex justify-center gap-1.5 mt-2">
-            <div className="w-8 h-1 bg-emerald-500/20 rounded-full" />
-            <div className="w-4 h-1 bg-slate-200 rounded-full" />
-            <div className="w-4 h-1 bg-slate-200 rounded-full" />
+          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center">
+                <TrendingDown size={24} />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+                  Expense
+                </p>
+                <p className="text-xl font-black text-rose-600 tabular-nums">
+                  {formatCurrency(summary.expense)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
+                <Wallet size={24} />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+                  Net Balance
+                </p>
+                <p className="text-xl font-black text-blue-600 tabular-nums">
+                  {formatCurrency(summary.balance)}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Transaction Ledger Table Only - Full Width */}
-      <div className="bg-white rounded-xl border border-slate-300 shadow-md overflow-hidden">
-        <div className="px-6 py-3 border-b border-slate-300 flex justify-between items-center bg-slate-100/50">
-          <h3 className="font-black text-slate-800 flex items-center gap-2 text-sm uppercase tracking-wider">
-            <FileText size={16} className="text-finance-primary" />
-            Buku Kas / Ledger Transaksi
-          </h3>
-          <span className="text-[10px] font-black text-slate-500 bg-white border border-slate-300 px-3 py-1 rounded-full shadow-sm">
-            {filteredTransactions.length} ENTRIES
-          </span>
+      {/* REPORT VISUALIZATION TABS */}
+      <div className="mt-8">
+        <div className="flex p-1.5 bg-slate-200/50 rounded-2xl w-full md:w-fit mb-6 border border-slate-200 shadow-sm mx-auto md:mx-0">
+          <button
+            onClick={() => setReportTab("cashflow")}
+            className={`flex-1 md:flex-none px-4 md:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              reportTab === "cashflow"
+                ? "bg-slate-900 text-white shadow-md"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            Cash Flow
+          </button>
+          <button
+            onClick={() => setReportTab("spending")}
+            className={`flex-1 md:flex-none px-4 md:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              reportTab === "spending"
+                ? "bg-slate-900 text-white shadow-md"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            Spending
+          </button>
+          <button
+            onClick={() => setReportTab("income")}
+            className={`flex-1 md:flex-none px-4 md:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              reportTab === "income"
+                ? "bg-slate-900 text-white shadow-md"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            Income
+          </button>
         </div>
-        <div className="overflow-x-auto overflow-y-auto max-h-[600px] border-t border-slate-300">
-          <table className="w-full text-left border-collapse table-fixed min-w-[1000px]">
-            <thead className="sticky top-0 z-20 shadow-sm">
-              <tr className="text-[11px] font-black text-slate-700 bg-slate-200 border-b border-slate-300 uppercase tracking-tight">
-                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 w-32">
-                  Tanggal
-                </th>
-                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 w-20">
-                  Tipe
-                </th>
-                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 w-48">
-                  Kategori / Deskripsi
-                </th>
-                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 text-right w-40">
-                  Jumlah
-                </th>
-                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 hidden lg:table-cell w-32">
-                  Akun
-                </th>
-                <th className="px-4 py-2 bg-slate-200 border-r border-slate-300 hidden xl:table-cell w-32">
-                  Metode
-                </th>
-                <th className="px-4 py-2 bg-slate-200 text-center hidden md:table-cell w-24">
-                  Status
-                </th>
-              </tr>
-            </thead>
-            <tbody className="text-[12px] font-medium tabular-nums divide-y divide-slate-300">
-              {filteredTransactions.map((tx, idx) => (
-                <tr
-                  key={tx.id}
-                  className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50/80"} hover:bg-blue-50/50 transition-colors group`}
-                >
-                  <td className="px-4 py-2 border-r border-slate-200 text-slate-800 font-bold whitespace-nowrap">
-                    {new Date(tx.date).toLocaleDateString("id-ID", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </td>
-                  <td className="px-4 py-2 border-r border-slate-200">
-                    <span
-                      className={`text-[9px] font-black px-2 py-0.5 rounded border uppercase ${tx.type === "income" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-rose-100 text-rose-700 border-rose-200"}`}
-                    >
-                      {tx.type === "income" ? "IN" : "OUT"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2 border-r border-slate-200">
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-bold text-slate-900 leading-none mb-0.5">
-                        {tx.category}
-                      </span>
-                      {tx.description && (
-                        <span className="text-[10px] text-slate-500 italic truncate max-w-full">
-                          {tx.description}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td
-                    className={`px-4 py-2 border-r border-slate-200 text-right font-black ${tx.type === "income" ? "text-emerald-600" : "text-rose-600"}`}
-                  >
-                    {tx.type === "income" ? "+" : "-"}
-                    {formatCurrency(tx.amount)}
-                  </td>
-                  <td className="px-4 py-2 border-r border-slate-200 text-slate-700 hidden lg:table-cell">
-                    {tx.account}
-                  </td>
-                  <td className="px-4 py-2 border-r border-slate-200 text-slate-500 text-[10px] hidden xl:table-cell">
-                    {tx.payment_method}
-                  </td>
-                  <td className="px-4 py-2 text-center hidden md:table-cell">
-                    {tx.status === "done" ? (
-                      <span className="text-[9px] font-black text-slate-400">
-                        DONE
-                      </span>
-                    ) : (
-                      <span className="text-[9px] font-black text-amber-600 bg-amber-100 px-2 py-0.5 rounded border border-amber-200">
-                        PENDING
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-              {filteredTransactions.length === 0 && (
-                <tr>
-                  <td
-                    colSpan="7"
-                    className="px-6 py-12 text-center text-slate-400 italic"
-                  >
-                    No records found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {reportTab === "cashflow" && (
+            <>
+              {/* Desktop Sankey */}
+              <div className="hidden md:block">
+                <CashFlowSankey transactions={filteredTransactions} />
+              </div>
+
+              {/* Mobile Simplified Bar View */}
+              <div className="md:hidden bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-slate-800">Cash Flow Trend</h3>
+                  <div className="p-2 bg-slate-50 rounded-xl text-slate-400">
+                    <TrendingUp size={16} />
+                  </div>
+                </div>
+
+                {/* Cash Flow Bar Chart */}
+                <div className="w-full h-[320px] -mx-4">
+                  <ReportCashFlowChart transactions={filteredTransactions} />
+                </div>
+              </div>
+            </>
+          )}
+
+          {reportTab === "spending" && (
+            <SpendingBreakdown
+              transactions={filteredTransactions}
+              totalExpense={summary.expense}
+            />
+          )}
+          {/* INCOME ANALYSIS TAB */}
+          {reportTab === "income" && (
+            <IncomeAnalysis
+              transactions={filteredTransactions}
+              totalIncome={summary.income}
+            />
+          )}
         </div>
       </div>
     </div>

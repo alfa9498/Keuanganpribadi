@@ -5,23 +5,8 @@ import { StatCard } from "../molecules/StatCard";
 import { BentoGrid, BentoCard } from "../atoms/BentoGrid";
 import { AnimatedList } from "../atoms/AnimatedList";
 
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-  Sector,
-  BarChart,
-  Bar,
-  LabelList,
-} from "recharts";
+import { DashboardTrendChart } from "./DashboardTrendChart";
+import { DashboardPieChart } from "./DashboardPieChart";
 
 import { TimeFilter } from "../molecules/TimeFilter";
 import { CategoryFilter } from "../molecules/CategoryFilter";
@@ -76,113 +61,7 @@ const getAccountIcon = (name, iconName) => {
 
 // getAccountIcon removed from here and moved above as per previous chunk.
 
-const renderActiveShape = (props) => {
-  const RADIAN = Math.PI / 180;
-  const {
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    startAngle,
-    endAngle,
-    fill,
-    payload,
-    percent,
-    value,
-    name,
-  } = props;
-  const sin = Math.sin(-RADIAN * midAngle);
-  const cos = Math.cos(-RADIAN * midAngle);
-  const sx = cx + (outerRadius + 10) * cos;
-  const sy = cy + (outerRadius + 10) * sin;
-  const mx = cx + (outerRadius + 30) * cos;
-  const my = cy + (outerRadius + 30) * sin;
-  const ex = mx + (cos >= 0 ? 1 : -1) * 22;
-  const ey = my;
-  const textAnchor = cos >= 0 ? "start" : "end";
-
-  return (
-    <g>
-      <Sector
-        cx={cx}
-        cy={cy}
-        innerRadius={innerRadius}
-        outerRadius={outerRadius + 6}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        fill={fill}
-      />
-      <Sector
-        cx={cx}
-        cy={cy}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        innerRadius={outerRadius + 8}
-        outerRadius={outerRadius + 10}
-        fill={fill}
-      />
-      <path
-        d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
-        stroke={fill}
-        fill="none"
-      />
-      <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-      <text
-        x={ex + (cos >= 0 ? 1 : -1) * 12}
-        y={ey}
-        textAnchor={textAnchor}
-        fill="currentColor"
-        className="text-xs font-bold fill-slate-700 dark:fill-white"
-      >
-        {name}
-      </text>
-      <text
-        x={ex + (cos >= 0 ? 1 : -1) * 12}
-        y={ey}
-        dy={18}
-        textAnchor={textAnchor}
-        fill="#94a3b8"
-        className="text-[10px]"
-      >
-        {new Intl.NumberFormat("id-ID", {
-          style: "currency",
-          currency: "IDR",
-          maximumFractionDigits: 0,
-        }).format(value)}
-        <tspan fill="#64748b" className="ml-1">
-          {" "}
-          ({(percent * 100).toFixed(1)}%)
-        </tspan>
-      </text>
-    </g>
-  );
-};
-
-const CustomBarLabel = (props) => {
-  const { x, y, width, height, value } = props;
-  const formattedValue = new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(value);
-
-  // Threshold to decide if text fits inside (approx 80px for currency)
-  const isShortBar = width < 80;
-
-  return (
-    <text
-      x={isShortBar ? x + width + 5 : x + width - 5}
-      y={y + height / 2 + 4}
-      fill={isShortBar ? "#94a3b8" : "#fff"}
-      fontSize={10}
-      fontWeight="bold"
-      textAnchor={isShortBar ? "start" : "end"}
-    >
-      {formattedValue}
-    </text>
-  );
-};
+// Recharts helpers removed
 
 export const DashboardOrganism = ({
   user,
@@ -201,7 +80,10 @@ export const DashboardOrganism = ({
   const [barDataMain, setBarDataMain] = useState([]); // Horizontal Bar: Main Category
   const [barDataSub, setBarDataSub] = useState([]); // Horizontal Bar: Sub Category
   const [barDataAccount, setBarDataAccount] = useState([]); // Horizontal Bar: Account (Expenses)
-  const [categoriesData, setCategoriesData] = useState({ expense: [], income: [] });
+  const [categoriesData, setCategoriesData] = useState({
+    expense: [],
+    income: [],
+  });
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [allTransactions, setAllTransactions] = useState([]); // Store all raw data
@@ -330,9 +212,9 @@ export const DashboardOrganism = ({
       filtered = filtered.filter((tx) => {
         if (tx.category === category) return true;
         // Check if the selected category is a Group Name
-        const group = categoriesData.expense.find(g => g.name === category);
+        const group = categoriesData.expense.find((g) => g.name === category);
         if (group) {
-          return group.subCategories.some(sub => sub.name === tx.category);
+          return group.subCategories.some((sub) => sub.name === tx.category);
         }
         return false;
       });
@@ -831,97 +713,8 @@ export const DashboardOrganism = ({
                 </span>
               </div>
             </div>
-            <div className="h-[280px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={chartData}
-                  margin={{ top: 10, right: 0, left: -20, bottom: 0 }}
-                >
-                  <defs>
-                    <linearGradient
-                      id="colorIncome"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient
-                      id="colorExpense"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor="#F43F5E" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#F43F5E" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="#1e293b"
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="name"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#64748b", fontSize: 11 }}
-                    dy={10}
-                    minTickGap={30}
-                  />
-                  <YAxis
-                    tick={{ fill: "#64748b", fontSize: 11 }}
-                    axisLine={false}
-                    tickLine={false}
-                    dx={-10}
-                    tickFormatter={(value) =>
-                      value >= 1000000
-                        ? `${(value / 1000000).toFixed(1)}M`
-                        : value >= 1000
-                          ? `${(value / 1000).toFixed(0)}K`
-                          : value
-                    }
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0f172a",
-                      borderColor: "#1e293b",
-                      color: "#f1f5f9",
-                      borderRadius: "8px",
-                      boxShadow:
-                        "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-                    }}
-                    itemStyle={{ color: "#fff", fontSize: "13px" }}
-                    labelStyle={{
-                      color: "#cbd5e1",
-                      marginBottom: "0.25rem",
-                      fontSize: "12px",
-                    }}
-                    formatter={(value) => formatCurrency(value)}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="income"
-                    stroke="#10B981"
-                    strokeWidth={3}
-                    fillOpacity={1}
-                    fill="url(#colorIncome)"
-                    activeDot={{ r: 6, strokeWidth: 0, fill: "#fff" }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="expense"
-                    stroke="#F43F5E"
-                    strokeWidth={3}
-                    fillOpacity={1}
-                    fill="url(#colorExpense)"
-                    activeDot={{ r: 6, strokeWidth: 0, fill: "#fff" }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+            <div className="flex-1 w-full min-h-0">
+              <DashboardTrendChart data={chartData} isMobile={isMobile} />
             </div>
           </div>
           {/* Background Glow */}
@@ -987,56 +780,7 @@ export const DashboardOrganism = ({
             </p>
           </div>
           <div className="h-[200px] w-full relative flex-1">
-            {pieData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Tooltip
-                    formatter={(value) => formatCurrency(value)}
-                    contentStyle={{
-                      borderRadius: "12px",
-                      border: "none",
-                      boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
-                    }}
-                  />
-                  <Pie
-                    activeIndex={activeIndex}
-                    activeShape={renderActiveShape}
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    onMouseEnter={onPieEnter}
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                        stroke="rgba(0,0,0,0)"
-                      />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex h-full items-center justify-center text-slate-500 text-sm">
-                Belum ada data
-              </div>
-            )}
-            {pieData.length > 0 && (
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none mt-2">
-                <span className="text-[10px] text-slate-500 block uppercase tracking-wider">
-                  Total
-                </span>
-                <span className="text-slate-800 dark:text-white font-bold text-sm">
-                  {formatCurrency(
-                    pieData.reduce((acc, curr) => acc + curr.value, 0),
-                  )}
-                </span>
-              </div>
-            )}
+            <DashboardPieChart data={pieData} colors={COLORS} />
           </div>
         </BentoCard>
 
@@ -1050,54 +794,31 @@ export const DashboardOrganism = ({
               Ranking pengeluaran berdasarkan grup
             </p>
           </div>
-          <div className="h-[250px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                layout="vertical"
-                data={barDataMain}
-                margin={{
-                  top: 5,
-                  right: isMobile ? 10 : 30,
-                  left: isMobile ? 0 : 40,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  horizontal={false}
-                  stroke="#334155"
-                />
-                <XAxis type="number" hide />
-                <YAxis
-                  dataKey="name"
-                  type="category"
-                  width={isMobile ? 60 : 100}
-                  tick={{ fill: "#94a3b8", fontSize: isMobile ? 9 : 11 }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip
-                  cursor={{ fill: "#334155", opacity: 0.4 }}
-                  contentStyle={{
-                    backgroundColor: "#0f172a",
-                    borderColor: "#1e293b",
-                    color: "#f1f5f9",
-                    borderRadius: "8px",
-                  }}
-                  itemStyle={{ color: "#fff" }}
-                  formatter={(value) => formatCurrency(value)}
-                />
-                <Bar
-                  dataKey="value"
-                  fill="#1e293b"
-                  stroke="#334155"
-                  radius={[0, 4, 4, 0]}
-                  barSize={20}
-                >
-                  <LabelList dataKey="value" content={<CustomBarLabel />} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="space-y-3 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+            {barDataMain.slice(0, 5).map((item, idx) => (
+              <div key={idx} className="group">
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-slate-300 font-bold">{item.name}</span>
+                  <span className="text-white font-black">
+                    {formatCurrency(item.value)}
+                  </span>
+                </div>
+                <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-colors hover:opacity-80"
+                    style={{
+                      width: `${(item.value / summary.expense) * 100}%`,
+                      backgroundColor: COLORS[idx % COLORS.length],
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+            {barDataMain.length === 0 && (
+              <p className="text-slate-500 text-xs">
+                Belum ada data pengeluaran.
+              </p>
+            )}
           </div>
         </BentoCard>
 
@@ -1111,54 +832,31 @@ export const DashboardOrganism = ({
               Detail spesifik pos pengeluaran
             </p>
           </div>
-          <div className="h-[250px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                layout="vertical"
-                data={barDataSub}
-                margin={{
-                  top: 5,
-                  right: isMobile ? 10 : 30,
-                  left: isMobile ? 0 : 40,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  horizontal={false}
-                  stroke="#334155"
-                />
-                <XAxis type="number" hide />
-                <YAxis
-                  dataKey="name"
-                  type="category"
-                  width={isMobile ? 60 : 100}
-                  tick={{ fill: "#94a3b8", fontSize: isMobile ? 9 : 11 }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip
-                  cursor={{ fill: "#334155", opacity: 0.4 }}
-                  contentStyle={{
-                    backgroundColor: "#0f172a",
-                    borderColor: "#1e293b",
-                    color: "#f1f5f9",
-                    borderRadius: "8px",
-                  }}
-                  itemStyle={{ color: "#fff" }}
-                  formatter={(value) => formatCurrency(value)}
-                />
-                <Bar
-                  dataKey="value"
-                  fill="#1e293b"
-                  stroke="#334155"
-                  radius={[0, 4, 4, 0]}
-                  barSize={20}
-                >
-                  <LabelList dataKey="value" content={<CustomBarLabel />} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="space-y-3 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+            {barDataSub.slice(0, 5).map((item, idx) => (
+              <div key={idx} className="group">
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-slate-300 font-bold">{item.name}</span>
+                  <span className="text-white font-black">
+                    {formatCurrency(item.value)}
+                  </span>
+                </div>
+                <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-colors hover:opacity-80"
+                    style={{
+                      width: `${(item.value / summary.expense) * 100}%`,
+                      backgroundColor: COLORS[(idx + 2) % COLORS.length],
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+            {barDataSub.length === 0 && (
+              <p className="text-slate-500 text-xs">
+                Belum ada data pengeluaran.
+              </p>
+            )}
           </div>
         </BentoCard>
         {/* 10. Recent Transactions List */}
