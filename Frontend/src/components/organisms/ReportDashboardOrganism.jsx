@@ -17,6 +17,7 @@ import { Badge } from "../atoms/Badge";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { API_URL } from "../../config/api";
+import { fetchCategories } from "../../services/categoryService";
 
 export const ReportDashboardOrganism = ({ user }) => {
   const [allTransactions, setAllTransactions] = useState([]);
@@ -25,71 +26,22 @@ export const ReportDashboardOrganism = ({ user }) => {
   const [filterRange, setFilterRange] = useState("30D");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterAccount, setFilterAccount] = useState("");
+  const [categoriesData, setCategoriesData] = useState({ expense: [], income: [] });
 
-  const expenseCategories = {
-    Makanan: ["Makanan", "Makan & Minum", "Sarapan", "Jajan Harian"],
-    Transportasi: [
-      "Transportasi",
-      "Transport Harian",
-      "Bensin",
-      "Parkir",
-      "Ojol / Taksi Online",
-      "pengeluaran Pulang",
-    ],
-    Tagihan: [
-      "Tagihan",
-      "Listrik",
-      "Internet",
-      "Pulsa",
-      "Air",
-      "Tagihan Internet",
-      "Biaya Admin",
-    ],
-    Belanja: [
-      "Belanja",
-      "Belanja Bulanan",
-      "Shopping",
-      "shopee",
-      "Laundry",
-      "Marketplace (Shopee, dll)",
-    ],
-    Hiburan: ["Hiburan", "Nongkrong", "Jalan-jalan"],
-    Kesehatan: ["Kesehatan", "Berobat", "Obat", "BPJS / Asuransi"],
-    Pendidikan: ["Pendidikan", "Sekolah", "Kursus", "Buku / Alat Tulis"],
-    "Orang Tua": [
-      "Orang Tua",
-      "Orang tua aa",
-      "Orang tua neng",
-      "Listrik Orang Tua",
-      "Pulsa Orang Tua",
-    ],
-    Hadiah: ["Hadiah", "Hadiah / Acara", "Acara", "Ulang Tahun", "Nikahan"],
-    Keuangan: [
-      "Keuangan",
-      "Tabungan",
-      "Investasi",
-      "Hutang",
-      "Piutang",
-      "Tarik Tunai",
-      "Cicilan / Hutang",
-      "Tabungan anak",
-      "Tabung Kita",
-    ],
-    Sewa: ["Sewa", "mobil", "motor", "kontrakan", "kosan"],
-    Lainnya: ["Lainnya"],
-  };
+  // Hardcoded categories removed.
 
   const getCategoryGroup = (category) => {
-    for (const [group, items] of Object.entries(expenseCategories)) {
-      if (items.includes(category)) return group;
-    }
-    return null;
+    const group = categoriesData.expense.find(g => 
+      g.subCategories.some(sub => sub.name === category)
+    );
+    return group ? group.name : null;
   };
 
   useEffect(() => {
     if (user?.id) {
       fetchTransactions();
       fetchAccounts();
+      fetchCategoriesData();
     }
   }, [user]);
 
@@ -105,6 +57,15 @@ export const ReportDashboardOrganism = ({ user }) => {
       console.error("Failed to fetch transactions:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCategoriesData = async () => {
+    try {
+      const data = await fetchCategories();
+      setCategoriesData(data);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
     }
   };
 
@@ -191,9 +152,10 @@ export const ReportDashboardOrganism = ({ user }) => {
     if (filterCategory) {
       data = data.filter((tx) => {
         if (tx.category === filterCategory) return true;
-        // If the selected category is a group, check if tx.category is inside it
-        if (expenseCategories[filterCategory]) {
-          return expenseCategories[filterCategory].includes(tx.category);
+        
+        const group = categoriesData.expense.find(g => g.name === filterCategory);
+        if (group) {
+          return group.subCategories.some(sub => sub.name === tx.category);
         }
         return false;
       });
@@ -528,6 +490,7 @@ export const ReportDashboardOrganism = ({ user }) => {
             <CategoryFilter
               currentCategory={filterCategory}
               onCategoryChange={setFilterCategory}
+              categories={categoriesData}
             />
           </div>
           <div className="w-full sm:w-auto">

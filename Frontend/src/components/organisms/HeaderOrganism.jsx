@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Menu, Bell, X, Calendar, SlidersHorizontal } from "lucide-react";
 import { TimeFilter } from "../molecules/TimeFilter";
 import { CategoryFilter } from "../molecules/CategoryFilter";
+import { fetchCategories } from "../../services/categoryService";
 import { AccountFilter } from "../molecules/AccountFilter";
 import { API_URL } from "../../config/api";
 
@@ -22,6 +23,7 @@ export const HeaderOrganism = ({
   const [notificationCount, setNotificationCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [categoriesData, setCategoriesData] = useState({ expense: [], income: [] });
   const notifRef = useRef(null);
 
   // Fetch unread notification count
@@ -123,6 +125,15 @@ export const HeaderOrganism = ({
     }
   };
 
+  const fetchCategoriesData = async () => {
+    try {
+      const data = await fetchCategories();
+      setCategoriesData(data);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  };
+
   // Format timestamp to relative time
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
@@ -156,11 +167,13 @@ export const HeaderOrganism = ({
   useEffect(() => {
     fetchUnreadCount();
     fetchAccounts();
+    fetchCategoriesData();
 
     // Poll every 30 seconds
     const interval = setInterval(() => {
       fetchUnreadCount();
       fetchAccounts();
+      fetchCategoriesData();
     }, 30000);
 
     return () => clearInterval(interval);
@@ -226,6 +239,7 @@ export const HeaderOrganism = ({
                 <CategoryFilter
                   currentCategory={filterCategory}
                   onCategoryChange={setFilterCategory}
+                  categories={categoriesData}
                 />
                 <AccountFilter
                   currentAccount={filterAccount}
@@ -250,6 +264,7 @@ export const HeaderOrganism = ({
                       <CategoryFilter
                         currentCategory={filterCategory}
                         onCategoryChange={setFilterCategory}
+                        categories={categoriesData}
                       />
                     </div>
                     <div className="space-y-1.5">

@@ -9,6 +9,7 @@ import { TimeFilter } from "../molecules/TimeFilter";
 import { API_URL } from "../../config/api";
 import { CategoryFilter } from "../molecules/CategoryFilter";
 import { AccountFilter } from "../molecules/AccountFilter";
+import { fetchCategories } from "../../services/categoryService";
 
 export const TransactionListOrganism = ({
   user,
@@ -24,12 +25,23 @@ export const TransactionListOrganism = ({
   const [activeListTab, setActiveListTab] = useState("all"); // all, income, expense
   const [refreshKey, setRefreshKey] = useState(0);
   const [accounts, setAccounts] = useState([]);
+  const [categoriesData, setCategoriesData] = useState({ expense: [], income: [] });
 
   useEffect(() => {
     if (user?.id) {
       fetchAccounts();
+      fetchCategoriesData();
     }
   }, [user?.id]);
+
+  const fetchCategoriesData = async () => {
+    try {
+      const data = await fetchCategories();
+      setCategoriesData(data);
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+    }
+  };
 
   const fetchAccounts = async () => {
     if (!user?.id) return;
@@ -127,6 +139,7 @@ export const TransactionListOrganism = ({
             <CategoryFilter
               currentCategory={filterCategory}
               onCategoryChange={setFilterCategory}
+              categories={categoriesData}
             />
           </div>
         </div>

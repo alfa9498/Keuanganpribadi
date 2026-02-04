@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { fetchCategories } from "../../services/categoryService";
 import { Button } from "../atoms/Button";
 import { StatCard } from "../molecules/StatCard";
 import { BentoGrid, BentoCard } from "../atoms/BentoGrid";
@@ -71,58 +72,7 @@ const getAccountIcon = (name, iconName) => {
   return <Coins size={14} className="text-amber-500" />;
 };
 
-const expenseCategories = {
-  Makanan: ["Makanan", "Makan & Minum", "Sarapan", "Jajan Harian"],
-  Transportasi: [
-    "Transportasi",
-    "Transport Harian",
-    "Bensin",
-    "Parkir",
-    "Ojol / Taksi Online",
-    "pengeluaran Pulang",
-  ],
-  Tagihan: [
-    "Tagihan",
-    "Listrik",
-    "Internet",
-    "Pulsa",
-    "Air",
-    "Tagihan Internet",
-    "Biaya Admin",
-  ],
-  Belanja: [
-    "Belanja",
-    "Belanja Bulanan",
-    "Shopping",
-    "shopee",
-    "Laundry",
-    "Marketplace (Shopee, dll)",
-  ],
-  Hiburan: ["Hiburan", "Nongkrong", "Jalan-jalan"],
-  Kesehatan: ["Kesehatan", "Berobat", "Obat", "BPJS / Asuransi"],
-  Pendidikan: ["Pendidikan", "Sekolah", "Kursus", "Buku / Alat Tulis"],
-  "Orang Tua": [
-    "Orang Tua",
-    "Orang tua aa",
-    "Orang tua neng",
-    "Listrik Orang Tua",
-    "Pulsa Orang Tua",
-  ],
-  Hadiah: ["Hadiah", "Hadiah / Acara", "Acara", "Ulang Tahun", "Nikahan"],
-  Keuangan: [
-    "Keuangan",
-    "Tabungan",
-    "Investasi",
-    "Hutang",
-    "Piutang",
-    "Tarik Tunai",
-    "Cicilan / Hutang",
-    "Tabungan anak",
-    "Tabung Kita",
-  ],
-  Sewa: ["Sewa", "mobil", "motor", "kontrakan", "kosan"],
-  Lainnya: ["Lainnya"],
-};
+// Hardcoded expenseCategories removed. Now using dynamic categories from DB.
 
 // getAccountIcon removed from here and moved above as per previous chunk.
 
@@ -251,6 +201,8 @@ export const DashboardOrganism = ({
   const [barDataMain, setBarDataMain] = useState([]); // Horizontal Bar: Main Category
   const [barDataSub, setBarDataSub] = useState([]); // Horizontal Bar: Sub Category
   const [barDataAccount, setBarDataAccount] = useState([]); // Horizontal Bar: Account (Expenses)
+  const [categoriesData, setCategoriesData] = useState({ expense: [], income: [] });
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [allTransactions, setAllTransactions] = useState([]); // Store all raw data
   const [debtSummary, setDebtSummary] = useState({
@@ -313,8 +265,20 @@ export const DashboardOrganism = ({
     if (user?.id) {
       fetchTransactions();
       fetchAccounts();
+      fetchCategoriesData();
     }
   }, [user]);
+
+  const fetchCategoriesData = async () => {
+    try {
+      const data = await fetchCategories();
+      setCategoriesData(data);
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
 
   useEffect(() => {
     if (allTransactions.length > 0) {
@@ -365,8 +329,10 @@ export const DashboardOrganism = ({
     if (category) {
       filtered = filtered.filter((tx) => {
         if (tx.category === category) return true;
-        if (expenseCategories[category]) {
-          return expenseCategories[category].includes(tx.category);
+        // Check if the selected category is a Group Name
+        const group = categoriesData.expense.find(g => g.name === category);
+        if (group) {
+          return group.subCategories.some(sub => sub.name === tx.category);
         }
         return false;
       });
@@ -451,12 +417,11 @@ export const DashboardOrganism = ({
     let expense = 0;
     const dateMap = {};
     const categoryMap = {}; // Will now store aggregation by Main Category
-
     // Helper to map any sub-category to its Main Category
     const reverseCategoryMap = {};
-    Object.keys(expenseCategories).forEach((mainCat) => {
-      expenseCategories[mainCat].forEach((subCat) => {
-        reverseCategoryMap[subCat] = mainCat;
+    categoriesData.expense.forEach((group) => {
+      group.subCategories.forEach((subCat) => {
+        reverseCategoryMap[subCat.name] = group.name;
       });
     });
 

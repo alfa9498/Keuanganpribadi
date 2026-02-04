@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { fetchCategories } from "../../services/categoryService";
 import { Button } from "../atoms/Button";
 import { Badge } from "../atoms/Badge";
 import {
@@ -73,65 +74,33 @@ export const RecentTransactionsOrganism = ({
   const [backendTransactions, setBackendTransactions] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [categoriesData, setCategoriesData] = useState({ expense: [], income: [] });
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
-  const expenseCategories = {
-    Makanan: ["Makanan", "Makan & Minum", "Sarapan", "Jajan Harian"],
-    Transportasi: [
-      "Transportasi",
-      "Transport Harian",
-      "Bensin",
-      "Parkir",
-      "Ojol / Taksi Online",
-      "pengeluaran Pulang",
-    ],
-    Tagihan: [
-      "Tagihan",
-      "Listrik",
-      "Internet",
-      "Pulsa",
-      "Air",
-      "Tagihan Internet",
-      "Biaya Admin",
-    ],
-    Belanja: [
-      "Belanja",
-      "Belanja Bulanan",
-      "Shopping",
-      "shopee",
-      "Laundry",
-      "Marketplace (Shopee, dll)",
-    ],
-    Hiburan: ["Hiburan", "Nongkrong", "Jalan-jalan"],
-    Kesehatan: ["Kesehatan", "Berobat", "Obat", "BPJS / Asuransi"],
-    Pendidikan: ["Pendidikan", "Sekolah", "Kursus", "Buku / Alat Tulis"],
-    "Orang Tua": [
-      "Orang Tua",
-      "Orang tua aa",
-      "Orang tua neng",
-      "Listrik Orang Tua",
-      "Pulsa Orang Tua",
-    ],
-    Hadiah: ["Hadiah", "Hadiah / Acara", "Acara", "Ulang Tahun", "Nikahan"],
-    Keuangan: [
-      "Keuangan",
-      "Tabungan",
-      "Investasi",
-      "Hutang",
-      "Piutang",
-      "Tarik Tunai",
-      "Cicilan / Hutang",
-      "Tabungan anak",
-      "Tabung Kita",
-    ],
-    Lainnya: ["Lainnya"],
+  const fetchCategoriesData = async () => {
+    try {
+      const data = await fetchCategories();
+      setCategoriesData(data);
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+    } finally {
+      setLoadingCategories(false);
+    }
   };
 
-  const getCategoryGroup = (category) => {
-    for (const [group, items] of Object.entries(expenseCategories)) {
-      if (items.includes(category)) return group;
+  useEffect(() => {
+    if (user?.id) {
+      fetchCategoriesData();
     }
-    return null;
+  }, [user?.id]);
+
+  // Hardcoded categories removed.
+
+  const getCategoryGroup = (category) => {
+    const group = categoriesData.expense.find(g => 
+      g.subCategories.some(sub => sub.name === category)
+    );
+    return group ? group.name : null;
   };
 
   const formatCurrency = (amount) => {
@@ -218,8 +187,9 @@ export const RecentTransactionsOrganism = ({
     if (!user?.id) return;
     setIsLoading(true);
     try {
-      const categoryParam = expenseCategories[activeCategory]
-        ? expenseCategories[activeCategory].join(",")
+      const group = categoriesData.expense.find(g => g.name === activeCategory);
+      const categoryParam = group
+        ? group.subCategories.map(s => s.name).join(",")
         : activeCategory;
 
       const { startDate, endDate } = calculateDateRange(filterRange);
@@ -396,6 +366,7 @@ export const RecentTransactionsOrganism = ({
               <CategoryFilter
                 currentCategory={activeCategory}
                 onCategoryChange={onCategoryChange}
+                categories={categoriesData}
               />
               <AccountFilter
                 currentAccount={activeAccount}
