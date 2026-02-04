@@ -14,6 +14,9 @@ export default {
           surface: "#FFFFFF", // White
         },
       },
+      screens: {
+        xs: "420px",
+      },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
       },

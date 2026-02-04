@@ -174,15 +174,15 @@ export const BudgetPage = ({ user }) => {
   }
 
   return (
-    <div className="w-full max-w-[1200px] p-4 lg:p-6 space-y-6 animate-fade-in text-slate-800">
+    <div className="w-full max-w-[1200px] p-3 md:p-4 lg:p-6 space-y-4 md:space-y-6 animate-fade-in text-slate-800">
       {/* Header & Month Selector */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 md:p-5 rounded-3xl border border-slate-100 shadow-sm">
         <div className="space-y-0.5">
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight">
+          <h2 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">
             Budgets
           </h2>
-          <p className="text-xs font-medium text-slate-500 flex items-center gap-2">
-            <Calendar size={14} className="text-slate-400" />
+          <p className="text-[10px] md:text-xs font-medium text-slate-500 flex items-center gap-2">
+            <Calendar size={12} className="text-slate-400 md:w-3.5 md:h-3.5" />
             Track and manage your monthly spending
           </p>
         </div>
@@ -209,8 +209,8 @@ export const BudgetPage = ({ user }) => {
         </div>
       </div>
 
-      {/* Summary Highlights - Smaller Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Summary Highlights - Responsive Cards */}
+      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {[
           { label: "Planned", val: totalBudget, icon: Wallet, color: "blue" },
           {
@@ -234,19 +234,19 @@ export const BudgetPage = ({ user }) => {
         ].map((item, idx) => (
           <div
             key={idx}
-            className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3"
+            className="bg-white p-3 md:p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-2 md:gap-3"
           >
             <div
-              className={`w-10 h-10 bg-${item.color}-50 text-${item.color}-600 rounded-xl flex items-center justify-center`}
+              className={`shrink-0 w-8 h-8 md:w-10 md:h-10 bg-${item.color}-50 text-${item.color}-600 rounded-xl flex items-center justify-center`}
             >
-              <item.icon size={20} />
+              <item.icon size={16} className="md:w-5 md:h-5" />
             </div>
-            <div>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+            <div className="min-w-0">
+              <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest truncate">
                 {item.label}
               </p>
               <p
-                className={`text-sm font-black tabular-nums ${item.label === "Remaining" || item.label === "Actual" || item.label === "From Prev" ? `text-${item.color}-600` : "text-slate-800"}`}
+                className={`text-xs md:text-sm font-black tabular-nums truncate ${item.label === "Remaining" || item.label === "Actual" || item.label === "From Prev" ? `text-${item.color}-600` : "text-slate-800"}`}
               >
                 {formatCurrency(item.val)}
               </p>
@@ -255,9 +255,9 @@ export const BudgetPage = ({ user }) => {
         ))}
       </div>
 
-      {/* Budget Table */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
-        <div className="p-6 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
+      {/* Budget List - Desktop Table / Mobile Cards */}
+      <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+        <div className="p-4 md:p-6 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="relative w-full md:w-72">
             <Search
               className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
@@ -268,19 +268,20 @@ export const BudgetPage = ({ user }) => {
               placeholder="Search categories..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-slate-900 transition-all"
+              className="w-full pl-12 pr-4 py-2.5 md:py-3 bg-slate-50 border-none rounded-2xl text-xs md:text-sm font-medium focus:ring-2 focus:ring-slate-900 transition-all"
             />
           </div>
           <button
             onClick={loadBudgets}
-            className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-black transition-all"
+            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-black transition-all"
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-            Refresh
+            Sync Budget
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* DESKTOP TABLE VIEW */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50/50">
@@ -307,8 +308,6 @@ export const BudgetPage = ({ user }) => {
             <tbody className="divide-y divide-slate-50">
               {Object.entries(groupedBudgets).map(([groupName, categories]) => {
                 const isCollapsed = collapsedGroups[groupName];
-
-                // Group totals
                 const gPlanned = categories.reduce(
                   (s, c) => s + parseFloat(c.budget_amount || 0),
                   0,
@@ -334,7 +333,6 @@ export const BudgetPage = ({ user }) => {
 
                 return (
                   <React.Fragment key={groupName}>
-                    {/* Group Header Row */}
                     <tr
                       className="bg-slate-50/50 cursor-pointer hover:bg-slate-100/80 transition-colors"
                       onClick={() => toggleGroup(groupName)}
@@ -377,7 +375,6 @@ export const BudgetPage = ({ user }) => {
                         </div>
                       </td>
                     </tr>
-
                     {!isCollapsed &&
                       categories.map((cat) => {
                         const rolloverVal = cat.is_rollover
@@ -387,7 +384,6 @@ export const BudgetPage = ({ user }) => {
                           parseFloat(cat.budget_amount || 0) + rolloverVal;
                         const remaining =
                           capacity - parseFloat(cat.actual_spent || 0);
-
                         const percentUsed =
                           capacity > 0
                             ? Math.min(
@@ -397,7 +393,6 @@ export const BudgetPage = ({ user }) => {
                             : cat.actual_spent > 0
                               ? 100
                               : 0;
-
                         return (
                           <tr
                             key={cat.category_id}
@@ -413,7 +408,7 @@ export const BudgetPage = ({ user }) => {
                                   disabled={toggling === cat.category_id}
                                   className={`text-[8px] font-black uppercase tracking-tighter flex items-center gap-1 transition-all ${cat.is_rollover ? "text-emerald-500" : "text-slate-300 hover:text-slate-500"}`}
                                 >
-                                  <History size={8} />
+                                  <History size={8} />{" "}
                                   {cat.is_rollover
                                     ? "Rollover ON"
                                     : "Rollover OFF"}
@@ -493,6 +488,208 @@ export const BudgetPage = ({ user }) => {
               })}
             </tbody>
           </table>
+        </div>
+
+        {/* MOBILE CARD VIEW */}
+        <div className="md:hidden divide-y divide-slate-50">
+          {Object.entries(groupedBudgets).map(([groupName, categories]) => {
+            const isCollapsed = collapsedGroups[groupName];
+            const gPlanned = categories.reduce(
+              (s, c) => s + parseFloat(c.budget_amount || 0),
+              0,
+            );
+            const gRollover = categories.reduce(
+              (s, c) =>
+                s + (c.is_rollover ? parseFloat(c.rollover_balance || 0) : 0),
+              0,
+            );
+            const gSpent = categories.reduce(
+              (s, c) => s + parseFloat(c.actual_spent || 0),
+              0,
+            );
+            const gCapacity = gPlanned + gRollover;
+            const gRemaining = gCapacity - gSpent;
+            const gPercent =
+              gCapacity > 0
+                ? Math.min(100, (gSpent / gCapacity) * 100)
+                : gSpent > 0
+                  ? 100
+                  : 0;
+
+            return (
+              <div key={groupName} className="flex flex-col">
+                <button
+                  onClick={() => toggleGroup(groupName)}
+                  className="w-full px-5 py-3.5 bg-slate-50/50 flex items-center justify-between group"
+                >
+                  <div className="flex items-center gap-2">
+                    {isCollapsed ? (
+                      <ChevronRight size={14} className="text-slate-400" />
+                    ) : (
+                      <ChevronDown size={14} className="text-slate-400" />
+                    )}
+                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                      {groupName}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-right">
+                    <div className="flex flex-col items-end">
+                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">
+                        Remaining
+                      </span>
+                      <span
+                        className={`text-[11px] font-black tabular-nums ${gRemaining >= 0 ? "text-emerald-500" : "text-rose-500"}`}
+                      >
+                        {formatCurrency(gRemaining)}
+                      </span>
+                    </div>
+                  </div>
+                </button>
+
+                {!isCollapsed && (
+                  <div className="flex flex-col px-3 py-2 gap-2 bg-white">
+                    {categories.map((cat) => {
+                      const rolloverVal = cat.is_rollover
+                        ? parseFloat(cat.rollover_balance || 0)
+                        : 0;
+                      const capacity =
+                        parseFloat(cat.budget_amount || 0) + rolloverVal;
+                      const remaining =
+                        capacity - parseFloat(cat.actual_spent || 0);
+                      const percentUsed =
+                        capacity > 0
+                          ? Math.min(
+                              100,
+                              (parseFloat(cat.actual_spent) / capacity) * 100,
+                            )
+                          : cat.actual_spent > 0
+                            ? 100
+                            : 0;
+
+                      return (
+                        <div
+                          key={cat.category_id}
+                          className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm space-y-3"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="space-y-1">
+                              <h4 className="text-xs font-bold text-slate-800">
+                                {cat.category_name}
+                              </h4>
+                              <button
+                                onClick={() => handleToggleRollover(cat)}
+                                disabled={toggling === cat.category_id}
+                                className={`text-[8px] font-black uppercase tracking-tighter flex items-center gap-1 p-1 -ml-1 rounded-md transition-all ${cat.is_rollover ? "bg-emerald-50 text-emerald-600" : "bg-slate-50 text-slate-400"}`}
+                              >
+                                <History size={8} />{" "}
+                                {cat.is_rollover
+                                  ? "Rollover ON"
+                                  : "Rollover OFF"}
+                                {toggling === cat.category_id && (
+                                  <RefreshCw
+                                    size={8}
+                                    className="animate-spin"
+                                  />
+                                )}
+                              </button>
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                              <div className="flex items-center gap-1.5 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                                <input
+                                  type="number"
+                                  value={cat.budget_amount}
+                                  onChange={(e) =>
+                                    handleBudgetChange(
+                                      cat.category_id,
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="w-16 text-right bg-transparent border-none focus:ring-0 font-black text-slate-700 text-[11px] p-0"
+                                />
+                                {cat.isModified && (
+                                  <button
+                                    onClick={() => handleSaveBudget(cat)}
+                                    disabled={saving === cat.category_id}
+                                    className="text-emerald-500"
+                                  >
+                                    {saving === cat.category_id ? (
+                                      <RefreshCw
+                                        className="animate-spin"
+                                        size={12}
+                                      />
+                                    ) : (
+                                      <Save size={12} />
+                                    )}
+                                  </button>
+                                )}
+                              </div>
+                              <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest text-right">
+                                Planned Budget
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <div className="flex justify-between text-[9px] font-black uppercase tracking-widest">
+                              <span className="text-slate-400">
+                                Spending Progress
+                              </span>
+                              <span
+                                className={
+                                  remaining >= 0
+                                    ? "text-emerald-500"
+                                    : "text-rose-500"
+                                }
+                              >
+                                {Math.round(percentUsed)}%
+                              </span>
+                            </div>
+                            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-700 ${remaining >= 0 ? "bg-emerald-500" : "bg-rose-500"}`}
+                                style={{ width: `${percentUsed}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-50">
+                            <div className="flex flex-col">
+                              <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">
+                                Spent
+                              </span>
+                              <span className="text-[10px] font-bold text-slate-700 tabular-nums">
+                                {formatCurrency(cat.actual_spent)}
+                              </span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">
+                                Rollover
+                              </span>
+                              <span
+                                className={`text-[10px] font-bold tabular-nums ${rolloverVal >= 0 ? "text-emerald-500" : "text-rose-500"}`}
+                              >
+                                {formatCurrency(rolloverVal)}
+                              </span>
+                            </div>
+                            <div className="flex flex-col items-end">
+                              <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">
+                                Remaining
+                              </span>
+                              <span
+                                className={`text-[10px] font-black tabular-nums ${remaining >= 0 ? "text-emerald-600" : "text-rose-600"}`}
+                              >
+                                {formatCurrency(remaining)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
