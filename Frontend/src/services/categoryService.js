@@ -14,7 +14,10 @@ export const fetchCategories = async () => {
     credentials: "include",
     headers: getHeaders(),
   });
-  if (!response.ok) throw new Error("Failed to fetch categories");
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || errorData.message || "Failed to fetch categories");
+  }
   return await response.json();
 };
 
