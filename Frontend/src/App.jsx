@@ -12,6 +12,7 @@ import { ForgotPasswordOrganism } from "./components/organisms/ForgotPasswordOrg
 import { VerifyOtpOrganism } from "./components/organisms/VerifyOtpOrganism";
 import { ResetPasswordOrganism } from "./components/organisms/ResetPasswordOrganism";
 import { TelegramConnectOrganism } from "./components/organisms/TelegramConnectOrganism";
+import { GuideOrganism } from "./components/organisms/GuideOrganism";
 import { MainLayoutTemplate } from "./components/templates/MainLayoutTemplate";
 import { AuthContainer } from "./components/templates/AuthContainer";
 
@@ -258,6 +259,7 @@ function App() {
         {activeTab === "filter" && <ReportDashboardOrganism user={user} />}
         {activeTab === "accounts" && <AccountDashboardOrganism user={user} />}
         {activeTab === "telegram" && <TelegramConnectOrganism user={user} />}
+        {activeTab === "guide" && <GuideOrganism />}
       </MainLayoutTemplate>
     </NotificationProvider>
   );

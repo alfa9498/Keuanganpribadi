@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   Send,
   Tag,
+  HelpCircle,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
@@ -170,6 +171,7 @@ export const SidebarOrganism = ({
     { id: "categories", label: "Categories", icon: Tag },
     { id: "filter", label: "Reports", icon: LineChart },
     { id: "telegram", label: "Telegram Bot", icon: Send },
+    { id: "guide", label: "Panduan", icon: HelpCircle },
   ];
 
   return (

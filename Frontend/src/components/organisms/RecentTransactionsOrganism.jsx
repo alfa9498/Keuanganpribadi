@@ -74,6 +74,7 @@ export const RecentTransactionsOrganism = ({
   const [backendTransactions, setBackendTransactions] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [categoriesData, setCategoriesData] = useState({ expense: [], income: [] });
   const [loadingCategories, setLoadingCategories] = useState(true);
 
@@ -339,12 +340,14 @@ export const RecentTransactionsOrganism = ({
   };
 
   const handleViewAll = () => {
-    // Show all items (disable pagination limit)
-    setRowsPerPage(totalItems > 0 ? totalItems : 100);
+    if (isExpanded) {
+      setRowsPerPage(10);
+      setIsExpanded(false);
+    } else {
+      setRowsPerPage(totalItems > 0 ? totalItems : 100);
+      setIsExpanded(true);
+    }
     setCurrentPage(1);
-
-    // We do NOT reset filters here, allowing the user to view all
-    // records matching their current filter selection.
   };
 
   return (
