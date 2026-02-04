@@ -15,7 +15,10 @@ export default {
                     danger: '#EF4444', // Red 500
                     background: '#F1F5F9', // Slate 100
                     surface: '#FFFFFF', // White
-                }
+                },
+                fontFamily: {
+                    inter: ['Inter', 'sans-serif'],
+                },
             }
         },
     },

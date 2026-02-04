@@ -164,14 +164,10 @@ export const SidebarOrganism = ({
   }, []);
 
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "accounts", label: "Accounts", icon: CreditCard },
-    { id: "transaction-list", label: "Transactions", icon: Receipt },
-    { id: "categories", label: "MANAGEMENT CATEGORY", icon: Tag },
+    { id: "categories", label: "Categories", icon: Tag },
     { id: "filter", label: "Reports", icon: LineChart },
     { id: "telegram", label: "Telegram Bot", icon: Send },
   ];
-  console.log("Current Menu Items:", menuItems.map(m => m.id));
 
   return (
     <>
