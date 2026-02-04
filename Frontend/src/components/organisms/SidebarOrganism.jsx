@@ -167,6 +167,7 @@ export const SidebarOrganism = ({
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "accounts", label: "Accounts", icon: CreditCard },
     { id: "transaction-list", label: "Transactions", icon: Receipt },
+    { id: "categories", label: "Categories", icon: Tag },
     { id: "filter", label: "Reports", icon: LineChart },
     { id: "telegram", label: "Telegram Bot", icon: Send },
   ];
