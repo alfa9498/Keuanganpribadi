@@ -12,7 +12,11 @@ exports.getCategories = async (req, res) => {
     });
   } catch (error) {
     console.error("Get Categories Error:", error);
-    res.status(500).json({ message: "Failed to fetch categories" });
+    res.status(500).json({ 
+      message: "Failed to fetch categories", 
+      error: error.message,
+      stack: error.stack 
+    });
   }
 };
 
