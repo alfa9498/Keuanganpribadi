@@ -64,8 +64,8 @@ export const LanyardSlider = ({ items, className = "" }) => {
       </div>
 
       {/* Fade Gradients for visual depth */}
-      <div className="absolute top-0 bottom-0 left-0 w-24 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent pointer-events-none z-10" />
-      <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent pointer-events-none z-10" />
+      <div className="absolute top-0 bottom-0 left-0 w-16 md:w-64 bg-gradient-to-r from-slate-50 via-slate-50/50 dark:from-slate-950 dark:via-slate-950/50 to-transparent pointer-events-none z-10" />
+      <div className="absolute top-0 bottom-0 right-0 w-16 md:w-64 bg-gradient-to-l from-slate-50 via-slate-50/50 dark:from-slate-950 dark:via-slate-950/50 to-transparent pointer-events-none z-10" />
     </div>
   );
 };
