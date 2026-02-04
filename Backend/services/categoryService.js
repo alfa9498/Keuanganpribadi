@@ -79,13 +79,18 @@ exports.createGroup = async (userId, data) => {
 
 exports.updateGroup = async (userId, groupId, data) => {
   const { name } = data;
-  await db
+  const [result] = await db
     .promise()
     .query("UPDATE category_groups SET name = ? WHERE id = ? AND user_id = ?", [
       name,
       groupId,
       userId,
     ]);
+  
+  if (result.affectedRows === 0) {
+    throw new Error("Update failed: Group not found or permission denied.");
+  }
+  
   return { id: groupId, name };
 };
 
@@ -115,12 +120,17 @@ exports.createCategory = async (userId, data) => {
 
 exports.updateCategory = async (userId, categoryId, data) => {
   const { name, group_id } = data;
-  await db
+  const [result] = await db
     .promise()
     .query(
       "UPDATE categories SET name = ?, group_id = ? WHERE id = ? AND user_id = ?",
       [name, group_id || null, categoryId, userId],
     );
+
+  if (result.affectedRows === 0) {
+    throw new Error("Update failed: Category not found or permission denied.");
+  }
+
   return { id: categoryId, name, group_id };
 };
 
