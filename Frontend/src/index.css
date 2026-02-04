@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-finance-background text-finance-primary antialiased;
+    @apply bg-finance-background text-finance-primary antialiased font-inter;
   }
 }
 
