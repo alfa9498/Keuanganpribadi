@@ -6,6 +6,7 @@ import { DashboardOrganism } from "./components/organisms/DashboardOrganism";
 import { AccountDashboardOrganism } from "./components/organisms/AccountDashboardOrganism";
 import { TransactionFormOrganism } from "./components/organisms/TransactionFormOrganism";
 import { TransactionListOrganism } from "./components/organisms/TransactionListOrganism";
+import CategoryManagementOrganism from "./components/organisms/CategoryManagementOrganism";
 import { ReportDashboardOrganism } from "./components/organisms/ReportDashboardOrganism";
 import { ForgotPasswordOrganism } from "./components/organisms/ForgotPasswordOrganism";
 import { VerifyOtpOrganism } from "./components/organisms/VerifyOtpOrganism";
@@ -253,6 +254,7 @@ function App() {
             onSuccess={() => setActiveTab("transaction-list")}
           />
         )}
+        {activeTab === "categories" && <CategoryManagementOrganism />}
         {activeTab === "filter" && <ReportDashboardOrganism user={user} />}
         {activeTab === "accounts" && <AccountDashboardOrganism user={user} />}
         {activeTab === "telegram" && <TelegramConnectOrganism user={user} />}

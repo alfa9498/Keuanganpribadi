@@ -100,6 +100,10 @@ app.put("/notifications/mark-all-read", notificationController.markAllAsRead);
 const accountRoutes = require("./routes/accountRoutes");
 app.use("/accounts", accountRoutes);
 
+// Category Routes
+const categoryRoutes = require("./routes/categoryRoutes");
+app.use("/api/categories", categoryRoutes);
+
 // Telegram Webhook Endpoint
 app.post("/telegram-webhook", (req, res) => {
   console.log("📥 WEBHOOK POST RECEIVED ON /telegram-webhook");

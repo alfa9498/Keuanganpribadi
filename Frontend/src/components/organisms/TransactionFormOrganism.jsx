@@ -4,83 +4,8 @@ import { Card } from "../atoms/Card";
 import { FormField } from "../molecules/FormField";
 import { useNotification } from "../../context/NotificationContext";
 import { API_URL } from "../../config/api";
+import { fetchCategories } from "../../services/categoryService";
 
-const expenseCategories = {
-  "Survival (Kebutuhan)": [
-    "Makanan",
-    "Makan & Minum",
-    "Sarapan",
-    "Jajan Harian",
-    "Transportasi",
-    "Transport Harian",
-    "Bensin",
-    "Parkir",
-    "Ojol / Taksi Online",
-    "pengeluaran Pulang",
-    "Tagihan",
-    "Listrik",
-    "Internet",
-    "Pulsa",
-    "Air",
-    "Tagihan Internet",
-    "Biaya Admin",
-    "Kesehatan",
-    "Berobat",
-    "Obat",
-    "BPJS / Asuransi",
-    "Sewa",
-    "mobil",
-    "motor",
-    "kontrakan",
-    "kosan",
-    "Orang Tua",
-    "Orang tua aa",
-    "Orang tua neng",
-    "Listrik Orang Tua",
-    "Pulsa Orang Tua",
-  ],
-  "Optional (Keinginan)": [
-    "Belanja",
-    "Belanja Bulanan",
-    "Shopping",
-    "shopee",
-    "Laundry",
-    "Marketplace (Shopee, dll)",
-    "Hiburan",
-    "Nongkrong",
-    "Jalan-jalan",
-  ],
-  "Culture (Kultur)": ["Pendidikan", "Sekolah", "Kursus", "Buku / Alat Tulis"],
-  "Extra (Tak Terduga)": [
-    "Hadiah",
-    "Hadiah / Acara",
-    "Acara",
-    "Ulang Tahun",
-    "Nikahan",
-    "Keuangan",
-    "Tabungan",
-    "Investasi",
-    "Hutang",
-    "Piutang",
-    "Cicilan / Hutang",
-    "Tabungan anak",
-    "Tabung Kita",
-    "Lainnya",
-  ],
-};
-
-const incomeCategories = [
-  "Saldo Awal",
-  "Gaji",
-  "Bonus",
-  "Hadiah",
-  "Penjualan",
-  "Investasi",
-  "Bunga Bank",
-  "Piutang",
-  "Hutang",
-  "Lainnya",
-];
 export const TransactionFormOrganism = ({
   user,
   onSuccess,
@@ -101,6 +26,12 @@ export const TransactionFormOrganism = ({
   };
 
   const [accounts, setAccounts] = useState([]);
+  const [categoriesData, setCategoriesData] = useState({
+    expense: [],
+    income: [],
+  });
+  const [categoryGroup, setCategoryGroup] = useState("");
+
   const [formData, setFormData] = useState({
     date: initialData?.date
       ? formatDateForInput(initialData.date)
@@ -115,52 +46,49 @@ export const TransactionFormOrganism = ({
     status: initialData?.status || "done",
   });
 
-  const fetchAccounts = async () => {
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    loadData();
+  }, [user?.id]);
+
+  const loadData = async () => {
     if (!user?.id) return;
     try {
-      const response = await fetch(`${API_URL}/accounts?user_id=${user.id}`, {
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (response.ok) {
-        setAccounts(result.data);
-        if (result.data.length > 0 && !isEdit) {
+      // Parallel Fetch
+      const [accRes, catRes] = await Promise.all([
+        fetch(`${API_URL}/accounts?user_id=${user.id}`, {
+          credentials: "include",
+        }),
+        fetchCategories(),
+      ]);
+
+      if (accRes.ok) {
+        const accResult = await accRes.json();
+        setAccounts(accResult.data);
+        if (accResult.data.length > 0 && !isEdit) {
           setFormData((prev) => ({
             ...prev,
-            account: initialData?.account || result.data[0].name,
+            account: initialData?.account || accResult.data[0].name,
           }));
         }
       }
-    } catch (error) {
-      console.error("Failed to fetch accounts:", error);
-    }
-  };
 
-  // Helper to find category group
-  const findCategoryGroup = (category) => {
-    if (!category) return "";
-    const foundGroup = Object.keys(expenseCategories).find((group) =>
-      expenseCategories[group].includes(category),
-    );
-    return foundGroup || "";
-  };
+      setCategoriesData(catRes); // { expense: [], income: [] }
 
-  const [categoryGroup, setCategoryGroup] = useState("");
-
-  // Auto-set category group on mount if editing
-  useEffect(() => {
-    fetchAccounts();
-    if (isEdit && initialData?.category && initialData?.type === "expense") {
-      const foundGroup = Object.keys(expenseCategories).find((group) =>
-        expenseCategories[group].includes(initialData.category),
-      );
-      if (foundGroup) {
-        setCategoryGroup(foundGroup);
+      // Logic for Edit Mode (Auto-set Group)
+      if (isEdit && initialData?.category && initialData?.type === "expense") {
+        const foundGroup = catRes.expense.find((group) =>
+          group.subCategories.some((cat) => cat.name === initialData.category),
+        );
+        if (foundGroup) {
+          setCategoryGroup(foundGroup.name);
+        }
       }
+    } catch (error) {
+      console.error("Failed to load data:", error);
     }
-  }, [initialData, isEdit]);
-
-  const [errors, setErrors] = useState({});
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -279,6 +207,12 @@ export const TransactionFormOrganism = ({
     setFormData((prev) => ({ ...prev, amount: rawValue }));
   };
 
+  // Helper to get active subcategories based on selected group
+  const getActiveSubCategories = () => {
+    const group = categoriesData.expense.find((g) => g.name === categoryGroup);
+    return group ? group.subCategories : [];
+  };
+
   return (
     <div className="flex justify-center w-full animate-fade-in">
       <Card
@@ -364,9 +298,9 @@ export const TransactionFormOrganism = ({
                 onChange={handleGroupChange}
               >
                 <option value="">Select Main Category</option>
-                {Object.keys(expenseCategories).map((group) => (
-                  <option key={group} value={group}>
-                    {group}
+                {categoriesData.expense.map((group) => (
+                  <option key={group.id} value={group.name}>
+                    {group.name}
                   </option>
                 ))}
               </FormField>
@@ -382,12 +316,11 @@ export const TransactionFormOrganism = ({
                 disabled={!categoryGroup}
               >
                 <option value="">Select Sub Category</option>
-                {categoryGroup &&
-                  expenseCategories[categoryGroup].map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
+                {getActiveSubCategories().map((cat) => (
+                  <option key={cat.id} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
               </FormField>
             </div>
           ) : (
@@ -400,9 +333,9 @@ export const TransactionFormOrganism = ({
               error={errors.category}
             >
               <option value="">Select Category</option>
-              {incomeCategories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
+              {categoriesData.income.map((cat) => (
+                <option key={cat.id} value={cat.name}>
+                  {cat.name}
                 </option>
               ))}
             </FormField>

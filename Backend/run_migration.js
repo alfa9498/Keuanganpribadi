@@ -1,41 +1,63 @@
-const db = require('./config/db');
-const fs = require('fs');
-const path = require('path');
+const mysql = require("mysql2/promise");
+const fs = require("fs");
+const path = require("path");
+require("dotenv").config();
 
-const migrationPath = path.join(__dirname, 'migrations', 'add_transfer_support.sql');
-const sql = fs.readFileSync(migrationPath, 'utf8');
-
-// Split multi-statement SQL but careful with ENUM strings. 
-// For this simple case, we'll run the ALTER statements.
-const statements = [
-    "ALTER TABLE transactions MODIFY COLUMN type ENUM('income', 'expense', 'transfer') NOT NULL",
-    "ALTER TABLE transactions ADD COLUMN to_account VARCHAR(100) DEFAULT NULL AFTER account"
-];
-
-const runMigrations = async () => {
-    for (const statement of statements) {
-        try {
-            await new Promise((resolve, reject) => {
-                db.query(statement, (err, result) => {
-                    if (err) {
-                        // Ignore if column already exists
-                        if (err.errno === 1060) {
-                            console.log(`⚠️ Column already exists, skipping: ${statement.substring(0, 30)}...`);
-                            resolve();
-                        } else {
-                            reject(err);
-                        }
-                    } else {
-                        console.log(`✅ Success: ${statement.substring(0, 50)}...`);
-                        resolve();
-                    }
-                });
-            });
-        } catch (error) {
-            console.error("❌ Migration failed:", error.message);
+const dbConfig = {
+  host: (process.env.DB_HOST || "localhost").trim(),
+  user: (process.env.DB_USER || "root").trim(),
+  password: (process.env.DB_PASSWORD || "").trim(),
+  database: (process.env.DB_NAME || "myapp_db").trim(),
+  port: parseInt(process.env.DB_PORT || "3306"),
+  ssl:
+    process.env.DB_SSL === "true"
+      ? {
+          rejectUnauthorized: false,
+          minVersion: "TLSv1.2",
         }
-    }
-    db.end();
+      : null,
 };
 
-runMigrations();
+async function runMigration() {
+  console.log("🚀 Starting Database Migration...");
+  console.log(`Connecting to: ${dbConfig.host} / ${dbConfig.database}`);
+
+  let connection;
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    console.log("✅ Connected to database");
+
+    const sqlFile = path.join(
+      __dirname,
+      "migrations",
+      "migration_category_system.sql",
+    );
+    const sql = fs.readFileSync(sqlFile, "utf8");
+
+    // Split by semicolon to run multiple queries if needed,
+    // but for CREATE TABLE usually fine to run as separate queries or use multipleStatements
+    // Simple create table usually works fine
+
+    console.log("📜 Executing SQL migration...");
+
+    // Execute queries one by one
+    const queries = sql.split(";").filter((q) => q.trim());
+
+    for (const query of queries) {
+      if (query.trim()) {
+        await connection.query(query);
+      }
+    }
+
+    console.log("✅ Migration executed successfully!");
+    console.log("   - Created table: category_groups");
+    console.log("   - Created table: categories");
+  } catch (error) {
+    console.error("❌ Migration failed:", error.message);
+  } finally {
+    if (connection) await connection.end();
+    process.exit();
+  }
+}
+
+runMigration();
