@@ -16,10 +16,10 @@ export default {
                     background: '#F1F5F9', // Slate 100
                     surface: '#FFFFFF', // White
                 },
-                fontFamily: {
-                    inter: ['Inter', 'sans-serif'],
-                },
-            }
+            },
+            fontFamily: {
+                inter: ['Inter', 'sans-serif'],
+            },
         },
     },
     plugins: [],
