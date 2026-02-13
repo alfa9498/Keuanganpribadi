@@ -32,6 +32,14 @@
       "destination": "/api/index.js"
     },
     {
+      "source": "/api/budgets(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/api/goals(.*)",
+      "destination": "/api/index.js"
+    },
+    {
       "source": "/socket.io/(.*)",
       "destination": "/api/index.js"
     },
