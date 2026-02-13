@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const budgetController = require('../controllers/budgetController');
 const goalController = require('../controllers/goalController');
-const { verifyToken } = require('../middleware/authMiddleware');
+const { authenticateToken } = require('../middleware/authMiddleware');
 
 // Middleware for all
-router.use(verifyToken);
+router.use(authenticateToken);
 
 // --- Budget Routes ---
 router.get('/budgets', budgetController.getBudgets);

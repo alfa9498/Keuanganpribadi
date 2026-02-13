@@ -8,19 +8,19 @@ exports.getBudgets = async (req, res) => {
         const month = req.query.month || new Date().toISOString().slice(0, 7); // YYYY-MM
 
         // 1. Get all expense categories
-        const [categories] = await db.query(
+        const [categories] = await db.promise().query(
             "SELECT id, name FROM categories WHERE user_id = ? AND type = 'expense'",
             [userId]
         );
 
         // 2. Get budgets for this month
-        const [budgets] = await db.query(
+        const [budgets] = await db.promise().query(
             "SELECT category_id, amount FROM budgets WHERE user_id = ? AND month = ?",
             [userId, month]
         );
 
         // 3. Get actual spending for this month grouped by category
-        const [spending] = await db.query(`
+        const [spending] = await db.promise().query(`
             SELECT category, SUM(amount) as total_spent 
             FROM transactions 
             WHERE user_id = ? 
@@ -28,7 +28,6 @@ exports.getBudgets = async (req, res) => {
             AND DATE_FORMAT(date, '%Y-%m') = ?
             GROUP BY category
         `, [userId, month]);
-
         // 4. Merge data
         const budgetMap = new Map(budgets.map(b => [b.category_id, parseFloat(b.amount)]));
         const spendingMap = new Map(spending.map(s => [s.category, parseFloat(s.total_spent)]));
@@ -60,7 +59,7 @@ exports.setBudget = async (req, res) => {
         }
 
         // Upsert budget
-        await db.query(`
+        await db.promise().query(`
             INSERT INTO budgets (user_id, category_id, amount, month)
             VALUES (?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE amount = VALUES(amount)

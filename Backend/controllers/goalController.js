@@ -4,11 +4,10 @@ const db = require('../config/db');
 exports.getGoals = async (req, res) => {
     try {
         const userId = req.user.id;
-        const [goals] = await db.query(
+        const [goals] = await db.promise().query(
             "SELECT * FROM savings_goals WHERE user_id = ? ORDER BY created_at DESC", 
             [userId]
-        );
-        res.json({ status: 'success', data: goals });
+        );        res.json({ status: 'success', data: goals });
     } catch (error) {
         res.status(500).json({ status: 'error', message: error.message });
     }
@@ -20,11 +19,10 @@ exports.createGoal = async (req, res) => {
         const userId = req.user.id;
         const { name, target_amount, deadline, icon, color } = req.body;
 
-        const [result] = await db.query(
+        const [result] = await db.promise().query(
             "INSERT INTO savings_goals (user_id, name, target_amount, deadline, icon, color) VALUES (?, ?, ?, ?, ?, ?)",
             [userId, name, target_amount, deadline, icon || 'PiggyBank', color || 'bg-blue-500']
         );
-
         res.json({ status: 'success', data: { id: result.insertId, ...req.body } });
     } catch (error) {
         res.status(500).json({ status: 'error', message: error.message });
@@ -43,7 +41,7 @@ exports.updateFunds = async (req, res) => {
         }
 
         // 1. Verify goal ownership
-        const [goals] = await db.query("SELECT * FROM savings_goals WHERE id = ? AND user_id = ?", [goalId, userId]);
+        const [goals] = await db.promise().query("SELECT * FROM savings_goals WHERE id = ? AND user_id = ?", [goalId, userId]);
         if (goals.length === 0) return res.status(404).json({ status: 'error', message: 'Goal not found' });
         
         const goal = goals[0];
@@ -59,14 +57,13 @@ exports.updateFunds = async (req, res) => {
         }
 
         // 2. Update Goal
-        await db.query("UPDATE savings_goals SET current_amount = ? WHERE id = ?", [newAmount, goalId]);
+        await db.promise().query("UPDATE savings_goals SET current_amount = ? WHERE id = ?", [newAmount, goalId]);
 
         // 3. Log Goal Transaction
-        await db.query(
+        await db.promise().query(
             "INSERT INTO goal_transactions (goal_id, amount, type, notes) VALUES (?, ?, ?, ?)",
             [goalId, amount, type, notes]
         );
-
         res.json({ status: 'success', message: 'Funds updated', new_amount: newAmount });
 
     } catch (error) {
@@ -80,7 +77,7 @@ exports.deleteGoal = async (req, res) => {
         const userId = req.user.id;
         const goalId = req.params.id;
         
-        await db.query("DELETE FROM savings_goals WHERE id = ? AND user_id = ?", [goalId, userId]);
+        await db.promise().query("DELETE FROM savings_goals WHERE id = ? AND user_id = ?", [goalId, userId]);
         
         res.json({ status: 'success', message: 'Goal deleted' });
     } catch (error) {
