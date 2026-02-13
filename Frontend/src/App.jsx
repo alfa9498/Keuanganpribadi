@@ -14,6 +14,7 @@ import { VerifyOtpOrganism } from "./components/organisms/VerifyOtpOrganism";
 import { ResetPasswordOrganism } from "./components/organisms/ResetPasswordOrganism";
 import { TelegramConnectOrganism } from "./components/organisms/TelegramConnectOrganism";
 import { GuideOrganism } from "./components/organisms/GuideOrganism";
+import { PlanningOrganism } from "./components/organisms/PlanningOrganism";
 import { MainLayoutTemplate } from "./components/templates/MainLayoutTemplate";
 import { AuthContainer } from "./components/templates/AuthContainer";
 
@@ -257,6 +258,7 @@ function App() {
           />
         )}
         {activeTab === "categories" && <CategoryManagementOrganism />}
+        {activeTab === "planning" && <PlanningOrganism />}
         {activeTab === "filter" && <ReportDashboardOrganism user={user} />}
         {activeTab === "accounts" && <AccountDashboardOrganism user={user} />}
         {activeTab === "budgets" && <BudgetPage user={user} />}

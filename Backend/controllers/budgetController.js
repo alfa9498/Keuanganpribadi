@@ -1,121 +1,74 @@
-const db = require("../config/db");
+const db = require('../config/db');
 
-/**
- * Get budgets for a specific month (YYYY-MM)
- * Includes actual spending per category.
- */
-exports.getMonthlyBudgets = async (req, res) => {
-  const { user_id, month } = req.query;
+// Get budgets for a specific month (default: current month)
+// Returns: List of categories with their budget limit AND current spending
+exports.getBudgets = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const month = req.query.month || new Date().toISOString().slice(0, 7); // YYYY-MM
 
-  if (!user_id || !month) {
-    return res.status(400).json({
-      success: false,
-      message: "user_id and month (YYYY-MM) are required",
-    });
-  }
+        // 1. Get all expense categories
+        const [categories] = await db.query(
+            "SELECT id, name FROM categories WHERE user_id = ? AND type = 'expense'",
+            [userId]
+        );
 
-  try {
-    console.log(
-      `[DEBUG] Fetching budgets for user: ${user_id}, month: ${month}`,
-    );
+        // 2. Get budgets for this month
+        const [budgets] = await db.query(
+            "SELECT category_id, amount FROM budgets WHERE user_id = ? AND month = ?",
+            [userId, month]
+        );
 
-    // Query to get categories with their budget amount for the month and actual spending from transactions
-    // Rollover: Sum of (Budget - Spent) for all previous months if is_rollover is true
-    const query = `
-            SELECT 
-                c.id as category_id,
-                c.name as category_name,
-                c.type as category_type,
-                c.is_rollover,
-                cg.name as group_name,
-                COALESCE(b.amount, 0) as budget_amount,
-                (
-                    SELECT COALESCE(SUM(amount), 0)
-                    FROM transactions t
-                    WHERE t.user_id = ? 
-                      AND t.category = c.name
-                      AND DATE_FORMAT(t.date, '%Y-%m') = ?
-                      AND t.type = 'expense'
-                ) as actual_spent,
-                (
-                    SELECT COALESCE(SUM(prev_b.amount), 0) - 
-                           COALESCE((
-                               SELECT SUM(t_inner.amount)
-                               FROM transactions t_inner
-                               WHERE t_inner.user_id = prev_b.user_id
-                                 AND t_inner.category = c.name
-                                 AND DATE_FORMAT(t_inner.date, '%Y-%m') < ?
-                                 AND DATE_FORMAT(t_inner.date, '%Y-%m') IN (
-                                     SELECT month FROM budgets WHERE user_id = prev_b.user_id AND category_id = c.id
-                                 )
-                           ), 0)
-                    FROM budgets prev_b
-                    WHERE prev_b.category_id = c.id 
-                      AND prev_b.user_id = ? 
-                      AND prev_b.month < ?
-                      AND c.is_rollover = 1
-                ) as rollover_balance
-            FROM categories c
-            LEFT JOIN category_groups cg ON c.group_id = cg.id
-            LEFT JOIN budgets b ON c.id = b.category_id AND b.user_id = ? AND b.month = ?
-            WHERE c.user_id = ? AND c.type = 'expense'
-            ORDER BY cg.name, c.name;
-        `;
+        // 3. Get actual spending for this month grouped by category
+        const [spending] = await db.query(`
+            SELECT category, SUM(amount) as total_spent 
+            FROM transactions 
+            WHERE user_id = ? 
+            AND type = 'expense' 
+            AND DATE_FORMAT(date, '%Y-%m') = ?
+            GROUP BY category
+        `, [userId, month]);
 
-    const [results] = await db.promise().execute(query, [
-      user_id,
-      month, // current spent
-      month,
-      user_id,
-      month, // rollover (this is tricky, maybe simplify?)
-      user_id,
-      month, // current budget
-      user_id, // categories filter
-    ]);
+        // 4. Merge data
+        const budgetMap = new Map(budgets.map(b => [b.category_id, parseFloat(b.amount)]));
+        const spendingMap = new Map(spending.map(s => [s.category, parseFloat(s.total_spent)]));
 
-    console.log(`[DEBUG] Found ${results.length} budget categories`);
+        const result = categories.map(cat => ({
+            categoryId: cat.id,
+            categoryName: cat.name,
+            budgetLimit: budgetMap.get(cat.id) || 0,
+            currentSpent: spendingMap.get(cat.name) || 0, // Matching by name is risky if names change, but schema uses name in transactions. ideally transactions should use category_id.
+            // Note: In this system transactions store category NAME, but budgets store ID. 
+            // We need to match properly.
+        }));
 
-    res.status(200).json({
-      success: true,
-      data: results,
-    });
-  } catch (error) {
-    console.error("❌ Error in getMonthlyBudgets:", error);
-    res.status(500).json({
-      success: false,
-      message: "Gagal mengambil data anggaran bulan ini",
-      error: error.message,
-    });
-  }
+        res.json({ status: 'success', data: result, month });
+    } catch (error) {
+        console.error("Get Budgets Error:", error);
+        res.status(500).json({ status: 'error', message: error.message });
+    }
 };
 
-/**
- * Set or Update budget for a category
- */
+// Set or Update Budget for a Category
 exports.setBudget = async (req, res) => {
-  const { user_id, category_id, amount, month } = req.body;
+    try {
+        const userId = req.user.id;
+        const { categoryId, amount, month } = req.body;
 
-  if (!user_id || !category_id || amount === undefined || !month) {
-    return res
-      .status(400)
-      .json({ success: false, message: "All fields are required" });
-  }
+        if (!categoryId || amount === undefined || !month) {
+            return res.status(400).json({ status: 'error', message: 'Missing required fields' });
+        }
 
-  try {
-    const query = `
+        // Upsert budget
+        await db.query(`
             INSERT INTO budgets (user_id, category_id, amount, month)
             VALUES (?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE amount = VALUES(amount);
-        `;
+            ON DUPLICATE KEY UPDATE amount = VALUES(amount)
+        `, [userId, categoryId, amount, month]);
 
-    await db.promise().execute(query, [user_id, category_id, amount, month]);
-
-    res.status(200).json({
-      success: true,
-      message: "Budget updated successfully",
-    });
-  } catch (error) {
-    console.error("Error setting budget:", error);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
+        res.json({ status: 'success', message: 'Budget updated successfully' });
+    } catch (error) {
+        console.error("Set Budget Error:", error);
+        res.status(500).json({ status: 'error', message: error.message });
+    }
 };

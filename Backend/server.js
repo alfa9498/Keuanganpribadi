@@ -106,9 +106,9 @@ app.use("/accounts", accountRoutes);
 const categoryRoutes = require("./routes/categoryRoutes");
 app.use("/api/categories", categoryRoutes);
 
-// Budget Routes
-const budgetRoutes = require("./routes/budgetRoutes");
-app.use("/budgets", budgetRoutes);
+// Planning Routes
+const planningRoutes = require("./routes/planningRoutes");
+app.use("/api", planningRoutes);
 
 // Telegram Webhook Endpoint
 app.post("/telegram-webhook", (req, res) => {
