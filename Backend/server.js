@@ -100,7 +100,7 @@ app.put("/notifications/mark-all-read", notificationController.markAllAsRead);
 
 // Account Routes
 const accountRoutes = require("./routes/accountRoutes");
-app.use("/accounts", accountRoutes);
+app.use("/api/accounts", accountRoutes);
 
 // Category Routes
 const categoryRoutes = require("./routes/categoryRoutes");
