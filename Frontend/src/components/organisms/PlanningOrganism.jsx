@@ -31,15 +31,18 @@ const BudgetCard = ({ category, onEdit, onDelete }) => {
   else if (isNearLimit) barColor = "bg-amber-500";
 
   return (
-    <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group relative">
-      <div className="flex justify-between items-start mb-2">
+    <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group relative">
+      <div className="flex justify-between items-start mb-1.5">
         <div>
-          <h4 className="font-bold text-slate-800">{category.categoryName}</h4>
-          <p className="text-xs text-slate-500">
+          <h4 className="font-bold text-sm text-slate-800">
+            {category.categoryName}
+          </h4>
+          <p className="text-[10px] text-slate-500">
             Limit:{" "}
             {new Intl.NumberFormat("id-ID", {
               style: "currency",
               currency: "IDR",
+              maximumFractionDigits: 0,
             }).format(category.budgetLimit)}
           </p>
         </div>
@@ -48,30 +51,30 @@ const BudgetCard = ({ category, onEdit, onDelete }) => {
             onClick={() => onEdit(category)}
             className="p-1 text-slate-400 hover:text-slate-600 rounded"
           >
-            <MoreVertical size={16} />
+            <MoreVertical size={14} />
           </button>
           <button
             onClick={() => onDelete(category)}
             className="p-1 text-slate-300 hover:text-rose-500 rounded opacity-0 group-hover:opacity-100 transition-opacity"
           >
-            <Trash2 size={16} />
+            <Trash2 size={14} />
           </button>
         </div>
       </div>
 
-      <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mb-2">
+      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-1.5">
         <div
           className={`h-full ${barColor} transition-all duration-500`}
           style={{ width: `${percent}%` }}
         />
       </div>
 
-      <div className="flex justify-between items-center text-xs font-semibold">
+      <div className="flex justify-between items-center text-[10px] font-semibold">
         <span className={isOverBudget ? "text-rose-600" : "text-slate-600"}>
-          Terpakai:{" "}
           {new Intl.NumberFormat("id-ID", {
             style: "currency",
             currency: "IDR",
+            maximumFractionDigits: 0,
           }).format(category.currentSpent)}
         </span>
         <span className="text-slate-400">{percent.toFixed(0)}%</span>
@@ -179,23 +182,22 @@ const KakeiboSummaryCard = ({
   const isNegative = pocketMoney < 0;
 
   return (
-    <div className="bg-white border-l-4 border-slate-800 p-6 rounded-r-xl shadow-sm mb-8 flex flex-col md:flex-row gap-6 items-start md:items-center">
-      {/* Notion Icon/Callout Style */}
-      <div className="text-4xl">📔</div>
+    <div className="bg-white border-l-4 border-slate-800 p-4 rounded-r-xl shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-start md:items-center">
+      <div className="text-3xl">📔</div>
 
       <div className="flex-1 w-full text-slate-800">
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2 border-b border-slate-200 pb-2">
+        <h3 className="text-lg font-bold mb-3 flex items-center gap-2 border-b border-slate-100 pb-1">
           Monthly Ledger
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
           {/* Income Input */}
           <div>
-            <label className="block text-slate-400 text-xs uppercase font-bold mb-1">
-              Income (Pemasukan)
+            <label className="block text-slate-400 text-[10px] uppercase font-bold mb-1">
+              Income
             </label>
-            <div className="flex items-center gap-2 border-b-2 border-slate-200 hover:border-slate-800 transition-colors">
-              <span className="text-slate-500">Rp</span>
+            <div className="flex items-center gap-2 border-b border-slate-200 hover:border-slate-800 transition-colors pb-1">
+              <span className="text-slate-500 font-sans">Rp</span>
               <input
                 type="number"
                 value={income}
@@ -207,15 +209,15 @@ const KakeiboSummaryCard = ({
           </div>
 
           {/* Calculations */}
-          <div className="space-y-1 text-slate-500">
+          <div className="space-y-1 text-slate-500 border-l border-slate-100 pl-4 md:border-none md:pl-0">
             <div className="flex justify-between">
-              <span>Fixed (Survival):</span>
+              <span>Fixed:</span>
               <span className="font-bold text-rose-500">
                 -{new Intl.NumberFormat("id-ID").format(fixedExpenses)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span>Savings (Goals):</span>
+              <span>Savings:</span>
               <span className="font-bold text-blue-500">
                 -{new Intl.NumberFormat("id-ID").format(savings)}
               </span>
@@ -223,16 +225,17 @@ const KakeiboSummaryCard = ({
           </div>
 
           {/* Result */}
-          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
-            <label className="text-xs text-slate-400 uppercase font-bold">
-              Pocket Money (Sisa)
+          <div className="bg-slate-50 p-2 rounded-lg border border-slate-200 text-center">
+            <label className="text-[10px] text-slate-400 uppercase font-bold">
+              Pocket Money
             </label>
             <p
-              className={`text-xl font-bold ${isNegative ? "text-rose-600" : "text-emerald-600"}`}
+              className={`text-lg font-bold ${isNegative ? "text-rose-600" : "text-emerald-600"}`}
             >
               {new Intl.NumberFormat("id-ID", {
                 style: "currency",
                 currency: "IDR",
+                maximumFractionDigits: 0,
               }).format(pocketMoney)}
             </p>
           </div>
@@ -258,38 +261,39 @@ const EnvelopeGroup = ({
   const percent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
   return (
-    <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
         <div>
-          <h3 className={`text-xl font-bold ${color} flex items-center gap-2`}>
+          <h3 className={`text-lg font-bold ${color} flex items-center gap-2`}>
             {title}
           </h3>
-          <p className="text-sm text-slate-500">{description}</p>
+          <p className="text-xs text-slate-500">{description}</p>
         </div>
-        <div className="text-right bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100">
-          <p className="text-xs text-slate-400 font-bold uppercase">
+        <div className="text-right bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-100">
+          <p className="text-[10px] text-slate-400 font-bold uppercase">
             Sisa Amplop
           </p>
           <p
-            className={`text-lg font-bold font-mono ${totalRemaining < 0 ? "text-rose-500" : "text-emerald-600"}`}
+            className={`text-sm font-bold font-mono ${totalRemaining < 0 ? "text-rose-500" : "text-emerald-600"}`}
           >
             {new Intl.NumberFormat("id-ID", {
               style: "currency",
               currency: "IDR",
+              maximumFractionDigits: 0,
             }).format(totalRemaining)}
           </p>
         </div>
       </div>
 
       {/* Progress Bar for Group */}
-      <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mb-6">
+      <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mb-4">
         <div
           className={`h-full transition-all duration-500 ${percent > 100 ? "bg-rose-500" : "bg-slate-400"}`}
           style={{ width: `${Math.min(percent, 100)}%` }}
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {items.map((item) => (
           <BudgetCard
             key={item.categoryId}
