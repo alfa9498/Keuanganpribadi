@@ -11,6 +11,8 @@ import {
   Trash2,
   History,
   Edit2,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { API_URL } from "../../config/api";
 import { Button } from "../atoms/Button";
@@ -303,6 +305,8 @@ const EnvelopeGroup = ({
   onEdit,
   onDelete,
 }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   if (items.length === 0) return null;
 
   const totalBudget = items.reduce((sum, item) => sum + item.budgetLimit, 0);
@@ -311,49 +315,69 @@ const EnvelopeGroup = ({
   const percent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
-        <div>
-          <h3 className={`text-lg font-bold ${color} flex items-center gap-2`}>
-            {title}
-          </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {description}
-          </p>
-        </div>
-        <div className="text-right bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">
-            Sisa Amplop
-          </p>
-          <p
-            className={`text-sm font-bold font-mono ${totalRemaining < 0 ? "text-rose-500" : "text-emerald-600"}`}
+    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm transition-all duration-300">
+      <div
+        className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 gap-2 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-800/30 transition-colors"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className={`p-1 rounded-lg transition-transform duration-300 ${isCollapsed ? "-rotate-90" : ""}`}
           >
-            {new Intl.NumberFormat("id-ID", {
-              style: "currency",
-              currency: "IDR",
-              maximumFractionDigits: 0,
-            }).format(totalRemaining)}
-          </p>
+            <ChevronDown size={20} className="text-slate-400" />
+          </div>
+          <div>
+            <h3
+              className={`text-lg font-bold ${color} flex items-center gap-2`}
+            >
+              {title}
+            </h3>
+            {!isCollapsed && (
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {description}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="text-right bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">
+              Sisa Amplop
+            </p>
+            <p
+              className={`text-sm font-bold font-mono ${totalRemaining < 0 ? "text-rose-500" : "text-emerald-600"}`}
+            >
+              {new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                maximumFractionDigits: 0,
+              }).format(totalRemaining)}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Progress Bar for Group */}
-      <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden mb-4">
-        <div
-          className={`h-full transition-all duration-500 ${percent > 100 ? "bg-rose-500" : "bg-slate-400 dark:bg-slate-500"}`}
-          style={{ width: `${Math.min(percent, 100)}%` }}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-        {items.map((item) => (
-          <BudgetCard
-            key={item.categoryId}
-            category={item}
-            onEdit={onEdit}
-            onDelete={onDelete}
+      <div
+        className={`px-4 pb-4 transition-all duration-300 ${isCollapsed ? "max-h-0 opacity-0 overflow-hidden pt-0" : "max-h-[2000px] opacity-100 pt-0"}`}
+      >
+        {/* Progress Bar for Group */}
+        <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden mb-4">
+          <div
+            className={`h-full transition-all duration-500 ${percent > 100 ? "bg-rose-500" : "bg-slate-400 dark:bg-slate-500"}`}
+            style={{ width: `${Math.min(percent, 100)}%` }}
           />
-        ))}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          {items.map((item) => (
+            <BudgetCard
+              key={item.categoryId}
+              category={item}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
