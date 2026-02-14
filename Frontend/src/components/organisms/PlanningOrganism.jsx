@@ -203,7 +203,8 @@ const GoalCard = ({ goal, onTopUp, onEdit, onDelete }) => {
 
 const KakeiboSummaryCard = ({
   incomeSources,
-  totalIncome,
+  totalIncome, // This is Actual Income
+  totalPlannedIncome,
   fixedExpenses,
   savings,
   onEditIncome,
@@ -224,8 +225,8 @@ const KakeiboSummaryCard = ({
           {/* Income Breakdown List */}
           <div className="space-y-2">
             <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold mb-1">
-              Income Sources (Total: Rp{" "}
-              {new Intl.NumberFormat("id-ID").format(totalIncome)})
+              Actual Income (Target: Rp{" "}
+              {new Intl.NumberFormat("id-ID").format(totalPlannedIncome)})
             </label>
             <div className="space-y-1 max-h-32 overflow-y-auto pr-2">
               {incomeSources.length > 0 ? (
@@ -234,18 +235,26 @@ const KakeiboSummaryCard = ({
                     key={source.categoryId}
                     className="flex justify-between items-center group/income pb-1 border-b border-slate-50 dark:border-slate-700/50"
                   >
-                    <span className="text-slate-600 dark:text-slate-300 truncate">
-                      {source.categoryName}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-800 dark:text-slate-100">
+                    <div className="flex flex-col">
+                      <span className="text-slate-600 dark:text-slate-300 truncate max-w-[120px]">
+                        {source.categoryName}
+                      </span>
+                      <span className="text-[10px] text-slate-400">
+                        Target: Rp{" "}
                         {new Intl.NumberFormat("id-ID").format(
                           source.budgetLimit,
                         )}
                       </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                        {new Intl.NumberFormat("id-ID").format(
+                          source.currentSpent,
+                        )}
+                      </span>
                       <button
                         onClick={() => onEditIncome(source)}
-                        className="p-1 text-slate-300 hover:text-slate-800 opacity-0 group-hover/income:opacity-100 transition-opacity"
+                        className="p-1 text-slate-300 hover:text-slate-800 dark:hover:text-slate-200 opacity-0 group-hover/income:opacity-100 transition-opacity"
                       >
                         <Edit2 size={12} />
                       </button>
@@ -428,7 +437,12 @@ export const PlanningOrganism = () => {
   }, []);
 
   // Derived Calculations
-  const totalIncome =
+  const totalActualIncome =
+    incomeSources.length > 0
+      ? incomeSources.reduce((sum, item) => sum + (item.currentSpent || 0), 0)
+      : 0;
+
+  const totalPlannedIncome =
     incomeSources.length > 0
       ? incomeSources.reduce((sum, item) => sum + (item.budgetLimit || 0), 0)
       : 0;
@@ -503,7 +517,8 @@ export const PlanningOrganism = () => {
     <div className="space-y-6 pb-20">
       <KakeiboSummaryCard
         incomeSources={incomeSources}
-        totalIncome={totalIncome}
+        totalIncome={totalActualIncome}
+        totalPlannedIncome={totalPlannedIncome}
         fixedExpenses={fixedExpenses}
         savings={savingsTarget}
         onEditIncome={(source) => {
