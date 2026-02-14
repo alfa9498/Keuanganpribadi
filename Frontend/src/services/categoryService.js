@@ -9,20 +9,22 @@ const getHeaders = () => {
 };
 
 export const fetchCategories = async () => {
-  const response = await fetch(`${API_URL}/api/categories`, {
+  const response = await fetch(`${API_URL}/categories`, {
     method: "GET",
     credentials: "include",
     headers: getHeaders(),
   });
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || errorData.message || "Failed to fetch categories");
+    throw new Error(
+      errorData.error || errorData.message || "Failed to fetch categories",
+    );
   }
   return await response.json();
 };
 
 export const createGroup = async (data) => {
-  const response = await fetch(`${API_URL}/api/categories/groups`, {
+  const response = await fetch(`${API_URL}/categories/groups`, {
     method: "POST",
     credentials: "include",
     headers: getHeaders(),
@@ -33,7 +35,7 @@ export const createGroup = async (data) => {
 };
 
 export const updateGroup = async (id, data) => {
-  const response = await fetch(`${API_URL}/api/categories/groups/${id}`, {
+  const response = await fetch(`${API_URL}/categories/groups/${id}`, {
     method: "PUT",
     credentials: "include",
     headers: getHeaders(),
@@ -44,7 +46,7 @@ export const updateGroup = async (id, data) => {
 };
 
 export const deleteGroup = async (id) => {
-  const response = await fetch(`${API_URL}/api/categories/groups/${id}`, {
+  const response = await fetch(`${API_URL}/categories/groups/${id}`, {
     method: "DELETE",
     credentials: "include",
     headers: getHeaders(),
@@ -54,7 +56,7 @@ export const deleteGroup = async (id) => {
 };
 
 export const createCategory = async (data) => {
-  const response = await fetch(`${API_URL}/api/categories/items`, {
+  const response = await fetch(`${API_URL}/categories/items`, {
     method: "POST",
     credentials: "include",
     headers: getHeaders(),
@@ -65,7 +67,7 @@ export const createCategory = async (data) => {
 };
 
 export const updateCategory = async (id, data) => {
-  const response = await fetch(`${API_URL}/api/categories/items/${id}`, {
+  const response = await fetch(`${API_URL}/categories/items/${id}`, {
     method: "PUT",
     credentials: "include",
     headers: getHeaders(),
@@ -76,7 +78,7 @@ export const updateCategory = async (id, data) => {
 };
 
 export const deleteCategory = async (id) => {
-  const response = await fetch(`${API_URL}/api/categories/items/${id}`, {
+  const response = await fetch(`${API_URL}/categories/items/${id}`, {
     method: "DELETE",
     credentials: "include",
     headers: getHeaders(),
