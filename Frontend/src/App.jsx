@@ -41,18 +41,21 @@ function App() {
       if (response.ok) {
         const result = await response.json();
         setUser(result.user);
-        // If we are on guest pages, move to dashboard
-        setActiveTab((current) =>
-          [
-            "login",
-            "register",
-            "forgot-password",
-            "verify-otp",
-            "reset-password",
-          ].includes(current)
-            ? "dashboard"
-            : current,
-        );
+
+        // Only redirect to dashboard if user is actually logged in
+        if (result.user) {
+          setActiveTab((current) =>
+            [
+              "login",
+              "register",
+              "forgot-password",
+              "verify-otp",
+              "reset-password",
+            ].includes(current)
+              ? "dashboard"
+              : current,
+          );
+        }
       }
     } catch (err) {
       console.error("Session check failed", err);
