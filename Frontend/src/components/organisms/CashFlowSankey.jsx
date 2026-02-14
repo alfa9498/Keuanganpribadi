@@ -36,43 +36,40 @@ export const CashFlowSankey = ({ transactions }) => {
     const nodes = [];
     const links = [];
 
+    const ROOT_NODE_ID = "hub:budget";
+    const ROOT_NODE_LABEL = "Budget";
+
     // Helper to push node if unique
-    const addNode = (id, color = "hsl(150, 70%, 50%)") => {
+    const addNode = (id, label, color = "hsl(150, 70%, 50%)") => {
       if (!nodes.find((n) => n.id === id)) {
-        nodes.push({ id, nodeColor: color });
+        nodes.push({ id, label, nodeColor: color });
       }
     };
 
     // --- NODE: INCOME SOURCES ---
-    // If we want detailed income sources, we add them here.
-    // For simplicity, let's Aggregate all Income into one "Total Income" node for the middle.
-    // But to look like the reference, we might want: Income Source A -> Income Pool -> Expenses
-    // Let's do: [Income Sources] -> [Budget/Pool] -> [Expenses Categories] + [Savings]
-
-    const ROOT_NODE = "Budget"; // Central Hub
-
-    // A. Left Side: Income Sources -> Budget
     Object.entries(incomeSources).forEach(([source, amount]) => {
       if (amount > 0) {
-        addNode(source, "#10b981"); // Emerald-500
+        const nodeId = `in:${source}`;
+        addNode(nodeId, source, "#10b981"); // Emerald-500
         links.push({
-          source: source,
-          target: ROOT_NODE,
+          source: nodeId,
+          target: ROOT_NODE_ID,
           value: amount,
         });
       }
     });
 
     // B. Central Hub
-    addNode(ROOT_NODE, "#3b82f6"); // Blue-500
+    addNode(ROOT_NODE_ID, ROOT_NODE_LABEL, "#3b82f6"); // Blue-500
 
     // C. Right Side: Budget -> Expenses Categories
     Object.entries(expenseByCategory).forEach(([category, amount]) => {
       if (amount > 0) {
-        addNode(category, "#f43f5e"); // Rose-500
+        const nodeId = `out:${category}`;
+        addNode(nodeId, category, "#f43f5e"); // Rose-500
         links.push({
-          source: ROOT_NODE,
-          target: category,
+          source: ROOT_NODE_ID,
+          target: nodeId,
           value: amount,
         });
       }
@@ -80,16 +77,15 @@ export const CashFlowSankey = ({ transactions }) => {
 
     // D. Right Side: Budget -> Savings
     if (savings > 0) {
-      addNode("Savings", "#22c55e"); // Green-500
+      const savingsId = "hub:savings";
+      addNode(savingsId, "Savings", "#22c55e"); // Green-500
       links.push({
-        source: ROOT_NODE,
-        target: "Savings",
+        source: ROOT_NODE_ID,
+        target: savingsId,
         value: savings,
       });
     }
 
-    // Filter out nodes with no links just in case
-    // (Sankey crashes if links reference missing nodes)
     return { nodes, links };
   }, [transactions]);
 
@@ -132,7 +128,7 @@ export const CashFlowSankey = ({ transactions }) => {
         // Custom Tooltip
         tooltip={({ node }) => (
           <div className="bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 px-3 py-2 rounded-lg text-xs font-bold shadow-xl">
-            {node.id}:{" "}
+            {node.label || node.id}:{" "}
             {new Intl.NumberFormat("id-ID", {
               style: "currency",
               currency: "IDR",
@@ -142,7 +138,8 @@ export const CashFlowSankey = ({ transactions }) => {
         )}
         linkTooltip={({ link }) => (
           <div className="bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 px-3 py-2 rounded-lg text-xs font-bold shadow-xl">
-            {link.source.id} ➔ {link.target.id}:<br />
+            {link.source.label || link.source.id} ➔{" "}
+            {link.target.label || link.target.id}:<br />
             {new Intl.NumberFormat("id-ID", {
               style: "currency",
               currency: "IDR",
