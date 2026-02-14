@@ -20,22 +20,54 @@ exports.getGoals = async (req, res) => {
 exports.createGoal = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name, target_amount, deadline, icon, color } = req.body;
+    const { name, target_amount, monthly_target, deadline, icon, color } =
+      req.body;
 
     const [result] = await db
       .promise()
       .query(
-        "INSERT INTO savings_goals (user_id, name, target_amount, deadline, icon, color) VALUES (?, ?, ?, ?, ?, ?)",
+        "INSERT INTO savings_goals (user_id, name, target_amount, monthly_target, deadline, icon, color) VALUES (?, ?, ?, ?, ?, ?, ?)",
         [
           userId,
           name,
           target_amount,
+          monthly_target || 0,
           deadline,
           icon || "PiggyBank",
           color || "bg-blue-500",
         ],
       );
     res.json({ status: "success", data: { id: result.insertId, ...req.body } });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+// ... (skip updateFunds and deleteGoal as they don't change schema) ...
+
+// Update Goal
+exports.updateGoal = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const goalId = req.params.id;
+    const { name, target_amount, monthly_target, color, deadline } = req.body;
+
+    await db
+      .promise()
+      .query(
+        "UPDATE savings_goals SET name = ?, target_amount = ?, monthly_target = ?, color = ?, deadline = ? WHERE id = ? AND user_id = ?",
+        [
+          name,
+          target_amount,
+          monthly_target || 0,
+          color,
+          deadline,
+          goalId,
+          userId,
+        ],
+      );
+
+    res.json({ status: "success", message: "Goal updated" });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
   }
@@ -132,13 +164,21 @@ exports.updateGoal = async (req, res) => {
   try {
     const userId = req.user.id;
     const goalId = req.params.id;
-    const { name, target_amount, color, deadline } = req.body;
+    const { name, target_amount, monthly_target, color, deadline } = req.body;
 
     await db
       .promise()
       .query(
-        "UPDATE savings_goals SET name = ?, target_amount = ?, color = ?, deadline = ? WHERE id = ? AND user_id = ?",
-        [name, target_amount, color, deadline, goalId, userId],
+        "UPDATE savings_goals SET name = ?, target_amount = ?, monthly_target = ?, color = ?, deadline = ? WHERE id = ? AND user_id = ?",
+        [
+          name,
+          target_amount,
+          monthly_target || 0,
+          color,
+          deadline,
+          goalId,
+          userId,
+        ],
       );
 
     res.json({ status: "success", message: "Goal updated" });

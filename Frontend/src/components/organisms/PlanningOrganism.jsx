@@ -141,19 +141,34 @@ const GoalCard = ({ goal, onTopUp, onEdit, onDelete }) => {
           </span>
           <span>{percent.toFixed(0)}%</span>
         </div>
+
         <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
           <div
             className={`h-full ${percent >= 100 ? "bg-emerald-500" : "bg-blue-500"} transition-all duration-1000`}
             style={{ width: `${percent}%` }}
           />
         </div>
-        <p className="text-xs text-slate-400 mt-1 text-right">
-          Kurang:{" "}
-          {new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-          }).format(Math.max(0, remaining))}
-        </p>
+        <div className="flex justify-between items-end mt-1">
+          <p className="text-[10px] text-slate-400">
+            Target Nabung:{" "}
+            <span className="font-bold text-slate-600">
+              {new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+                maximumFractionDigits: 0,
+              }).format(goal.monthly_target || 0)}
+              /bln
+            </span>
+          </p>
+          <p className="text-xs text-slate-400 text-right">
+            Kurang:{" "}
+            {new Intl.NumberFormat("id-ID", {
+              style: "currency",
+              currency: "IDR",
+              maximumFractionDigits: 0,
+            }).format(Math.max(0, remaining))}
+          </p>
+        </div>
       </div>
 
       <Button
@@ -386,20 +401,11 @@ export const PlanningOrganism = () => {
     0,
   );
 
-  // Savings (Total Targeted Saving per month? Or just total accumulated?
-  // For Kakeibo flow, usually it's "Saving Target for this month".
-  // Since we don't have "Monthly Saving Target" per goal, I will use a simple assumption or just sum of all goal targets?
-  // No, that's too big. I'll just sum the 'current_amount' added this month if possible?
-  // Or better, let's just use 20% of income as default or input?
-  // User prompt said: "Input/Slider: Savings Target".
-  // I will add a manual savings target input for now to kept it simple).
-  const [savingsTarget, setSavingsTarget] = useState(
-    localStorage.getItem("kakeibo_savings") || 0,
+  // Savings (Calculated from Sum of Goals Monthly Targets)
+  const savingsTarget = goals.reduce(
+    (sum, g) => sum + (parseFloat(g.monthly_target) || 0),
+    0,
   );
-
-  useEffect(() => {
-    localStorage.setItem("kakeibo_savings", savingsTarget);
-  }, [savingsTarget]);
 
   const handleDeleteBudget = async (category) => {
     if (!window.confirm(`Hapus anggaran untuk ${category.categoryName}?`))
@@ -432,7 +438,7 @@ export const PlanningOrganism = () => {
   };
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-6 pb-20">
       <KakeiboSummaryCard
         income={income}
         fixedExpenses={fixedExpenses}
@@ -440,43 +446,7 @@ export const PlanningOrganism = () => {
         onIncomeChange={setIncome}
       />
 
-      {/* Manual Savings Input inside Summary Card in next iteration, for now let's add a separate slider or input for savings if needed. 
-          Actually KakeiboSummaryCard takes savings as prop. I need to allow changing it.
-          Let's update KakeiboSummaryCard to accept onSavingsChange or just put inputs there. 
-          Wait, I defined KakeiboSummaryCard above. I should update it to allow editing Savings too.
-      */}
-
-      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-        <h3 className="text-lg font-bold text-slate-700 mb-4">
-          Target Tabungan (Savings)
-        </h3>
-        <input
-          type="range"
-          min="0"
-          max={income}
-          step="50000"
-          value={savingsTarget}
-          onChange={(e) => setSavingsTarget(e.target.value)}
-          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-        />
-        <div className="flex justify-between text-xs text-slate-400 mt-2">
-          <span>Rp 0</span>
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-600">
-              {new Intl.NumberFormat("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              }).format(savingsTarget)}
-            </span>
-            <input
-              type="number"
-              value={savingsTarget}
-              onChange={(e) => setSavingsTarget(e.target.value)}
-              className="border border-slate-300 rounded px-2 py-1 w-24 text-right text-slate-700"
-            />
-          </div>
-        </div>
-      </div>
+      {/* Removed redundant slider, now using Goals Monthly Target */}
 
       <div className="space-y-8">
         <EnvelopeGroup
@@ -666,15 +636,18 @@ const BudgetForm = ({ category, onSuccess }) => {
 const GoalForm = ({ goal, onSuccess }) => {
   const [name, setName] = useState("");
   const [target, setTarget] = useState("");
+  const [monthlyTarget, setMonthlyTarget] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (goal) {
       setName(goal.name);
       setTarget(goal.target_amount);
+      setMonthlyTarget(goal.monthly_target || "");
     } else {
       setName("");
       setTarget("");
+      setMonthlyTarget("");
     }
   }, [goal]);
 
@@ -691,6 +664,7 @@ const GoalForm = ({ goal, onSuccess }) => {
         body: JSON.stringify({
           name,
           target_amount: parseInt(target),
+          monthly_target: parseInt(monthlyTarget) || 0,
           color: goal?.color || "bg-indigo-500", // default or existing
         }),
         credentials: "include",
@@ -718,19 +692,37 @@ const GoalForm = ({ goal, onSuccess }) => {
           required
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">
-          Target Nominal (Rp)
-        </label>
-        <input
-          type="number"
-          value={target}
-          onChange={(e) => setTarget(e.target.value)}
-          className="w-full p-2 border border-slate-300 rounded-lg"
-          placeholder="0"
-          required
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            Total Target (Rp)
+          </label>
+          <input
+            type="number"
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+            className="w-full p-2 border border-slate-300 rounded-lg"
+            placeholder="0"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            Nabung per Bulan
+          </label>
+          <input
+            type="number"
+            value={monthlyTarget}
+            onChange={(e) => setMonthlyTarget(e.target.value)}
+            className="w-full p-2 border border-slate-300 rounded-lg"
+            placeholder="0"
+          />
+          <p className="text-[10px] text-slate-400 mt-1">
+            Opsional, akan muncul di Kakeibo Save Target
+          </p>
+        </div>
       </div>
+
       <div className="flex justify-end gap-2">
         <Button type="submit" disabled={isLoading}>
           {isLoading
