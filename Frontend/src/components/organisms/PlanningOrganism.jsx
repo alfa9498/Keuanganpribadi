@@ -167,10 +167,175 @@ const GoalCard = ({ goal, onTopUp, onEdit, onDelete }) => {
 
 // --- Main Container ---
 
+// --- Kakeibo Components ---
+
+const KakeiboSummaryCard = ({
+  income,
+  fixedExpenses,
+  savings,
+  onIncomeChange,
+}) => {
+  const pocketMoney = income - fixedExpenses - savings;
+  const isNegative = pocketMoney < 0;
+
+  return (
+    <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-6 rounded-3xl shadow-xl mb-8 relative overflow-hidden">
+      {/* Decorative circles */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-40 h-40 bg-emerald-500 opacity-10 rounded-full -ml-10 -mb-10 pointer-events-none"></div>
+
+      <h3 className="text-lg font-medium text-slate-300 mb-6 flex items-center gap-2">
+        <Wallet size={20} />
+        Kakeibo Overview
+      </h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
+        {/* 1. Income */}
+        <div className="relative group">
+          <label className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1 block">
+            Pemasukan (Income)
+          </label>
+          <div className="flex items-center gap-2 text-2xl font-bold text-emerald-400">
+            <span className="text-sm pt-1">Rp</span>
+            <input
+              type="number"
+              value={income}
+              onChange={(e) => onIncomeChange(e.target.value)}
+              className="bg-transparent border-b border-slate-600 focus:border-emerald-500 outline-none w-full transition-colors font-mono"
+              placeholder="0"
+            />
+          </div>
+        </div>
+
+        {/* Operator */}
+        <div className="hidden md:flex justify-center text-slate-500">
+          <span className="text-2xl font-light">-</span>
+        </div>
+
+        {/* 2. Fixed & Savings */}
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1 block">
+              Fixed (Survival)
+            </label>
+            <p className="text-xl font-bold text-slate-200 font-mono">
+              {new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+              }).format(fixedExpenses)}
+            </p>
+          </div>
+          <div>
+            <label className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1 block">
+              Savings (Goals)
+            </label>
+            <p className="text-xl font-bold text-slate-200 font-mono">
+              {new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+              }).format(savings)}
+            </p>
+          </div>
+        </div>
+
+        {/* Operator */}
+        <div className="hidden md:flex justify-center text-slate-500">
+          <span className="text-2xl font-light">=</span>
+        </div>
+
+        {/* 3. Pocket Money */}
+        <div
+          className={`p-4 rounded-2xl ${isNegative ? "bg-rose-500/20 border border-rose-500/50" : "bg-emerald-500/20 border border-emerald-500/50"}`}
+        >
+          <label
+            className={`text-xs uppercase tracking-wider font-bold mb-1 block ${isNegative ? "text-rose-300" : "text-emerald-300"}`}
+          >
+            Sisa (Pocket Money)
+          </label>
+          <p
+            className={`text-3xl font-bold font-mono ${isNegative ? "text-rose-400" : "text-emerald-400"}`}
+          >
+            {new Intl.NumberFormat("id-ID", {
+              style: "currency",
+              currency: "IDR",
+            }).format(pocketMoney)}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const EnvelopeGroup = ({
+  title,
+  description,
+  color,
+  items,
+  onEdit,
+  onDelete,
+}) => {
+  if (items.length === 0) return null;
+
+  const totalBudget = items.reduce((sum, item) => sum + item.budgetLimit, 0);
+  const totalSpent = items.reduce((sum, item) => sum + item.currentSpent, 0);
+  const totalRemaining = Math.max(0, totalBudget - totalSpent);
+  const percent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+
+  return (
+    <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div>
+          <h3 className={`text-xl font-bold ${color} flex items-center gap-2`}>
+            {title}
+          </h3>
+          <p className="text-sm text-slate-500">{description}</p>
+        </div>
+        <div className="text-right bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100">
+          <p className="text-xs text-slate-400 font-bold uppercase">
+            Sisa Amplop
+          </p>
+          <p
+            className={`text-lg font-bold font-mono ${totalRemaining < 0 ? "text-rose-500" : "text-emerald-600"}`}
+          >
+            {new Intl.NumberFormat("id-ID", {
+              style: "currency",
+              currency: "IDR",
+            }).format(totalRemaining)}
+          </p>
+        </div>
+      </div>
+
+      {/* Progress Bar for Group */}
+      <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mb-6">
+        <div
+          className={`h-full transition-all duration-500 ${percent > 100 ? "bg-rose-500" : "bg-slate-400"}`}
+          style={{ width: `${Math.min(percent, 100)}%` }}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {items.map((item) => (
+          <BudgetCard
+            key={item.categoryId}
+            category={item}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// --- Main Container ---
+
 export const PlanningOrganism = () => {
-  const [activeTab, setActiveTab] = useState("budget"); // 'budget' or 'goals'
+  const [activeTab, setActiveTab] = useState("kakeibo");
   const [budgets, setBudgets] = useState([]);
   const [goals, setGoals] = useState([]);
+  const [income, setIncome] = useState(
+    localStorage.getItem("kakeibo_income") || 0,
+  );
 
   // Modals
   const [isBudgetModalOpen, setBudgetModalOpen] = useState(false);
@@ -184,17 +349,16 @@ export const PlanningOrganism = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      if (activeTab === "budget") {
-        const res = await fetch(`${API_URL}/budgets`, {
-          credentials: "include",
-        });
-        const json = await res.json();
-        if (json.status === "success") setBudgets(json.data);
-      } else {
-        const res = await fetch(`${API_URL}/goals`, { credentials: "include" });
-        const json = await res.json();
-        if (json.status === "success") setGoals(json.data);
-      }
+      const [budgetsRes, goalsRes] = await Promise.all([
+        fetch(`${API_URL}/budgets`, { credentials: "include" }),
+        fetch(`${API_URL}/goals`, { credentials: "include" }),
+      ]);
+
+      const budgetsJson = await budgetsRes.json();
+      const goalsJson = await goalsRes.json();
+
+      if (budgetsJson.status === "success") setBudgets(budgetsJson.data);
+      if (goalsJson.status === "success") setGoals(goalsJson.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -204,7 +368,58 @@ export const PlanningOrganism = () => {
 
   useEffect(() => {
     fetchData();
-  }, [activeTab]);
+  }, []);
+
+  // Persist income
+  useEffect(() => {
+    localStorage.setItem("kakeibo_income", income);
+  }, [income]);
+
+  // Derived Calculations
+  const groupedBudgets = {
+    survival: budgets.filter(
+      (b) =>
+        b.groupName?.toLowerCase().includes("survival") ||
+        b.groupName?.toLowerCase().includes("kebutuhan"),
+    ),
+    optional: budgets.filter(
+      (b) =>
+        b.groupName?.toLowerCase().includes("optional") ||
+        b.groupName?.toLowerCase().includes("keinginan"),
+    ),
+    culture: budgets.filter(
+      (b) =>
+        b.groupName?.toLowerCase().includes("culture") ||
+        b.groupName?.toLowerCase().includes("kultur"),
+    ),
+    extra: budgets.filter(
+      (b) =>
+        b.groupName?.toLowerCase().includes("extra") ||
+        b.groupName?.toLowerCase().includes("tak terduga") ||
+        b.groupName === "Uncategorized",
+    ),
+  };
+
+  // Fixed Expenses = Survival Group Needs
+  const fixedExpenses = groupedBudgets.survival.reduce(
+    (sum, item) => sum + item.budgetLimit,
+    0,
+  );
+
+  // Savings (Total Targeted Saving per month? Or just total accumulated?
+  // For Kakeibo flow, usually it's "Saving Target for this month".
+  // Since we don't have "Monthly Saving Target" per goal, I will use a simple assumption or just sum of all goal targets?
+  // No, that's too big. I'll just sum the 'current_amount' added this month if possible?
+  // Or better, let's just use 20% of income as default or input?
+  // User prompt said: "Input/Slider: Savings Target".
+  // I will add a manual savings target input for now to kept it simple).
+  const [savingsTarget, setSavingsTarget] = useState(
+    localStorage.getItem("kakeibo_savings") || 0,
+  );
+
+  useEffect(() => {
+    localStorage.setItem("kakeibo_savings", savingsTarget);
+  }, [savingsTarget]);
 
   const handleDeleteBudget = async (category) => {
     if (!window.confirm(`Hapus anggaran untuk ${category.categoryName}?`))
@@ -237,68 +452,117 @@ export const PlanningOrganism = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header & Tabs */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
-        <div className="flex gap-2 bg-slate-100 p-1 rounded-2xl">
-          <button
-            onClick={() => setActiveTab("budget")}
-            className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === "budget" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-          >
-            Monthly Budget
-          </button>
-          <button
-            onClick={() => setActiveTab("goals")}
-            className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === "goals" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-          >
-            Savings Goals
-          </button>
-        </div>
+    <div className="space-y-8 pb-20">
+      <KakeiboSummaryCard
+        income={income}
+        fixedExpenses={fixedExpenses}
+        savings={savingsTarget}
+        onIncomeChange={setIncome}
+      />
 
-        <div>
-          {activeTab === "goals" && (
-            <Button
-              onClick={() => {
-                setSelectedItem(null);
-                setGoalModalOpen(true);
-              }}
-            >
-              <Plus size={18} className="mr-1" /> Buat Tujuan Baru
-            </Button>
-          )}
+      {/* Manual Savings Input inside Summary Card in next iteration, for now let's add a separate slider or input for savings if needed. 
+          Actually KakeiboSummaryCard takes savings as prop. I need to allow changing it.
+          Let's update KakeiboSummaryCard to accept onSavingsChange or just put inputs there. 
+          Wait, I defined KakeiboSummaryCard above. I should update it to allow editing Savings too.
+      */}
+
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+        <h3 className="text-lg font-bold text-slate-700 mb-4">
+          Target Tabungan (Savings)
+        </h3>
+        <input
+          type="range"
+          min="0"
+          max={income}
+          step="50000"
+          value={savingsTarget}
+          onChange={(e) => setSavingsTarget(e.target.value)}
+          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+        />
+        <div className="flex justify-between text-xs text-slate-400 mt-2">
+          <span>Rp 0</span>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-600">
+              {new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+              }).format(savingsTarget)}
+            </span>
+            <input
+              type="number"
+              value={savingsTarget}
+              onChange={(e) => setSavingsTarget(e.target.value)}
+              className="border border-slate-300 rounded px-2 py-1 w-24 text-right text-slate-700"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Content Area */}
-      {activeTab === "budget" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {budgets.length > 0 ? (
-            budgets.map((b) => (
-              <BudgetCard
-                key={b.categoryId}
-                category={b}
-                onEdit={(item) => {
-                  setSelectedItem(item);
-                  setBudgetModalOpen(true);
-                }}
-                onDelete={handleDeleteBudget}
-              />
-            ))
-          ) : (
-            <p className="text-slate-500 col-span-full text-center py-10">
-              Belum ada kategori pengeluaran.
-            </p>
-          )}
+      <div className="space-y-8">
+        <EnvelopeGroup
+          title="Survival (Kebutuhan)"
+          description="Pengeluaran wajib untuk bertahan hidup (Makan, Transport, Tagihan)."
+          color="text-rose-500"
+          items={groupedBudgets.survival}
+          onEdit={(item) => {
+            setSelectedItem(item);
+            setBudgetModalOpen(true);
+          }}
+          onDelete={handleDeleteBudget}
+        />
 
-          {/* Hint Card */}
-          <div className="border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center text-slate-400">
-            <TrendingUp className="mb-2 opacity-50" />
-            <p className="text-sm">
-              Klik ikon titik tiga di kartu untuk mengatur limit anggaran.
-            </p>
-          </div>
+        <EnvelopeGroup
+          title="Optional (Keinginan)"
+          description="Belanja, Hiburan, dan kesenangan lainnya."
+          color="text-amber-500"
+          items={groupedBudgets.optional}
+          onEdit={(item) => {
+            setSelectedItem(item);
+            setBudgetModalOpen(true);
+          }}
+          onDelete={handleDeleteBudget}
+        />
+
+        <EnvelopeGroup
+          title="Culture (Kultur)"
+          description="Pendidikan, Buku, Kursus, dan pengembangan diri."
+          color="text-blue-500"
+          items={groupedBudgets.culture}
+          onEdit={(item) => {
+            setSelectedItem(item);
+            setBudgetModalOpen(true);
+          }}
+          onDelete={handleDeleteBudget}
+        />
+
+        <EnvelopeGroup
+          title="Extra (Tak Terduga)"
+          description="Pengeluaran dadakan, hadiah, atau perbaikan."
+          color="text-purple-500"
+          items={groupedBudgets.extra}
+          onEdit={(item) => {
+            setSelectedItem(item);
+            setBudgetModalOpen(true);
+          }}
+          onDelete={handleDeleteBudget}
+        />
+      </div>
+
+      {/* Savings Goals Section */}
+      <div className="mt-12">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <Target className="text-blue-500" /> Goals Progress
+          </h3>
+          <Button
+            onClick={() => {
+              setSelectedItem(null);
+              setGoalModalOpen(true);
+            }}
+          >
+            <Plus size={18} className="mr-1" /> Tambah Goal
+          </Button>
         </div>
-      ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {goals.map((g) => (
             <GoalCard
@@ -315,22 +579,8 @@ export const PlanningOrganism = () => {
               onDelete={handleDeleteGoal}
             />
           ))}
-          {goals.length === 0 && (
-            <div className="col-span-full text-center py-20 bg-white rounded-3xl border border-slate-100">
-              <PiggyBank size={48} className="mx-auto text-slate-300 mb-4" />
-              <h3 className="text-lg font-bold text-slate-700">
-                Mulai Menabung Impian Anda
-              </h3>
-              <p className="text-slate-500 mb-4">
-                Buat target tabungan untuk rumah, kendaraan, atau liburan.
-              </p>
-              <Button onClick={() => setGoalModalOpen(true)}>
-                Buat Tujuan Pertama
-              </Button>
-            </div>
-          )}
         </div>
-      )}
+      </div>
 
       {/* Modals */}
       <Modal

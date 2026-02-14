@@ -7,13 +7,14 @@ exports.getBudgets = async (req, res) => {
     const userId = req.user.id;
     const month = req.query.month || new Date().toISOString().slice(0, 7); // YYYY-MM
 
-    // 1. Get all expense categories
-    const [categories] = await db
-      .promise()
-      .query(
-        "SELECT id, name FROM categories WHERE user_id = ? AND type = 'expense'",
-        [userId],
-      );
+    // 1. Get all expense categories with their group name
+    const [categories] = await db.promise().query(
+      `SELECT c.id, c.name, cg.name as group_name 
+       FROM categories c
+       LEFT JOIN category_groups cg ON c.group_id = cg.id
+       WHERE c.user_id = ? AND c.type = 'expense'`,
+      [userId],
+    );
 
     // 2. Get budgets for this month
     const [budgets] = await db
@@ -46,6 +47,7 @@ exports.getBudgets = async (req, res) => {
     const result = categories.map((cat) => ({
       categoryId: cat.id,
       categoryName: cat.name,
+      groupName: cat.group_name || "Uncategorized",
       budgetLimit: budgetMap.get(cat.id) || 0,
       currentSpent: spendingMap.get(cat.name) || 0, // Matching by name is risky if names change, but schema uses name in transactions. ideally transactions should use category_id.
       // Note: In this system transactions store category NAME, but budgets store ID.
