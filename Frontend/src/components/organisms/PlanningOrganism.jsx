@@ -179,87 +179,63 @@ const KakeiboSummaryCard = ({
   const isNegative = pocketMoney < 0;
 
   return (
-    <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-6 rounded-3xl shadow-xl mb-8 relative overflow-hidden">
-      {/* Decorative circles */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 w-40 h-40 bg-emerald-500 opacity-10 rounded-full -ml-10 -mb-10 pointer-events-none"></div>
+    <div className="bg-white border-l-4 border-slate-800 p-6 rounded-r-xl shadow-sm mb-8 flex flex-col md:flex-row gap-6 items-start md:items-center">
+      {/* Notion Icon/Callout Style */}
+      <div className="text-4xl">📔</div>
 
-      <h3 className="text-lg font-medium text-slate-300 mb-6 flex items-center gap-2">
-        <Wallet size={20} />
-        Kakeibo Overview
-      </h3>
+      <div className="flex-1 w-full text-slate-800">
+        <h3 className="text-xl font-bold mb-4 flex items-center gap-2 border-b border-slate-200 pb-2">
+          Monthly Ledger
+        </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
-        {/* 1. Income */}
-        <div className="relative group">
-          <label className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1 block">
-            Pemasukan (Income)
-          </label>
-          <div className="flex items-center gap-2 text-2xl font-bold text-emerald-400">
-            <span className="text-sm pt-1">Rp</span>
-            <input
-              type="number"
-              value={income}
-              onChange={(e) => onIncomeChange(e.target.value)}
-              className="bg-transparent border-b border-slate-600 focus:border-emerald-500 outline-none w-full transition-colors font-mono"
-              placeholder="0"
-            />
-          </div>
-        </div>
-
-        {/* Operator */}
-        <div className="hidden md:flex justify-center text-slate-500">
-          <span className="text-2xl font-light">-</span>
-        </div>
-
-        {/* 2. Fixed & Savings */}
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-sm">
+          {/* Income Input */}
           <div>
-            <label className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1 block">
-              Fixed (Survival)
+            <label className="block text-slate-400 text-xs uppercase font-bold mb-1">
+              Income (Pemasukan)
             </label>
-            <p className="text-xl font-bold text-slate-200 font-mono">
+            <div className="flex items-center gap-2 border-b-2 border-slate-200 hover:border-slate-800 transition-colors">
+              <span className="text-slate-500">Rp</span>
+              <input
+                type="number"
+                value={income}
+                onChange={(e) => onIncomeChange(e.target.value)}
+                className="w-full bg-transparent focus:outline-none font-bold text-slate-800"
+                placeholder="0"
+              />
+            </div>
+          </div>
+
+          {/* Calculations */}
+          <div className="space-y-1 text-slate-500">
+            <div className="flex justify-between">
+              <span>Fixed (Survival):</span>
+              <span className="font-bold text-rose-500">
+                -{new Intl.NumberFormat("id-ID").format(fixedExpenses)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>Savings (Goals):</span>
+              <span className="font-bold text-blue-500">
+                -{new Intl.NumberFormat("id-ID").format(savings)}
+              </span>
+            </div>
+          </div>
+
+          {/* Result */}
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
+            <label className="text-xs text-slate-400 uppercase font-bold">
+              Pocket Money (Sisa)
+            </label>
+            <p
+              className={`text-xl font-bold ${isNegative ? "text-rose-600" : "text-emerald-600"}`}
+            >
               {new Intl.NumberFormat("id-ID", {
                 style: "currency",
                 currency: "IDR",
-              }).format(fixedExpenses)}
+              }).format(pocketMoney)}
             </p>
           </div>
-          <div>
-            <label className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1 block">
-              Savings (Goals)
-            </label>
-            <p className="text-xl font-bold text-slate-200 font-mono">
-              {new Intl.NumberFormat("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              }).format(savings)}
-            </p>
-          </div>
-        </div>
-
-        {/* Operator */}
-        <div className="hidden md:flex justify-center text-slate-500">
-          <span className="text-2xl font-light">=</span>
-        </div>
-
-        {/* 3. Pocket Money */}
-        <div
-          className={`p-4 rounded-2xl ${isNegative ? "bg-rose-500/20 border border-rose-500/50" : "bg-emerald-500/20 border border-emerald-500/50"}`}
-        >
-          <label
-            className={`text-xs uppercase tracking-wider font-bold mb-1 block ${isNegative ? "text-rose-300" : "text-emerald-300"}`}
-          >
-            Sisa (Pocket Money)
-          </label>
-          <p
-            className={`text-3xl font-bold font-mono ${isNegative ? "text-rose-400" : "text-emerald-400"}`}
-          >
-            {new Intl.NumberFormat("id-ID", {
-              style: "currency",
-              currency: "IDR",
-            }).format(pocketMoney)}
-          </p>
         </div>
       </div>
     </div>
