@@ -13,6 +13,8 @@ import {
   Edit2,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
+  Calendar,
 } from "lucide-react";
 import { API_URL } from "../../config/api";
 import { Button } from "../atoms/Button";
@@ -430,15 +432,42 @@ export const PlanningOrganism = () => {
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(
+    new Date().toISOString().slice(0, 7),
+  ); // YYYY-MM
+
+  // Month Navigation Helpers
+  const nextMonth = () => {
+    const [year, month] = selectedMonth.split("-").map(Number);
+    const date = new Date(year, month); // javascript months are 0-indexed, so 'month' actually refers to next month
+    setSelectedMonth(date.toISOString().slice(0, 7));
+  };
+
+  const prevMonth = () => {
+    const [year, month] = selectedMonth.split("-").map(Number);
+    const date = new Date(year, month - 2); // go back two months to get previous
+    setSelectedMonth(date.toISOString().slice(0, 7));
+  };
+
+  const formatMonth = (monthStr) => {
+    const [year, month] = monthStr.split("-");
+    const date = new Date(year, parseInt(month) - 1);
+    return date.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+  };
 
   // Load Data
   const fetchData = async () => {
     setIsLoading(true);
     try {
+      const query = `?month=${selectedMonth}`;
       const [budgetsRes, incomeRes, goalsRes] = await Promise.all([
-        fetch(`${API_URL}/budgets?type=expense`, { credentials: "include" }),
-        fetch(`${API_URL}/budgets?type=income`, { credentials: "include" }),
-        fetch(`${API_URL}/goals`, { credentials: "include" }),
+        fetch(`${API_URL}/budgets${query}&type=expense`, {
+          credentials: "include",
+        }),
+        fetch(`${API_URL}/budgets${query}&type=income`, {
+          credentials: "include",
+        }),
+        fetch(`${API_URL}/goals`, { credentials: "include" }), // Goals are global but we might want them monthly later?
       ]);
 
       const budgetsJson = await budgetsRes.json();
@@ -457,7 +486,7 @@ export const PlanningOrganism = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [selectedMonth]);
 
   // Derived Calculations
   const totalActualIncome =
@@ -511,7 +540,7 @@ export const PlanningOrganism = () => {
       return;
     try {
       await fetch(
-        `${API_URL}/budgets?categoryId=${category.categoryId}&month=${new Date().toISOString().slice(0, 7)}`,
+        `${API_URL}/budgets?categoryId=${category.categoryId}&month=${selectedMonth}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -538,6 +567,48 @@ export const PlanningOrganism = () => {
 
   return (
     <div className="space-y-6 pb-20">
+      {/* Month Navigator */}
+      <div className="flex items-center justify-between bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-finance-primary/10 rounded-xl text-finance-primary dark:text-finance-secondary">
+            <Calendar size={20} />
+          </div>
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-widest text-slate-400">
+              Periode Planning
+            </h2>
+            <p className="text-lg font-bold text-slate-800 dark:text-white">
+              {formatMonth(selectedMonth)}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={prevMonth}
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors text-slate-600 dark:text-slate-300 active:scale-95"
+            title="Bulan Sebelumnya"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button
+            onClick={() =>
+              setSelectedMonth(new Date().toISOString().slice(0, 7))
+            }
+            className="px-4 py-2 text-xs font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition-colors text-slate-600 dark:text-slate-200"
+          >
+            Bulan Ini
+          </button>
+          <button
+            onClick={nextMonth}
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors text-slate-600 dark:text-slate-300 active:scale-95"
+            title="Bulan Berikutnya"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </div>
+      </div>
+
       <KakeiboSummaryCard
         incomeSources={incomeSources}
         totalIncome={totalActualIncome}
@@ -670,6 +741,7 @@ export const PlanningOrganism = () => {
       >
         <BudgetForm
           category={selectedItem}
+          selectedMonth={selectedMonth}
           onSuccess={() => {
             setBudgetModalOpen(false);
             fetchData();
@@ -710,7 +782,7 @@ export const PlanningOrganism = () => {
 
 // --- Form Components (Internal) ---
 
-const BudgetForm = ({ category, onSuccess }) => {
+const BudgetForm = ({ category, selectedMonth, onSuccess }) => {
   const [amount, setAmount] = useState(category?.budgetLimit || 0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -728,7 +800,7 @@ const BudgetForm = ({ category, onSuccess }) => {
         body: JSON.stringify({
           categoryId: category.categoryId,
           amount: parseInt(amount),
-          month: new Date().toISOString().slice(0, 7),
+          month: selectedMonth,
         }),
         credentials: "include",
       });
