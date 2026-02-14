@@ -170,7 +170,7 @@ export const SidebarOrganism = ({
     { id: "accounts", label: "Accounts", icon: CreditCard },
     { id: "transaction-list", label: "Transactions", icon: Receipt },
     { id: "categories", label: "Categories", icon: Tag },
-    { id: "planning", label: "Planning", icon: Target },
+    { id: "planning", label: "Kakeibo Planning", icon: Target },
     { id: "filter", label: "Reports", icon: LineChart },
     { id: "telegram", label: "Telegram Bot", icon: Send },
     { id: "guide", label: "Panduan", icon: HelpCircle },
