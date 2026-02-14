@@ -7,43 +7,9 @@
   },
   "rewrites": [
     {
-      "source": "/(ping|login|register|me|logout|forgot-password|verify-otp|reset-password|telegram-link|telegram-verification-code)",
+      "source": "/api/(.*)",
       "destination": "/api/index.js"
     },
-
-    {
-      "source": "/transaction(.*)",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/notifications(.*)",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/telegram-webhook",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/accounts(.*)",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/api/categories(.*)",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/api/budgets(.*)",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/api/goals(.*)",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/socket.io/(.*)",
-      "destination": "/api/index.js"
-    },
-
     {
       "source": "/(.*)",
       "destination": "/index.html"
