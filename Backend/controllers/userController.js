@@ -93,7 +93,8 @@ exports.me = (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(401).json({ message: "Not authenticated" });
+    // Return 200 to avoid console error, but with user: null
+    return res.json({ status: "success", user: null });
   }
 
   try {
