@@ -213,33 +213,49 @@ const KakeiboSummaryCard = ({
   const isNegative = pocketMoney < 0;
 
   return (
-    <div className="bg-white dark:bg-slate-800 border-l-4 border-slate-800 dark:border-slate-500 p-4 rounded-r-xl shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-start md:items-center">
-      <div className="text-3xl">📔</div>
+    <div className="bg-white dark:bg-slate-800 border-l-4 border-slate-800 dark:border-slate-500 rounded-r-2xl shadow-sm mb-6 transition-all duration-300 overflow-hidden">
+      <div className="p-5 flex flex-col md:flex-row gap-6 items-stretch">
+        {/* Left Side: Icon & Title */}
+        <div className="flex flex-row md:flex-col items-center md:justify-center gap-3 md:border-r border-slate-100 dark:border-slate-700 md:pr-6">
+          <div className="w-12 h-12 flex items-center justify-center bg-slate-100 dark:bg-slate-700 rounded-2xl text-2xl shadow-inner">
+            📔
+          </div>
+          <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase tracking-tighter md:rotate-180 md:[writing-mode:vertical-lr] text-center">
+            Ledger
+          </h3>
+        </div>
 
-      <div className="flex-1 w-full text-slate-800 dark:text-slate-100">
-        <h3 className="text-lg font-bold mb-3 flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-1">
-          Monthly Ledger
-        </h3>
+        {/* Middle: Data Visualization */}
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-w-0">
+          {/* Income Side */}
+          <div className="space-y-3">
+            <div className="flex justify-between items-end border-b border-slate-100 dark:border-slate-700 pb-2">
+              <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest">
+                Actual Income
+              </label>
+              <div className="text-right">
+                <span className="text-[10px] text-slate-400 block">
+                  Target: Rp{" "}
+                  {new Intl.NumberFormat("id-ID").format(totalPlannedIncome)}
+                </span>
+                <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                  Rp {new Intl.NumberFormat("id-ID").format(totalIncome)}
+                </span>
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-          {/* Income Breakdown List */}
-          <div className="space-y-2">
-            <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold mb-1">
-              Actual Income (Target: Rp{" "}
-              {new Intl.NumberFormat("id-ID").format(totalPlannedIncome)})
-            </label>
-            <div className="space-y-1 max-h-32 overflow-y-auto pr-2">
+            <div className="space-y-2 max-h-[160px] overflow-y-auto pr-3 custom-scrollbar">
               {incomeSources.length > 0 ? (
                 incomeSources.map((source) => (
                   <div
                     key={source.categoryId}
-                    className="flex justify-between items-center group/income pb-1 border-b border-slate-50 dark:border-slate-700/50"
+                    className="flex justify-between items-center group/income p-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors border border-transparent hover:border-slate-100 dark:hover:border-slate-600"
                   >
-                    <div className="flex flex-col">
-                      <span className="text-slate-600 dark:text-slate-300 truncate max-w-[120px]">
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate pr-2">
                         {source.categoryName}
                       </span>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[9px] text-slate-400">
                         Target: Rp{" "}
                         {new Intl.NumberFormat("id-ID").format(
                           source.budgetLimit,
@@ -247,14 +263,14 @@ const KakeiboSummaryCard = ({
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                      <span className="font-mono text-xs font-bold text-slate-600 dark:text-slate-300">
                         {new Intl.NumberFormat("id-ID").format(
                           source.currentSpent,
                         )}
                       </span>
                       <button
                         onClick={() => onEditIncome(source)}
-                        className="p-1 text-slate-300 hover:text-slate-800 dark:hover:text-slate-200 opacity-0 group-hover/income:opacity-100 transition-opacity"
+                        className="p-1 text-slate-300 hover:text-finance-accent opacity-0 group-hover/income:opacity-100 transition-all active:scale-90"
                       >
                         <Edit2 size={12} />
                       </button>
@@ -262,43 +278,50 @@ const KakeiboSummaryCard = ({
                   </div>
                 ))
               ) : (
-                <p className="text-[10px] text-slate-400 italic">
-                  Belum ada kategori pemasukan dengan target.
+                <p className="text-xs text-slate-400 italic text-center py-4">
+                  No income sources defined.
                 </p>
               )}
             </div>
           </div>
 
-          {/* Calculations */}
-          <div className="space-y-1 text-slate-500 dark:text-slate-400 border-l border-slate-100 dark:border-slate-700 pl-4 md:border-none md:pl-0">
-            <div className="flex justify-between">
-              <span>Fixed:</span>
-              <span className="font-bold text-rose-500">
-                -{new Intl.NumberFormat("id-ID").format(fixedExpenses)}
-              </span>
+          {/* Deductions & Result */}
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1">
+                  Fixed
+                </label>
+                <p className="text-sm font-bold text-rose-500 font-mono">
+                  -{new Intl.NumberFormat("id-ID").format(fixedExpenses)}
+                </p>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1">
+                  Savings
+                </label>
+                <p className="text-sm font-bold text-blue-500 font-mono">
+                  -{new Intl.NumberFormat("id-ID").format(savings)}
+                </p>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span>Savings:</span>
-              <span className="font-bold text-blue-500">
-                -{new Intl.NumberFormat("id-ID").format(savings)}
-              </span>
-            </div>
-          </div>
 
-          {/* Result */}
-          <div className="bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-center">
-            <label className="text-[10px] text-slate-400 uppercase font-bold">
-              Pocket Money
-            </label>
-            <p
-              className={`text-lg font-bold ${isNegative ? "text-rose-600" : "text-emerald-600"}`}
+            <div
+              className={`flex-1 flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed transition-all ${isNegative ? "bg-rose-50/50 dark:bg-rose-900/10 border-rose-200 dark:border-rose-800/50" : "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50"}`}
             >
-              {new Intl.NumberFormat("id-ID", {
-                style: "currency",
-                currency: "IDR",
-                maximumFractionDigits: 0,
-              }).format(pocketMoney)}
-            </p>
+              <label className="text-[10px] uppercase font-black text-slate-400 tracking-[0.2em] mb-1">
+                Pocket Money
+              </label>
+              <p
+                className={`text-2xl font-black font-mono transition-all ${isNegative ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}
+              >
+                {new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                  maximumFractionDigits: 0,
+                }).format(pocketMoney)}
+              </p>
+            </div>
           </div>
         </div>
       </div>
