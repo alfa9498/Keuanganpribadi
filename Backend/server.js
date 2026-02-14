@@ -68,35 +68,44 @@ app.use((req, res, next) => {
 });
 
 // Test Endpoint
-app.get("/ping", (req, res) => {
+app.get("/api/ping", (req, res) => {
   console.log("🏓 PING RECEIVED - Server is working!");
   res.send("PONG");
 });
 
 // User Routes
-app.post("/login", userController.login);
-app.post("/register", userController.register);
-app.get("/me", userController.me);
-app.post("/logout", userController.logout);
-app.get("/telegram-link", userController.generateTelegramLink);
-app.get("/telegram-verification-code", userController.generateVerificationCode);
+app.post("/api/login", userController.login);
+app.post("/api/register", userController.register);
+app.get("/api/me", userController.me);
+app.post("/api/logout", userController.logout);
+app.get("/api/telegram-link", userController.generateTelegramLink);
+app.get(
+  "/api/telegram-verification-code",
+  userController.generateVerificationCode,
+);
 
 // Forgot Password
-app.post("/forgot-password", userController.requestPasswordReset);
-app.post("/verify-otp", userController.verifyOtp);
-app.post("/reset-password", userController.resetPassword);
+app.post("/api/forgot-password", userController.requestPasswordReset);
+app.post("/api/verify-otp", userController.verifyOtp);
+app.post("/api/reset-password", userController.resetPassword);
 
 // Transaction Routes
-app.post("/transaction", transactionController.createTransaction);
-app.get("/transaction", transactionController.getTransactions);
-app.put("/transaction/:id", transactionController.updateTransaction);
-app.delete("/transaction/:id", transactionController.deleteTransaction);
+app.post("/api/transaction", transactionController.createTransaction);
+app.get("/api/transaction", transactionController.getTransactions);
+app.put("/api/transaction/:id", transactionController.updateTransaction);
+app.delete("/api/transaction/:id", transactionController.deleteTransaction);
 
 // Notification Routes
-app.get("/notifications", notificationController.getNotifications);
-app.get("/notifications/unread-count", notificationController.getUnreadCount);
-app.put("/notifications/:id/read", notificationController.markAsRead);
-app.put("/notifications/mark-all-read", notificationController.markAllAsRead);
+app.get("/api/notifications", notificationController.getNotifications);
+app.get(
+  "/api/notifications/unread-count",
+  notificationController.getUnreadCount,
+);
+app.put("/api/notifications/:id/read", notificationController.markAsRead);
+app.put(
+  "/api/notifications/mark-all-read",
+  notificationController.markAllAsRead,
+);
 
 // Account Routes
 const accountRoutes = require("./routes/accountRoutes");
@@ -111,8 +120,9 @@ const planningRoutes = require("./routes/planningRoutes");
 app.use("/api", planningRoutes);
 
 // Telegram Webhook Endpoint
-app.post("/telegram-webhook", (req, res) => {
-  console.log("📥 WEBHOOK POST RECEIVED ON /telegram-webhook");
+// IMPORTANT: Webhook URL set in Telegram must match this route
+app.post("/api/telegram-webhook", (req, res) => {
+  console.log("📥 WEBHOOK POST RECEIVED ON /api/telegram-webhook");
   telegramBotService.processUpdate(req.body);
   res.sendStatus(200);
 });

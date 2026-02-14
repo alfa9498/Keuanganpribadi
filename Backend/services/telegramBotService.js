@@ -147,7 +147,7 @@ const init = () => {
   }
 
   if (webhookHost && process.env.VERCEL === "1") {
-    const webhookUrl = `${webhookHost}/telegram-webhook`;
+    const webhookUrl = `${webhookHost}/api/telegram-webhook`;
     console.log(`🤖 Setting/Ensuring Webhook: ${webhookUrl}`);
 
     // Delete any existing webhook first to avoid conflicts
