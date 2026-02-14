@@ -188,12 +188,13 @@ const GoalCard = ({ goal, onTopUp, onEdit, onDelete }) => {
 // --- Kakeibo Components ---
 
 const KakeiboSummaryCard = ({
-  income,
+  incomeSources,
+  totalIncome,
   fixedExpenses,
   savings,
-  onIncomeChange,
+  onEditIncome,
 }) => {
-  const pocketMoney = income - fixedExpenses - savings;
+  const pocketMoney = totalIncome - fixedExpenses - savings;
   const isNegative = pocketMoney < 0;
 
   return (
@@ -206,20 +207,42 @@ const KakeiboSummaryCard = ({
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-          {/* Income Input */}
-          <div>
+          {/* Income Breakdown List */}
+          <div className="space-y-2">
             <label className="block text-slate-400 text-[10px] uppercase font-bold mb-1">
-              Income
+              Income Sources (Total: Rp{" "}
+              {new Intl.NumberFormat("id-ID").format(totalIncome)})
             </label>
-            <div className="flex items-center gap-2 border-b border-slate-200 hover:border-slate-800 transition-colors pb-1">
-              <span className="text-slate-500 font-sans">Rp</span>
-              <input
-                type="number"
-                value={income}
-                onChange={(e) => onIncomeChange(e.target.value)}
-                className="w-full bg-transparent focus:outline-none font-bold text-slate-800"
-                placeholder="0"
-              />
+            <div className="space-y-1 max-h-32 overflow-y-auto pr-2">
+              {incomeSources.length > 0 ? (
+                incomeSources.map((source) => (
+                  <div
+                    key={source.categoryId}
+                    className="flex justify-between items-center group/income pb-1 border-b border-slate-50"
+                  >
+                    <span className="text-slate-600 truncate">
+                      {source.categoryName}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-800">
+                        {new Intl.NumberFormat("id-ID").format(
+                          source.budgetLimit,
+                        )}
+                      </span>
+                      <button
+                        onClick={() => onEditIncome(source)}
+                        className="p-1 text-slate-300 hover:text-slate-800 opacity-0 group-hover/income:opacity-100 transition-opacity"
+                      >
+                        <Edit2 size={12} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-[10px] text-slate-400 italic">
+                  Belum ada kategori pemasukan dengan target.
+                </p>
+              )}
             </div>
           </div>
 
@@ -327,10 +350,8 @@ const EnvelopeGroup = ({
 export const PlanningOrganism = () => {
   const [activeTab, setActiveTab] = useState("kakeibo");
   const [budgets, setBudgets] = useState([]);
+  const [incomeSources, setIncomeSources] = useState([]); // New state for income breakdown
   const [goals, setGoals] = useState([]);
-  const [income, setIncome] = useState(
-    localStorage.getItem("kakeibo_income") || 0,
-  );
 
   // Modals
   const [isBudgetModalOpen, setBudgetModalOpen] = useState(false);
@@ -344,15 +365,18 @@ export const PlanningOrganism = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [budgetsRes, goalsRes] = await Promise.all([
-        fetch(`${API_URL}/budgets`, { credentials: "include" }),
+      const [budgetsRes, incomeRes, goalsRes] = await Promise.all([
+        fetch(`${API_URL}/budgets?type=expense`, { credentials: "include" }),
+        fetch(`${API_URL}/budgets?type=income`, { credentials: "include" }),
         fetch(`${API_URL}/goals`, { credentials: "include" }),
       ]);
 
       const budgetsJson = await budgetsRes.json();
+      const incomeJson = await incomeRes.json();
       const goalsJson = await goalsRes.json();
 
       if (budgetsJson.status === "success") setBudgets(budgetsJson.data);
+      if (incomeJson.status === "success") setIncomeSources(incomeJson.data);
       if (goalsJson.status === "success") setGoals(goalsJson.data);
     } catch (err) {
       console.error(err);
@@ -365,12 +389,12 @@ export const PlanningOrganism = () => {
     fetchData();
   }, []);
 
-  // Persist income
-  useEffect(() => {
-    localStorage.setItem("kakeibo_income", income);
-  }, [income]);
-
   // Derived Calculations
+  const totalIncome =
+    incomeSources.length > 0
+      ? incomeSources.reduce((sum, item) => sum + (item.budgetLimit || 0), 0)
+      : 0;
+
   const groupedBudgets = {
     survival: budgets.filter(
       (b) =>
@@ -440,10 +464,14 @@ export const PlanningOrganism = () => {
   return (
     <div className="space-y-6 pb-20">
       <KakeiboSummaryCard
-        income={income}
+        incomeSources={incomeSources}
+        totalIncome={totalIncome}
         fixedExpenses={fixedExpenses}
         savings={savingsTarget}
-        onIncomeChange={setIncome}
+        onEditIncome={(source) => {
+          setSelectedItem(source);
+          setBudgetModalOpen(true);
+        }}
       />
 
       {/* Removed redundant slider, now using Goals Monthly Target */}

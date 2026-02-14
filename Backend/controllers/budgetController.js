@@ -6,14 +6,15 @@ exports.getBudgets = async (req, res) => {
   try {
     const userId = req.user.id;
     const month = req.query.month || new Date().toISOString().slice(0, 7); // YYYY-MM
+    const type = req.query.type || "expense"; // Default to expense
 
-    // 1. Get all expense categories with their group name
+    // 1. Get all categories of the specified type with their group name
     const [categories] = await db.promise().query(
       `SELECT c.id, c.name, cg.name as group_name 
        FROM categories c
        LEFT JOIN category_groups cg ON c.group_id = cg.id
-       WHERE c.user_id = ? AND c.type = 'expense'`,
-      [userId],
+       WHERE c.user_id = ? AND c.type = ?`,
+      [userId, type],
     );
 
     // 2. Get budgets for this month
@@ -24,24 +25,24 @@ exports.getBudgets = async (req, res) => {
         [userId, month],
       );
 
-    // 3. Get actual spending for this month grouped by category
-    const [spending] = await db.promise().query(
+    // 3. Get actual amounts for this month grouped by category
+    const [actuals] = await db.promise().query(
       `
-            SELECT category, SUM(amount) as total_spent 
+            SELECT category, SUM(amount) as total 
             FROM transactions 
             WHERE user_id = ? 
-            AND type = 'expense' 
+            AND type = ? 
             AND DATE_FORMAT(date, '%Y-%m') = ?
             GROUP BY category
         `,
-      [userId, month],
+      [userId, type, month],
     );
     // 4. Merge data
     const budgetMap = new Map(
       budgets.map((b) => [b.category_id, parseFloat(b.amount)]),
     );
-    const spendingMap = new Map(
-      spending.map((s) => [s.category, parseFloat(s.total_spent)]),
+    const actualMap = new Map(
+      actuals.map((s) => [s.category, parseFloat(s.total)]),
     );
 
     const result = categories.map((cat) => ({
@@ -49,12 +50,10 @@ exports.getBudgets = async (req, res) => {
       categoryName: cat.name,
       groupName: cat.group_name || "Uncategorized",
       budgetLimit: budgetMap.get(cat.id) || 0,
-      currentSpent: spendingMap.get(cat.name) || 0, // Matching by name is risky if names change, but schema uses name in transactions. ideally transactions should use category_id.
-      // Note: In this system transactions store category NAME, but budgets store ID.
-      // We need to match properly.
+      currentSpent: actualMap.get(cat.name) || 0, // In transactions it's stored as name
     }));
 
-    res.json({ status: "success", data: result, month });
+    res.json({ status: "success", data: result, month, type });
   } catch (error) {
     console.error("Get Budgets Error:", error);
     res.status(500).json({ status: "error", message: error.message });
