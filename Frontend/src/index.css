@@ -4,7 +4,11 @@
 
 @layer base {
   body {
-    @apply bg-finance-background text-finance-primary antialiased font-inter;
+    @apply bg-finance-background text-finance-primary antialiased font-inter transition-colors duration-300;
+  }
+
+  body.dark {
+    @apply bg-slate-900 text-slate-100;
   }
 }
 

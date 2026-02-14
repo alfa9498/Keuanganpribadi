@@ -51,7 +51,7 @@ export const DoubleLanyardSlider = ({
           </div>
         ))}
         {accounts.length === 0 && (
-          <div className="text-slate-500 italic text-sm py-10 w-full text-center">
+          <div className="text-slate-500 dark:text-slate-400 italic text-sm py-10 w-full text-center">
             No accounts to display.
           </div>
         )}

@@ -104,14 +104,34 @@ export const ReportCashFlowChart = ({ transactions }) => {
         barAriaLabel={(e) => `${e.id}: ${e.formattedValue} on ${e.indexValue}`}
         theme={{
           axis: {
-            domain: { line: { stroke: "#e2e8f0" } },
+            domain: {
+              line: {
+                stroke: window.document.documentElement.classList.contains(
+                  "dark",
+                )
+                  ? "#1e293b"
+                  : "#e2e8f0",
+              },
+            },
             ticks: { text: { fill: "#64748b", fontSize: 10 } },
           },
-          grid: { line: { stroke: "#f1f5f9" } },
+          grid: {
+            line: {
+              stroke: window.document.documentElement.classList.contains("dark")
+                ? "#1e293b"
+                : "#f1f5f9",
+            },
+          },
           tooltip: {
             container: {
-              background: "#ffffff",
-              color: "#334155",
+              background: window.document.documentElement.classList.contains(
+                "dark",
+              )
+                ? "#1e293b"
+                : "#ffffff",
+              color: window.document.documentElement.classList.contains("dark")
+                ? "#cbd5e1"
+                : "#334155",
               fontSize: 12,
               borderRadius: "8px",
               boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",

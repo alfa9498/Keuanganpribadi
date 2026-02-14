@@ -691,24 +691,24 @@ export const DashboardOrganism = ({
 
       <BentoGrid>
         {/* 5. Main Trend Chart (Big) */}
-        <BentoCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-slate-900 !p-0 border border-slate-800 overflow-hidden relative">
+        <BentoCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-slate-100 dark:bg-slate-900 !p-0 border border-slate-200 dark:border-slate-800 overflow-hidden relative">
           <div className="p-6 relative z-10">
             <div className="flex flex-wrap justify-between items-end mb-4 gap-2">
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
                   Tren Keuangan
                 </h3>
-                <p className="text-slate-400 text-sm">
+                <p className="text-slate-500 dark:text-slate-400 text-sm">
                   Alur Pemasukan vs Pengeluaran
                 </p>
               </div>
-              <div className="flex gap-4 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700/50 backdrop-blur-sm">
-                <span className="flex items-center text-xs font-medium text-emerald-400">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 mr-2 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
+              <div className="flex gap-4 bg-white dark:bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm">
+                <span className="flex items-center text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 mr-2 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
                   Masuk
                 </span>
-                <span className="flex items-center text-xs font-medium text-rose-400">
-                  <span className="w-2 h-2 rounded-full bg-rose-400 mr-2 shadow-[0_0_8px_rgba(244,63,94,0.5)]"></span>
+                <span className="flex items-center text-xs font-medium text-rose-600 dark:text-rose-400">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 dark:bg-rose-400 mr-2 shadow-[0_0_8px_rgba(244,63,94,0.5)]"></span>
                   Keluar
                 </span>
               </div>
@@ -772,7 +772,7 @@ export const DashboardOrganism = ({
         {/* 7. Top Expenses Pie */}
         <BentoCard className="col-span-1 md:col-span-1 row-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-6 flex flex-col justify-between relative overflow-hidden">
           <div>
-            <h3 className="text-lg font-semibold text-white mb-1">
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-1">
               Top Pengeluaran
             </h3>
             <p className="text-slate-500 dark:text-slate-400 text-xs">
@@ -785,12 +785,12 @@ export const DashboardOrganism = ({
         </BentoCard>
 
         {/* 8. Expenses by Main Category (Bar) */}
-        <BentoCard className="col-span-1 md:col-span-2 bg-slate-900 border border-slate-800 !p-6">
+        <BentoCard className="col-span-1 md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-6">
           <div className="mb-4">
-            <h3 className="text-lg font-semibold text-white mb-1">
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-1">
               Kategori Utama
             </h3>
-            <p className="text-slate-400 text-xs">
+            <p className="text-slate-500 dark:text-slate-400 text-xs">
               Ranking pengeluaran berdasarkan grup
             </p>
           </div>
@@ -798,16 +798,18 @@ export const DashboardOrganism = ({
             {barDataMain.slice(0, 5).map((item, idx) => (
               <div key={idx} className="group">
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300 font-bold">{item.name}</span>
-                  <span className="text-white font-black">
+                  <span className="text-slate-600 dark:text-slate-300 font-bold">
+                    {item.name}
+                  </span>
+                  <span className="text-slate-800 dark:text-white font-black">
                     {formatCurrency(item.value)}
                   </span>
                 </div>
-                <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-colors hover:opacity-80"
                     style={{
-                      width: `${(item.value / summary.expense) * 100}%`,
+                      width: `${(item.value / (summary.expense || 1)) * 100}%`,
                       backgroundColor: COLORS[idx % COLORS.length],
                     }}
                   />
@@ -823,12 +825,12 @@ export const DashboardOrganism = ({
         </BentoCard>
 
         {/* 9. Top Sub-Categories (Bar) */}
-        <BentoCard className="col-span-1 md:col-span-2 bg-slate-900 border border-slate-800 !p-6">
+        <BentoCard className="col-span-1 md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-6">
           <div className="mb-4">
-            <h3 className="text-lg font-semibold text-white mb-1">
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-1">
               Sub-Kategori Teratas
             </h3>
-            <p className="text-slate-400 text-xs">
+            <p className="text-slate-500 dark:text-slate-400 text-xs">
               Detail spesifik pos pengeluaran
             </p>
           </div>
@@ -836,16 +838,18 @@ export const DashboardOrganism = ({
             {barDataSub.slice(0, 5).map((item, idx) => (
               <div key={idx} className="group">
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300 font-bold">{item.name}</span>
-                  <span className="text-white font-black">
+                  <span className="text-slate-600 dark:text-slate-300 font-bold">
+                    {item.name}
+                  </span>
+                  <span className="text-slate-800 dark:text-white font-black">
                     {formatCurrency(item.value)}
                   </span>
                 </div>
-                <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-colors hover:opacity-80"
                     style={{
-                      width: `${(item.value / summary.expense) * 100}%`,
+                      width: `${(item.value / (summary.expense || 1)) * 100}%`,
                       backgroundColor: COLORS[(idx + 2) % COLORS.length],
                     }}
                   />

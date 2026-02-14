@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+ import React, { useRef, useEffect } from "react";
 import { LanyardCard } from "../molecules/LanyardCard";
 
 export const LanyardSlider = ({ items, className = "" }) => {

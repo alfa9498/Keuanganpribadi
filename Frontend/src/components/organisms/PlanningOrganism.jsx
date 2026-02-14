@@ -31,13 +31,13 @@ const BudgetCard = ({ category, onEdit, onDelete }) => {
   else if (isNearLimit) barColor = "bg-amber-500";
 
   return (
-    <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group relative">
+    <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group relative">
       <div className="flex justify-between items-start mb-1.5">
         <div>
-          <h4 className="font-bold text-sm text-slate-800">
+          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100">
             {category.categoryName}
           </h4>
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[10px] text-slate-500 dark:text-slate-400">
             Limit:{" "}
             {new Intl.NumberFormat("id-ID", {
               style: "currency",
@@ -62,7 +62,7 @@ const BudgetCard = ({ category, onEdit, onDelete }) => {
         </div>
       </div>
 
-      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-1.5">
+      <div className="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden mb-1.5">
         <div
           className={`h-full ${barColor} transition-all duration-500`}
           style={{ width: `${percent}%` }}
@@ -70,14 +70,22 @@ const BudgetCard = ({ category, onEdit, onDelete }) => {
       </div>
 
       <div className="flex justify-between items-center text-[10px] font-semibold">
-        <span className={isOverBudget ? "text-rose-600" : "text-slate-600"}>
+        <span
+          className={
+            isOverBudget
+              ? "text-rose-600 dark:text-rose-400"
+              : "text-slate-600 dark:text-slate-300"
+          }
+        >
           {new Intl.NumberFormat("id-ID", {
             style: "currency",
             currency: "IDR",
             maximumFractionDigits: 0,
           }).format(category.currentSpent)}
         </span>
-        <span className="text-slate-400">{percent.toFixed(0)}%</span>
+        <span className="text-slate-400 dark:text-slate-500">
+          {percent.toFixed(0)}%
+        </span>
       </div>
     </div>
   );
@@ -92,7 +100,7 @@ const GoalCard = ({ goal, onTopUp, onEdit, onDelete }) => {
 
   return (
     <div
-      className={`bg-white p-5 rounded-3xl border border-slate-100 shadow-md relative overflow-hidden group`}
+      className={`bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-md relative overflow-hidden group`}
     >
       {/* Color accent */}
       <div
@@ -101,12 +109,16 @@ const GoalCard = ({ goal, onTopUp, onEdit, onDelete }) => {
 
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-xl bg-slate-50 text-slate-600`}>
+          <div
+            className={`p-2 rounded-xl bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300`}
+          >
             <Target size={20} />
           </div>
           <div>
-            <h4 className="font-bold text-slate-800">{goal.name}</h4>
-            <p className="text-xs text-slate-500">
+            <h4 className="font-bold text-slate-800 dark:text-slate-100">
+              {goal.name}
+            </h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Target:{" "}
               {new Intl.NumberFormat("id-ID", {
                 style: "currency",
@@ -132,7 +144,7 @@ const GoalCard = ({ goal, onTopUp, onEdit, onDelete }) => {
       </div>
 
       <div className="mb-4">
-        <div className="flex justify-between text-sm font-bold text-slate-700 mb-1">
+        <div className="flex justify-between text-sm font-bold text-slate-700 dark:text-slate-200 mb-1">
           <span>
             {new Intl.NumberFormat("id-ID", {
               style: "currency",
@@ -142,16 +154,16 @@ const GoalCard = ({ goal, onTopUp, onEdit, onDelete }) => {
           <span>{percent.toFixed(0)}%</span>
         </div>
 
-        <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+        <div className="w-full bg-slate-100 dark:bg-slate-700 h-3 rounded-full overflow-hidden">
           <div
             className={`h-full ${percent >= 100 ? "bg-emerald-500" : "bg-blue-500"} transition-all duration-1000`}
             style={{ width: `${percent}%` }}
           />
         </div>
         <div className="flex justify-between items-end mt-1">
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[10px] text-slate-400 dark:text-slate-500">
             Target Nabung:{" "}
-            <span className="font-bold text-slate-600">
+            <span className="font-bold text-slate-600 dark:text-slate-300">
               {new Intl.NumberFormat("id-ID", {
                 style: "currency",
                 currency: "IDR",
@@ -198,18 +210,18 @@ const KakeiboSummaryCard = ({
   const isNegative = pocketMoney < 0;
 
   return (
-    <div className="bg-white border-l-4 border-slate-800 p-4 rounded-r-xl shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-start md:items-center">
+    <div className="bg-white dark:bg-slate-800 border-l-4 border-slate-800 dark:border-slate-500 p-4 rounded-r-xl shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-start md:items-center">
       <div className="text-3xl">📔</div>
 
-      <div className="flex-1 w-full text-slate-800">
-        <h3 className="text-lg font-bold mb-3 flex items-center gap-2 border-b border-slate-100 pb-1">
+      <div className="flex-1 w-full text-slate-800 dark:text-slate-100">
+        <h3 className="text-lg font-bold mb-3 flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-1">
           Monthly Ledger
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
           {/* Income Breakdown List */}
           <div className="space-y-2">
-            <label className="block text-slate-400 text-[10px] uppercase font-bold mb-1">
+            <label className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold mb-1">
               Income Sources (Total: Rp{" "}
               {new Intl.NumberFormat("id-ID").format(totalIncome)})
             </label>
@@ -218,13 +230,13 @@ const KakeiboSummaryCard = ({
                 incomeSources.map((source) => (
                   <div
                     key={source.categoryId}
-                    className="flex justify-between items-center group/income pb-1 border-b border-slate-50"
+                    className="flex justify-between items-center group/income pb-1 border-b border-slate-50 dark:border-slate-700/50"
                   >
-                    <span className="text-slate-600 truncate">
+                    <span className="text-slate-600 dark:text-slate-300 truncate">
                       {source.categoryName}
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-800">
+                      <span className="font-bold text-slate-800 dark:text-slate-100">
                         {new Intl.NumberFormat("id-ID").format(
                           source.budgetLimit,
                         )}
@@ -247,7 +259,7 @@ const KakeiboSummaryCard = ({
           </div>
 
           {/* Calculations */}
-          <div className="space-y-1 text-slate-500 border-l border-slate-100 pl-4 md:border-none md:pl-0">
+          <div className="space-y-1 text-slate-500 dark:text-slate-400 border-l border-slate-100 dark:border-slate-700 pl-4 md:border-none md:pl-0">
             <div className="flex justify-between">
               <span>Fixed:</span>
               <span className="font-bold text-rose-500">
@@ -263,7 +275,7 @@ const KakeiboSummaryCard = ({
           </div>
 
           {/* Result */}
-          <div className="bg-slate-50 p-2 rounded-lg border border-slate-200 text-center">
+          <div className="bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-center">
             <label className="text-[10px] text-slate-400 uppercase font-bold">
               Pocket Money
             </label>
@@ -299,16 +311,18 @@ const EnvelopeGroup = ({
   const percent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
   return (
-    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
         <div>
           <h3 className={`text-lg font-bold ${color} flex items-center gap-2`}>
             {title}
           </h3>
-          <p className="text-xs text-slate-500">{description}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {description}
+          </p>
         </div>
-        <div className="text-right bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-100">
-          <p className="text-[10px] text-slate-400 font-bold uppercase">
+        <div className="text-right bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">
             Sisa Amplop
           </p>
           <p
@@ -324,9 +338,9 @@ const EnvelopeGroup = ({
       </div>
 
       {/* Progress Bar for Group */}
-      <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mb-4">
+      <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden mb-4">
         <div
-          className={`h-full transition-all duration-500 ${percent > 100 ? "bg-rose-500" : "bg-slate-400"}`}
+          className={`h-full transition-all duration-500 ${percent > 100 ? "bg-rose-500" : "bg-slate-400 dark:bg-slate-500"}`}
           style={{ width: `${Math.min(percent, 100)}%` }}
         />
       </div>
@@ -474,91 +488,117 @@ export const PlanningOrganism = () => {
         }}
       />
 
-      {/* Removed redundant slider, now using Goals Monthly Target */}
-
-      <div className="space-y-8">
-        <EnvelopeGroup
-          title="Survival (Kebutuhan)"
-          description="Pengeluaran wajib untuk bertahan hidup (Makan, Transport, Tagihan)."
-          color="text-rose-500"
-          items={groupedBudgets.survival}
-          onEdit={(item) => {
-            setSelectedItem(item);
-            setBudgetModalOpen(true);
-          }}
-          onDelete={handleDeleteBudget}
-        />
-
-        <EnvelopeGroup
-          title="Optional (Keinginan)"
-          description="Belanja, Hiburan, dan kesenangan lainnya."
-          color="text-amber-500"
-          items={groupedBudgets.optional}
-          onEdit={(item) => {
-            setSelectedItem(item);
-            setBudgetModalOpen(true);
-          }}
-          onDelete={handleDeleteBudget}
-        />
-
-        <EnvelopeGroup
-          title="Culture (Kultur)"
-          description="Pendidikan, Buku, Kursus, dan pengembangan diri."
-          color="text-blue-500"
-          items={groupedBudgets.culture}
-          onEdit={(item) => {
-            setSelectedItem(item);
-            setBudgetModalOpen(true);
-          }}
-          onDelete={handleDeleteBudget}
-        />
-
-        <EnvelopeGroup
-          title="Extra (Tak Terduga)"
-          description="Pengeluaran dadakan, hadiah, atau perbaikan."
-          color="text-purple-500"
-          items={groupedBudgets.extra}
-          onEdit={(item) => {
-            setSelectedItem(item);
-            setBudgetModalOpen(true);
-          }}
-          onDelete={handleDeleteBudget}
-        />
+      {/* Tabs */}
+      <div className="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl w-fit">
+        <button
+          onClick={() => setActiveTab("kakeibo")}
+          className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+            activeTab === "kakeibo"
+              ? "bg-white dark:bg-slate-700 text-finance-primary dark:text-white shadow-sm"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
+          }`}
+        >
+          Kakeibo Plan
+        </button>
+        <button
+          onClick={() => setActiveTab("goals")}
+          className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+            activeTab === "goals"
+              ? "bg-white dark:bg-slate-700 text-finance-primary dark:text-white shadow-sm"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
+          }`}
+        >
+          Goals Progress
+        </button>
       </div>
+
+      {activeTab === "kakeibo" && (
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <EnvelopeGroup
+            title="Survival (Kebutuhan)"
+            description="Pengeluaran wajib untuk bertahan hidup (Makan, Transport, Tagihan)."
+            color="text-rose-500"
+            items={groupedBudgets.survival}
+            onEdit={(item) => {
+              setSelectedItem(item);
+              setBudgetModalOpen(true);
+            }}
+            onDelete={handleDeleteBudget}
+          />
+
+          <EnvelopeGroup
+            title="Optional (Keinginan)"
+            description="Belanja, Hiburan, dan kesenangan lainnya."
+            color="text-amber-500"
+            items={groupedBudgets.optional}
+            onEdit={(item) => {
+              setSelectedItem(item);
+              setBudgetModalOpen(true);
+            }}
+            onDelete={handleDeleteBudget}
+          />
+
+          <EnvelopeGroup
+            title="Culture (Kultur)"
+            description="Pendidikan, Buku, Kursus, dan pengembangan diri."
+            color="text-blue-500"
+            items={groupedBudgets.culture}
+            onEdit={(item) => {
+              setSelectedItem(item);
+              setBudgetModalOpen(true);
+            }}
+            onDelete={handleDeleteBudget}
+          />
+
+          <EnvelopeGroup
+            title="Extra (Tak Terduga)"
+            description="Pengeluaran dadakan, hadiah, atau perbaikan."
+            color="text-purple-500"
+            items={groupedBudgets.extra}
+            onEdit={(item) => {
+              setSelectedItem(item);
+              setBudgetModalOpen(true);
+            }}
+            onDelete={handleDeleteBudget}
+          />
+        </div>
+      )}
 
       {/* Savings Goals Section */}
-      <div className="mt-12">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <Target className="text-blue-500" /> Goals Progress
-          </h3>
-          <Button
-            onClick={() => {
-              setSelectedItem(null);
-              setGoalModalOpen(true);
-            }}
-          >
-            <Plus size={18} className="mr-1" /> Tambah Goal
-          </Button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {goals.map((g) => (
-            <GoalCard
-              key={g.id}
-              goal={g}
-              onTopUp={(item) => {
-                setSelectedItem(item);
-                setFundsModalOpen(true);
-              }}
-              onEdit={(item) => {
-                setSelectedItem(item);
+      {activeTab === "goals" && (
+        <div className="mt-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <Target className="text-blue-500" /> Goals Progress
+            </h3>
+            <Button
+              onClick={() => {
+                setSelectedItem(null);
                 setGoalModalOpen(true);
               }}
-              onDelete={handleDeleteGoal}
-            />
-          ))}
+            >
+              <Plus size={18} className="mr-1" /> Tambah Goal
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {goals.map((g) => (
+              <GoalCard
+                key={g.id}
+                goal={g}
+                onTopUp={(item) => {
+                  setSelectedItem(item);
+                  setFundsModalOpen(true);
+                }}
+                onEdit={(item) => {
+                  setSelectedItem(item);
+                  setGoalModalOpen(true);
+                }}
+                onDelete={handleDeleteGoal}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Modals */}
       <Modal
@@ -641,14 +681,14 @@ const BudgetForm = ({ category, onSuccess }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
           Batas Anggaran Bulanan
         </label>
         <input
           type="number"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="w-full p-2 border border-slate-300 rounded-lg"
+          className="w-full p-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white focus:ring-2 focus:ring-finance-primary/20 outline-none"
           autoFocus
         />
       </div>
@@ -708,41 +748,41 @@ const GoalForm = ({ goal, onSuccess }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
           Nama Tujuan
         </label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full p-2 border border-slate-300 rounded-lg"
+          className="w-full p-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white focus:ring-2 focus:ring-finance-primary/20 outline-none"
           placeholder="Contoh: Beli Laptop Baru"
           required
         />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Total Target (Rp)
           </label>
           <input
             type="number"
             value={target}
             onChange={(e) => setTarget(e.target.value)}
-            className="w-full p-2 border border-slate-300 rounded-lg"
+            className="w-full p-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white focus:ring-2 focus:ring-finance-primary/20 outline-none"
             placeholder="0"
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Nabung per Bulan
           </label>
           <input
             type="number"
             value={monthlyTarget}
             onChange={(e) => setMonthlyTarget(e.target.value)}
-            className="w-full p-2 border border-slate-300 rounded-lg"
+            className="w-full p-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white focus:ring-2 focus:ring-finance-primary/20 outline-none"
             placeholder="0"
           />
           <p className="text-[10px] text-slate-400 mt-1">
@@ -793,31 +833,31 @@ const FundsForm = ({ goal, onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex gap-2 mb-4 bg-slate-100 p-1 rounded-lg">
+      <div className="flex gap-2 mb-4 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
         <button
           type="button"
           onClick={() => setType("deposit")}
-          className={`flex-1 py-1.5 px-3 rounded-md text-sm font-bold ${type === "deposit" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500"}`}
+          className={`flex-1 py-1.5 px-3 rounded-md text-sm font-bold transition-all ${type === "deposit" ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"}`}
         >
           + Nabung
         </button>
         <button
           type="button"
           onClick={() => setType("withdraw")}
-          className={`flex-1 py-1.5 px-3 rounded-md text-sm font-bold ${type === "withdraw" ? "bg-white text-rose-600 shadow-sm" : "text-slate-500"}`}
+          className={`flex-1 py-1.5 px-3 rounded-md text-sm font-bold transition-all ${type === "withdraw" ? "bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"}`}
         >
           - Tarik
         </button>
       </div>
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
           Nominal (Rp)
         </label>
         <input
           type="number"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="w-full p-2 border border-slate-300 rounded-lg"
+          className="w-full p-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white focus:ring-2 focus:ring-finance-primary/20 outline-none"
           placeholder="0"
           autoFocus
           required

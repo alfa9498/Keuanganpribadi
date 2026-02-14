@@ -448,7 +448,7 @@ export const ReportDashboardOrganism = ({ user }) => {
 
   if (loading && allTransactions.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-slate-500">
+      <div className="flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
         <RefreshCw className="animate-spin mb-4" size={32} />
         <p>Memuat data keuangan...</p>
       </div>
@@ -456,17 +456,20 @@ export const ReportDashboardOrganism = ({ user }) => {
   }
 
   return (
-    <div className="w-full max-w-[1600px] p-4 space-y-6 animate-fade-in font-inter text-slate-800">
+    <div className="w-full max-w-[1600px] p-4 space-y-6 animate-fade-in font-inter text-slate-800 dark:text-slate-200">
       {/* Header & Filters */}
       {/* Header & Filters Section */}
-      <div className="flex flex-col gap-6 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm transition-all hover:shadow-md">
+      <div className="flex flex-col gap-6 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="space-y-1">
-            <h2 className="text-3xl font-black text-slate-800 tracking-tight">
+            <h2 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">
               Financial Report
             </h2>
-            <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
-              <FileText size={16} className="text-slate-400" />
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 flex items-center gap-2">
+              <FileText
+                size={16}
+                className="text-slate-400 dark:text-slate-500"
+              />
               View and download your financial statements
             </p>
           </div>
@@ -474,14 +477,14 @@ export const ReportDashboardOrganism = ({ user }) => {
           <div className="flex gap-3 w-full lg:w-auto">
             <button
               onClick={exportToPDF}
-              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-900 text-white hover:bg-black rounded-2xl transition-all shadow-xl shadow-slate-900/10 text-sm font-black active:scale-95"
+              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-900 dark:bg-blue-600 text-white hover:bg-black dark:hover:bg-blue-500 rounded-2xl transition-all shadow-xl shadow-slate-900/10 dark:shadow-blue-900/20 text-sm font-black active:scale-95"
             >
               <Download size={18} />
               <span>EXPORT PDF</span>
             </button>
             <button
               onClick={fetchTransactions}
-              className="p-3.5 bg-slate-50 text-slate-600 hover:bg-slate-100 rounded-2xl border border-slate-100 transition-all active:scale-95"
+              className="p-3.5 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all active:scale-95"
               title="Refresh Data"
             >
               <RefreshCw size={18} />
@@ -490,7 +493,7 @@ export const ReportDashboardOrganism = ({ user }) => {
         </div>
 
         {/* Cohesive Filter Bar */}
-        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 pt-6 border-t border-slate-50">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 pt-6 border-t border-slate-50 dark:border-slate-800">
           <div className="w-full sm:w-auto">
             <AccountFilter
               currentAccount={filterAccount}
@@ -519,7 +522,7 @@ export const ReportDashboardOrganism = ({ user }) => {
                 setFilterAccount("");
                 setFilterRange("ALL");
               }}
-              className="text-[11px] font-black text-rose-500 hover:text-rose-600 bg-rose-50 px-4 py-2 rounded-full transition-all uppercase tracking-widest"
+              className="text-[11px] font-black text-rose-500 hover:text-rose-600 bg-rose-50 dark:bg-rose-900/20 px-4 py-2 rounded-full transition-all uppercase tracking-widest"
             >
               Reset Filters
             </button>
@@ -530,9 +533,9 @@ export const ReportDashboardOrganism = ({ user }) => {
       {/* Summary Cards - Grid on Desktop, Slider/Swap on Mobile */}
       <div className="relative">
         <div className="hidden md:grid grid-cols-3 gap-6">
-          <div className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300">
+          <div className="group bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300">
             <div className="flex justify-between items-start mb-4">
-              <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+              <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
                 <TrendingUp size={28} />
               </div>
               <Badge
@@ -542,17 +545,17 @@ export const ReportDashboardOrganism = ({ user }) => {
                 INCOME
               </Badge>
             </div>
-            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+            <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">
               Total Pemasukan
             </p>
-            <p className="text-3xl font-black text-emerald-600 tabular-nums">
+            <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
               {formatCurrency(summary.income)}
             </p>
           </div>
 
-          <div className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-rose-500/5 transition-all duration-300">
+          <div className="group bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-rose-500/5 transition-all duration-300">
             <div className="flex justify-between items-start mb-4">
-              <div className="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+              <div className="w-14 h-14 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
                 <TrendingDown size={28} />
               </div>
               <Badge
@@ -562,17 +565,17 @@ export const ReportDashboardOrganism = ({ user }) => {
                 EXPENSE
               </Badge>
             </div>
-            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+            <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">
               Total Pengeluaran
             </p>
-            <p className="text-3xl font-black text-rose-600 tabular-nums">
+            <p className="text-3xl font-black text-rose-600 dark:text-rose-400 tabular-nums">
               {formatCurrency(summary.expense)}
             </p>
           </div>
 
-          <div className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300">
+          <div className="group bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300">
             <div className="flex justify-between items-start mb-4">
-              <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+              <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
                 <Wallet size={28} />
               </div>
               <Badge
@@ -582,10 +585,10 @@ export const ReportDashboardOrganism = ({ user }) => {
                 NET BALANCE
               </Badge>
             </div>
-            <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">
+            <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">
               Saldo Bersih
             </p>
-            <p className="text-3xl font-black text-blue-600 tabular-nums">
+            <p className="text-3xl font-black text-blue-600 dark:text-blue-400 tabular-nums">
               {formatCurrency(summary.balance)}
             </p>
           </div>
@@ -593,48 +596,48 @@ export const ReportDashboardOrganism = ({ user }) => {
 
         {/* Mobile View Summary Cards - Vertical Stack (Monarch Style) */}
         <div className="md:hidden flex flex-col gap-4">
-          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center">
                 <TrendingUp size={24} />
               </div>
               <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5">
                   Income
                 </p>
-                <p className="text-xl font-black text-emerald-600 tabular-nums">
+                <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
                   {formatCurrency(summary.income)}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center">
                 <TrendingDown size={24} />
               </div>
               <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5">
                   Expense
                 </p>
-                <p className="text-xl font-black text-rose-600 tabular-nums">
+                <p className="text-xl font-black text-rose-600 dark:text-rose-400 tabular-nums">
                   {formatCurrency(summary.expense)}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center">
                 <Wallet size={24} />
               </div>
               <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5">
                   Net Balance
                 </p>
-                <p className="text-xl font-black text-blue-600 tabular-nums">
+                <p className="text-xl font-black text-blue-600 dark:text-blue-400 tabular-nums">
                   {formatCurrency(summary.balance)}
                 </p>
               </div>
@@ -645,13 +648,13 @@ export const ReportDashboardOrganism = ({ user }) => {
 
       {/* REPORT VISUALIZATION TABS */}
       <div className="mt-8">
-        <div className="flex p-1.5 bg-slate-200/50 rounded-2xl w-full md:w-fit mb-6 border border-slate-200 shadow-sm mx-auto md:mx-0">
+        <div className="flex p-1.5 bg-slate-200/50 dark:bg-slate-800/50 rounded-2xl w-full md:w-fit mb-6 border border-slate-200 dark:border-slate-800 shadow-sm mx-auto md:mx-0">
           <button
             onClick={() => setReportTab("cashflow")}
             className={`flex-1 md:flex-none px-4 md:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
               reportTab === "cashflow"
-                ? "bg-slate-900 text-white shadow-md"
-                : "text-slate-500 hover:text-slate-700"
+                ? "bg-slate-900 dark:bg-blue-600 text-white shadow-md"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             }`}
           >
             Cash Flow
@@ -660,8 +663,8 @@ export const ReportDashboardOrganism = ({ user }) => {
             onClick={() => setReportTab("spending")}
             className={`flex-1 md:flex-none px-4 md:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
               reportTab === "spending"
-                ? "bg-slate-900 text-white shadow-md"
-                : "text-slate-500 hover:text-slate-700"
+                ? "bg-slate-900 dark:bg-blue-600 text-white shadow-md"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             }`}
           >
             Spending
@@ -670,8 +673,8 @@ export const ReportDashboardOrganism = ({ user }) => {
             onClick={() => setReportTab("income")}
             className={`flex-1 md:flex-none px-4 md:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
               reportTab === "income"
-                ? "bg-slate-900 text-white shadow-md"
-                : "text-slate-500 hover:text-slate-700"
+                ? "bg-slate-900 dark:bg-blue-600 text-white shadow-md"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             }`}
           >
             Income
@@ -687,10 +690,12 @@ export const ReportDashboardOrganism = ({ user }) => {
               </div>
 
               {/* Mobile Simplified Bar View */}
-              <div className="md:hidden bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-6">
+              <div className="md:hidden bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-slate-800">Cash Flow Trend</h3>
-                  <div className="p-2 bg-slate-50 rounded-xl text-slate-400">
+                  <h3 className="font-bold text-slate-800 dark:text-white">
+                    Cash Flow Trend
+                  </h3>
+                  <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-400">
                     <TrendingUp size={16} />
                   </div>
                 </div>

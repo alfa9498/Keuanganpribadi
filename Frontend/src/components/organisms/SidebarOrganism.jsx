@@ -17,6 +17,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { ThemeToggle } from "../atoms/ThemeToggle";
 
 // Sidebar Item Component
 // Sidebar Item Component
@@ -83,7 +84,7 @@ const SidebarItem = ({
         className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200 group justify-between ${
           isActive && !item.children
             ? "bg-finance-primary text-white scale-105 shadow-lg shadow-finance-primary/20"
-            : "text-slate-400 hover:bg-slate-800 hover:text-white"
+            : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
         } ${isMinimized ? "justify-center px-0" : ""}`}
       >
         <div
@@ -108,12 +109,12 @@ const SidebarItem = ({
           className={
             !isMinimized
               ? "ml-9 mt-1 space-y-1 animate-fade-in-down"
-              : "absolute left-[calc(100%+0.5rem)] top-0 w-48 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-left-2"
+              : "absolute left-[calc(100%+0.5rem)] top-0 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-left-2"
           }
         >
           {/* Header for minimized floating menu */}
           {isMinimized && (
-            <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase border-b border-slate-800 mb-1">
+            <div className="px-4 py-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase border-b border-slate-100 dark:border-slate-800 mb-1">
               {item.label}
             </div>
           )}
@@ -128,9 +129,9 @@ const SidebarItem = ({
               }}
               className={`flex items-center w-full px-4 py-2 rounded-lg text-sm transition-colors duration-200 ${
                 activeTab === child.id
-                  ? "bg-finance-primary/10 text-finance-primary border-l-2 border-finance-primary scale-100 font-medium" // Different style for floating?
-                  : "text-slate-400 hover:text-white hover:bg-slate-800/50"
-              } ${!isMinimized && activeTab === child.id ? "bg-slate-800 text-white border-l-2" : ""}`} // Fallback to original style for expanded
+                  ? "bg-finance-primary/10 text-finance-primary border-l-2 border-finance-primary scale-100 font-medium"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50"
+              } ${!isMinimized && activeTab === child.id ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border-l-2" : ""}`}
             >
               {child.label}
             </button>
@@ -189,29 +190,32 @@ export const SidebarOrganism = ({
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-30 h-screen bg-slate-900 text-white transition-all duration-300 ease-in-out lg:translate-x-0 lg:static ${
+        className={`fixed top-0 left-0 z-30 h-screen transition-all duration-300 ease-in-out lg:translate-x-0 lg:static ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } ${isMinimized ? "w-20" : "w-64"}`}
+        } ${isMinimized ? "w-20" : "w-64"} bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white`}
       >
         {/* Logo */}
         <div
-          className={`flex items-center p-6 border-b border-slate-800 transition-all duration-300 relative ${isMinimized ? "justify-center" : "justify-between"}`}
+          className={`flex items-center p-6 border-b border-slate-200 dark:border-slate-800 transition-all duration-300 relative ${isMinimized ? "justify-center" : "justify-between"}`}
         >
-          {!isMinimized ? (
-            <h1 className="text-2xl font-bold tracking-tight text-white whitespace-nowrap overflow-hidden transition-all duration-300">
-              Finance
-              <span className="text-finance-primary uppercase italic text-xl ml-1">
-                App
-              </span>
-            </h1>
-          ) : (
-            <div className="bg-finance-primary w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-finance-primary/20">
-              <span className="text-white font-black text-xl">F</span>
-            </div>
-          )}
+          <div className="flex items-center gap-3">
+            {!isMinimized ? (
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap overflow-hidden transition-all duration-300">
+                Finance
+                <span className="text-finance-primary uppercase italic text-xl ml-1">
+                  App
+                </span>
+              </h1>
+            ) : (
+              <div className="bg-finance-primary w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-finance-primary/20">
+                <span className="text-white font-black text-xl">F</span>
+              </div>
+            )}
+            {!isMinimized && <ThemeToggle className="ml-2 scale-75" />}
+          </div>
           <button
             onClick={toggleSidebar}
-            className="lg:hidden text-slate-400 hover:text-white"
+            className="lg:hidden text-slate-400 hover:text-slate-900 dark:hover:text-white"
           >
             <Menu size={24} />
           </button>
@@ -253,16 +257,16 @@ export const SidebarOrganism = ({
 
         {/* Bottom Actions */}
         <div
-          className={`absolute bottom-0 left-0 w-full p-4 border-t border-slate-800 transition-all duration-300 ${isMinimized ? "px-2" : ""}`}
+          className={`absolute bottom-0 left-0 w-full p-4 border-t border-slate-200 dark:border-slate-800 transition-all duration-300 ${isMinimized ? "px-2" : ""}`}
         >
           {/* User Profile Section */}
           <div className="relative mb-3" ref={userMenuRef}>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className={`flex items-center w-full px-2 py-2 rounded-lg hover:bg-slate-800 transition-all duration-200 ${isMinimized ? "justify-center" : ""}`}
+              className={`flex items-center w-full px-2 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 ${isMinimized ? "justify-center" : ""}`}
             >
               <span
-                className={`h-9 w-9 rounded-full bg-gradient-to-tr from-slate-700 to-slate-600 flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-slate-700 shadow-inner`}
+                className={`h-9 w-9 rounded-full bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-slate-200 dark:border-slate-700 shadow-inner`}
               >
                 <img
                   src={
@@ -277,16 +281,16 @@ export const SidebarOrganism = ({
               {!isMinimized && (
                 <>
                   <div className="ml-3 flex-1 text-left overflow-hidden">
-                    <p className="text-sm font-bold text-white truncate">
+                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
                       {user?.fullName || "User"}
                     </p>
-                    <p className="text-[10px] text-slate-500 truncate uppercase font-medium">
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate uppercase font-medium">
                       {user?.role || "Personal Account"}
                     </p>
                   </div>
                   <ChevronDown
                     size={14}
-                    className={`text-slate-500 transition-transform ${showUserMenu ? "rotate-180" : ""}`}
+                    className={`text-slate-400 dark:text-slate-500 transition-transform ${showUserMenu ? "rotate-180" : ""}`}
                   />
                 </>
               )}
@@ -294,14 +298,14 @@ export const SidebarOrganism = ({
 
             {/* User Dropdown */}
             {showUserMenu && !isMinimized && (
-              <div className="absolute bottom-full left-0 right-0 mb-2 bg-slate-800 rounded-xl shadow-2xl py-2 border border-slate-700 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                <button className="w-full px-4 py-2.5 text-left text-sm hover:bg-slate-700 flex items-center gap-3 text-slate-300 transition-colors">
-                  <User size={16} className="text-slate-500" />
-                  <span className="font-medium">Profile Details</span>
+              <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-slate-800 rounded-xl shadow-2xl py-2 border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <button className="w-full px-4 py-2.5 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 text-slate-600 dark:text-slate-300 transition-colors border-b border-slate-50 dark:border-slate-700/50 mb-1 pb-2">
+                  <User size={16} className="text-slate-400" />
+                  <span className="font-bold">Profile Details</span>
                 </button>
-                <button className="w-full px-4 py-2.5 text-left text-sm hover:bg-slate-700 flex items-center gap-3 text-slate-300 transition-colors">
-                  <Settings size={16} className="text-slate-500" />
-                  <span className="font-medium">Settings</span>
+                <button className="w-full px-4 py-2.5 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 text-slate-600 dark:text-slate-300 transition-colors">
+                  <Settings size={16} className="text-slate-400" />
+                  <span className="font-bold">Settings</span>
                 </button>
               </div>
             )}
@@ -311,7 +315,7 @@ export const SidebarOrganism = ({
           <button
             onClick={onLogout}
             title={isMinimized ? "Logout" : ""}
-            className={`flex items-center w-full px-4 py-3 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all duration-200 group ${isMinimized ? "justify-center px-0" : ""}`}
+            className={`flex items-center w-full px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all duration-200 group ${isMinimized ? "justify-center px-0" : ""}`}
           >
             <LogOut
               size={20}

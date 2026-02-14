@@ -220,7 +220,7 @@ export const TransactionFormOrganism = ({
       >
         {!isEdit && (
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-finance-primary">
+            <h2 className="text-2xl font-bold text-finance-primary dark:text-blue-400">
               Add New Transaction
             </h2>
           </div>
@@ -255,7 +255,7 @@ export const TransactionFormOrganism = ({
                 <option value="transfer">Pindah Saldo / Tarik Tunai</option>
               </FormField>
               {/* Type Description Helper */}
-              <div className="text-xs text-slate-500 px-1">
+              <div className="text-xs text-slate-500 dark:text-slate-400 px-1">
                 {formData.type === "expense" &&
                   "Uang keluar untuk belanja/bayar (Harta berkurang)."}
                 {formData.type === "income" &&
@@ -280,11 +280,11 @@ export const TransactionFormOrganism = ({
 
           {/* Category Selection Logic */}
           {formData.type === "transfer" ? (
-            <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50">
-              <p className="text-sm font-medium text-blue-800 mb-2">
+            <div className="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100/50 dark:border-blue-800/50">
+              <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">
                 Internal Transfer
               </p>
-              <p className="text-xs text-blue-600">
+              <p className="text-xs text-blue-600 dark:text-blue-400">
                 This transaction will move money between your accounts.
               </p>
             </div>

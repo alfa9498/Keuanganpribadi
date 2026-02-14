@@ -59,10 +59,12 @@ export const LanyardCard = ({
         };
       case "receivable":
         return {
-          color: "text-amber-500",
+          color: "text-amber-600 dark:text-amber-400",
           bg: "bg-amber-500/10",
           border: "border-amber-500/20",
-          icon: <Coins className="text-amber-500" size={24} />,
+          icon: (
+            <Coins className="text-amber-600 dark:text-amber-400" size={24} />
+          ),
         };
       default:
         return {

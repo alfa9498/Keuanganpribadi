@@ -75,7 +75,10 @@ export const RecentTransactionsOrganism = ({
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [categoriesData, setCategoriesData] = useState({ expense: [], income: [] });
+  const [categoriesData, setCategoriesData] = useState({
+    expense: [],
+    income: [],
+  });
   const [loadingCategories, setLoadingCategories] = useState(true);
 
   const fetchCategoriesData = async () => {
@@ -98,8 +101,8 @@ export const RecentTransactionsOrganism = ({
   // Hardcoded categories removed.
 
   const getCategoryGroup = (category) => {
-    const group = categoriesData.expense.find(g => 
-      g.subCategories.some(sub => sub.name === category)
+    const group = categoriesData.expense.find((g) =>
+      g.subCategories.some((sub) => sub.name === category),
     );
     return group ? group.name : null;
   };
@@ -188,9 +191,11 @@ export const RecentTransactionsOrganism = ({
     if (!user?.id) return;
     setIsLoading(true);
     try {
-      const group = categoriesData.expense.find(g => g.name === activeCategory);
+      const group = categoriesData.expense.find(
+        (g) => g.name === activeCategory,
+      );
       const categoryParam = group
-        ? group.subCategories.map(s => s.name).join(",")
+        ? group.subCategories.map((s) => s.name).join(",")
         : activeCategory;
 
       const { startDate, endDate } = calculateDateRange(filterRange);
@@ -351,14 +356,14 @@ export const RecentTransactionsOrganism = ({
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-black/50 border border-slate-100 dark:border-slate-800 overflow-hidden">
       {/* Header section with search */}
       <div className="p-6 pb-4 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
-          <h3 className="text-xl font-bold text-slate-800 tracking-tight">
+          <h3 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">
             {title}
           </h3>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Mengelola rekaman terbaru Anda
           </p>
         </div>
@@ -395,16 +400,16 @@ export const RecentTransactionsOrganism = ({
               placeholder="Cari cepat..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-finance-primary/10 focus:border-finance-primary/30 transition-all placeholder:text-slate-400"
+              className="w-full pl-10 pr-4 py-2 bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-finance-primary/10 focus:border-finance-primary/30 transition-all placeholder:text-slate-400 dark:text-slate-200"
             />
           </div>
         </div>
       </div>
 
-      <div className="overflow-x-auto border-t border-slate-300">
+      <div className="overflow-x-auto border-t border-slate-300 dark:border-slate-800">
         <table className="w-full text-left border-collapse table-fixed min-w-[1000px]">
           <thead className="sticky top-0 z-20 shadow-sm">
-            <tr className="text-[11px] font-black text-slate-700 bg-slate-200 border-b border-slate-300 uppercase tracking-tight">
+            <tr className="text-[11px] font-black text-slate-700 dark:text-white bg-slate-200 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-700 uppercase tracking-tight">
               <th
                 className="px-4 py-2 border-r border-slate-300 w-32 cursor-pointer hover:bg-slate-300 transition-colors"
                 onClick={() => requestSort("date")}
@@ -489,7 +494,7 @@ export const RecentTransactionsOrganism = ({
                 return (
                   <tr
                     key={tx.id}
-                    className={`${idx % 2 === 0 ? "bg-white" : "bg-slate-50/80"} hover:bg-blue-50/50 transition-colors group`}
+                    className={`${idx % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50/80 dark:bg-slate-800/50"} hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors group border-b border-slate-100 dark:border-slate-800`}
                   >
                     <td className="px-4 py-2 border-r border-slate-200 text-slate-800 font-bold whitespace-nowrap">
                       {new Date(tx.date).toLocaleDateString("id-ID", {
@@ -516,7 +521,7 @@ export const RecentTransactionsOrganism = ({
                         {tx.payment_method}
                       </span>
                     </td>
-                    <td className="px-4 py-2 border-r border-slate-200 text-slate-700 font-bold hidden lg:table-cell">
+                    <td className="px-4 py-2 border-r border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold hidden lg:table-cell">
                       {tx.account}
                     </td>
                     <td className="px-4 py-2 border-r border-slate-200 text-center hidden xl:table-cell">

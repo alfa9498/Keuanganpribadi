@@ -166,7 +166,7 @@ export const BudgetPage = ({ user }) => {
 
   if (loading && budgets.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-slate-500">
+      <div className="flex flex-col items-center justify-center h-64 text-slate-500 dark:text-slate-400">
         <RefreshCw className="animate-spin mb-4" size={32} />
         <p>Memuat anggaran...</p>
       </div>
@@ -174,27 +174,33 @@ export const BudgetPage = ({ user }) => {
   }
 
   return (
-    <div className="w-full max-w-[1200px] p-3 md:p-4 lg:p-6 space-y-4 md:space-y-6 animate-fade-in text-slate-800">
+    <div className="w-full max-w-[1200px] p-3 md:p-4 lg:p-6 space-y-4 md:space-y-6 animate-fade-in text-slate-800 dark:text-slate-200">
       {/* Header & Month Selector */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 md:p-5 rounded-3xl border border-slate-100 shadow-sm">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
         <div className="space-y-0.5">
-          <h2 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">
+          <h2 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white tracking-tight">
             Budgets
           </h2>
-          <p className="text-[10px] md:text-xs font-medium text-slate-500 flex items-center gap-2">
-            <Calendar size={12} className="text-slate-400 md:w-3.5 md:h-3.5" />
+          <p className="text-[10px] md:text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-2">
+            <Calendar
+              size={12}
+              className="text-slate-400 dark:text-slate-500 md:w-3.5 md:h-3.5"
+            />
             Track and manage your monthly spending
           </p>
         </div>
 
-        <div className="flex items-center gap-3 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+        <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-100 dark:border-slate-800">
           <button
             onClick={prevMonth}
-            className="p-1.5 hover:bg-white hover:shadow-sm rounded-xl transition-all"
+            className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded-xl transition-all"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft
+              size={18}
+              className="text-slate-600 dark:text-slate-300"
+            />
           </button>
-          <span className="text-xs font-black text-slate-700 min-w-[100px] text-center uppercase tracking-widest">
+          <span className="text-xs font-black text-slate-700 dark:text-slate-200 min-w-[100px] text-center uppercase tracking-widest">
             {new Date(month + "-01").toLocaleDateString("id-ID", {
               month: "short",
               year: "numeric",
@@ -202,9 +208,12 @@ export const BudgetPage = ({ user }) => {
           </span>
           <button
             onClick={nextMonth}
-            className="p-1.5 hover:bg-white hover:shadow-sm rounded-xl transition-all"
+            className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded-xl transition-all"
           >
-            <ChevronRight size={18} />
+            <ChevronRight
+              size={18}
+              className="text-slate-600 dark:text-slate-300"
+            />
           </button>
         </div>
       </div>
@@ -234,19 +243,19 @@ export const BudgetPage = ({ user }) => {
         ].map((item, idx) => (
           <div
             key={idx}
-            className="bg-white p-3 md:p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-2 md:gap-3"
+            className="bg-white dark:bg-slate-900 p-3 md:p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-2 md:gap-3"
           >
             <div
-              className={`shrink-0 w-8 h-8 md:w-10 md:h-10 bg-${item.color}-50 text-${item.color}-600 rounded-xl flex items-center justify-center`}
+              className={`shrink-0 w-8 h-8 md:w-10 md:h-10 bg-${item.color}-50 dark:bg-${item.color}-900/20 text-${item.color}-600 dark:text-${item.color}-400 rounded-xl flex items-center justify-center`}
             >
               <item.icon size={16} className="md:w-5 md:h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest truncate">
+              <p className="text-[8px] md:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest truncate">
                 {item.label}
               </p>
               <p
-                className={`text-xs md:text-sm font-black tabular-nums truncate ${item.label === "Remaining" || item.label === "Actual" || item.label === "From Prev" ? `text-${item.color}-600` : "text-slate-800"}`}
+                className={`text-xs md:text-sm font-black tabular-nums truncate ${item.label === "Remaining" || item.label === "Actual" || item.label === "From Prev" ? `text-${item.color}-600 dark:text-${item.color}-400` : "text-slate-800 dark:text-white"}`}
               >
                 {formatCurrency(item.val)}
               </p>
@@ -256,8 +265,8 @@ export const BudgetPage = ({ user }) => {
       </div>
 
       {/* Budget List - Desktop Table / Mobile Cards */}
-      <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
-        <div className="p-4 md:p-6 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div className="bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-black/40 overflow-hidden">
+        <div className="p-4 md:p-6 border-b border-slate-50 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="relative w-full md:w-72">
             <Search
               className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
@@ -268,12 +277,12 @@ export const BudgetPage = ({ user }) => {
               placeholder="Search categories..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-2.5 md:py-3 bg-slate-50 border-none rounded-2xl text-xs md:text-sm font-medium focus:ring-2 focus:ring-slate-900 transition-all"
+              className="w-full pl-12 pr-4 py-2.5 md:py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-xs md:text-sm font-medium focus:ring-2 focus:ring-slate-900 dark:focus:ring-blue-600 transition-all dark:text-slate-200"
             />
           </div>
           <button
             onClick={loadBudgets}
-            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-black transition-all"
+            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 dark:bg-blue-600 text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-black dark:hover:bg-blue-500 transition-all"
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
             Sync Budget
@@ -284,28 +293,28 @@ export const BudgetPage = ({ user }) => {
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-slate-50/50">
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              <tr className="bg-slate-50/50 dark:bg-slate-800/50">
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                   Category
                 </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest w-40 text-right">
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest w-40 text-right">
                   Planned
                 </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">
                   Rollover
                 </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">
                   Actual spent
                 </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">
                   Remaining
                 </th>
-                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest min-w-[180px]">
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest min-w-[180px]">
                   Progress
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
               {Object.entries(groupedBudgets).map(([groupName, categories]) => {
                 const isCollapsed = collapsedGroups[groupName];
                 const gPlanned = categories.reduce(
@@ -334,7 +343,7 @@ export const BudgetPage = ({ user }) => {
                 return (
                   <React.Fragment key={groupName}>
                     <tr
-                      className="bg-slate-50/50 cursor-pointer hover:bg-slate-100/80 transition-colors"
+                      className="bg-slate-50/50 dark:bg-slate-800/30 cursor-pointer hover:bg-slate-100/80 dark:hover:bg-slate-800/50 transition-colors"
                       onClick={() => toggleGroup(groupName)}
                     >
                       <td className="px-5 py-2.5">
@@ -342,32 +351,35 @@ export const BudgetPage = ({ user }) => {
                           {isCollapsed ? (
                             <ChevronRight
                               size={14}
-                              className="text-slate-400"
+                              className="text-slate-400 dark:text-slate-500"
                             />
                           ) : (
-                            <ChevronDown size={14} className="text-slate-400" />
+                            <ChevronDown
+                              size={14}
+                              className="text-slate-400 dark:text-slate-500"
+                            />
                           )}
-                          <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                          <span className="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">
                             {groupName}
                           </span>
                         </div>
                       </td>
-                      <td className="px-5 py-2.5 text-right font-black text-[10px] text-slate-600 tabular-nums">
+                      <td className="px-5 py-2.5 text-right font-black text-[10px] text-slate-600 dark:text-slate-300 tabular-nums">
                         {formatCurrency(gPlanned)}
                       </td>
-                      <td className="px-5 py-2.5 text-right font-black text-[10px] text-amber-600 tabular-nums">
+                      <td className="px-5 py-2.5 text-right font-black text-[10px] text-amber-600 dark:text-amber-400 tabular-nums">
                         {formatCurrency(gRollover)}
                       </td>
-                      <td className="px-5 py-2.5 text-right font-black text-[10px] text-rose-600 tabular-nums">
+                      <td className="px-5 py-2.5 text-right font-black text-[10px] text-rose-600 dark:text-rose-400 tabular-nums">
                         {formatCurrency(gSpent)}
                       </td>
                       <td
-                        className={`px-5 py-2.5 text-right font-black text-[10px] tabular-nums ${gRemaining >= 0 ? "text-emerald-600" : "text-rose-600"}`}
+                        className={`px-5 py-2.5 text-right font-black text-[10px] tabular-nums ${gRemaining >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
                       >
                         {formatCurrency(gRemaining)}
                       </td>
                       <td className="px-5 py-2.5">
-                        <div className="h-1.5 w-full bg-slate-200/50 rounded-full overflow-hidden">
+                        <div className="h-1.5 w-full bg-slate-200/50 dark:bg-slate-800/50 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full ${gRemaining >= 0 ? "bg-emerald-500" : "bg-rose-500"}`}
                             style={{ width: `${gPercent}%` }}
@@ -396,11 +408,11 @@ export const BudgetPage = ({ user }) => {
                         return (
                           <tr
                             key={cat.category_id}
-                            className="group hover:bg-slate-50 transition-colors"
+                            className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                           >
                             <td className="px-5 py-3 pl-10">
                               <div className="flex flex-col gap-0.5">
-                                <p className="font-bold text-slate-800 text-xs">
+                                <p className="font-bold text-slate-800 dark:text-white text-xs">
                                   {cat.category_name}
                                 </p>
                                 <button
@@ -422,7 +434,7 @@ export const BudgetPage = ({ user }) => {
                               </div>
                             </td>
                             <td className="px-5 py-3">
-                              <div className="flex items-center justify-end gap-1.5 group-hover:bg-white group-hover:shadow-sm p-1 rounded-lg transition-all border border-transparent group-hover:border-slate-100">
+                              <div className="flex items-center justify-end gap-1.5 group-hover:bg-white dark:group-hover:bg-slate-800 group-hover:shadow-sm p-1 rounded-lg transition-all border border-transparent group-hover:border-slate-100 dark:group-hover:border-slate-700">
                                 <input
                                   type="number"
                                   value={cat.budget_amount}
@@ -432,13 +444,13 @@ export const BudgetPage = ({ user }) => {
                                       e.target.value,
                                     )
                                   }
-                                  className="w-full text-right bg-transparent border-none focus:ring-0 font-black text-slate-700 text-xs p-0"
+                                  className="w-full text-right bg-transparent border-none focus:ring-0 font-black text-slate-700 dark:text-slate-200 text-xs p-0"
                                 />
                                 {cat.isModified && (
                                   <button
                                     onClick={() => handleSaveBudget(cat)}
                                     disabled={saving === cat.category_id}
-                                    className="text-emerald-500 hover:text-emerald-600 transition-colors"
+                                    className="text-emerald-500 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors"
                                   >
                                     {saving === cat.category_id ? (
                                       <RefreshCw
@@ -459,23 +471,23 @@ export const BudgetPage = ({ user }) => {
                                 {formatCurrency(rolloverVal)}
                               </span>
                             </td>
-                            <td className="px-5 py-3 text-right font-bold text-xs text-slate-500 tabular-nums">
+                            <td className="px-5 py-3 text-right font-bold text-xs text-slate-500 dark:text-slate-400 tabular-nums">
                               {formatCurrency(cat.actual_spent)}
                             </td>
                             <td
-                              className={`px-5 py-3 text-right font-black text-xs tabular-nums ${remaining >= 0 ? "text-emerald-600" : "text-rose-600"}`}
+                              className={`px-5 py-3 text-right font-black text-xs tabular-nums ${remaining >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
                             >
                               {formatCurrency(remaining)}
                             </td>
                             <td className="px-5 py-3">
                               <div className="flex items-center gap-2">
-                                <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                                <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner">
                                   <div
                                     className={`h-full rounded-full transition-all duration-700 ${remaining >= 0 ? "bg-emerald-500" : "bg-rose-500"}`}
                                     style={{ width: `${percentUsed}%` }}
                                   />
                                 </div>
-                                <span className="text-[9px] font-black text-slate-400 w-8 tabular-nums">
+                                <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 w-8 tabular-nums">
                                   {Math.round(percentUsed)}%
                                 </span>
                               </div>
@@ -491,7 +503,7 @@ export const BudgetPage = ({ user }) => {
         </div>
 
         {/* MOBILE CARD VIEW */}
-        <div className="md:hidden divide-y divide-slate-50">
+        <div className="md:hidden divide-y divide-slate-50 dark:divide-slate-800">
           {Object.entries(groupedBudgets).map(([groupName, categories]) => {
             const isCollapsed = collapsedGroups[groupName];
             const gPlanned = categories.reduce(
@@ -520,15 +532,21 @@ export const BudgetPage = ({ user }) => {
               <div key={groupName} className="flex flex-col">
                 <button
                   onClick={() => toggleGroup(groupName)}
-                  className="w-full px-5 py-3.5 bg-slate-50/50 flex items-center justify-between group"
+                  className="w-full px-5 py-3.5 bg-slate-50/50 dark:bg-slate-800/30 flex items-center justify-between group"
                 >
                   <div className="flex items-center gap-2">
                     {isCollapsed ? (
-                      <ChevronRight size={14} className="text-slate-400" />
+                      <ChevronRight
+                        size={14}
+                        className="text-slate-400 dark:text-slate-500"
+                      />
                     ) : (
-                      <ChevronDown size={14} className="text-slate-400" />
+                      <ChevronDown
+                        size={14}
+                        className="text-slate-400 dark:text-slate-500"
+                      />
                     )}
-                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                    <span className="text-[10px] font-black text-slate-600 dark:text-slate-200 uppercase tracking-widest">
                       {groupName}
                     </span>
                   </div>
@@ -547,7 +565,7 @@ export const BudgetPage = ({ user }) => {
                 </button>
 
                 {!isCollapsed && (
-                  <div className="flex flex-col px-3 py-2 gap-2 bg-white">
+                  <div className="flex flex-col px-3 py-2 gap-2 bg-white dark:bg-slate-950">
                     {categories.map((cat) => {
                       const rolloverVal = cat.is_rollover
                         ? parseFloat(cat.rollover_balance || 0)
@@ -569,17 +587,17 @@ export const BudgetPage = ({ user }) => {
                       return (
                         <div
                           key={cat.category_id}
-                          className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm space-y-3"
+                          className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-3"
                         >
                           <div className="flex justify-between items-start">
                             <div className="space-y-1">
-                              <h4 className="text-xs font-bold text-slate-800">
+                              <h4 className="text-xs font-bold text-slate-800 dark:text-white">
                                 {cat.category_name}
                               </h4>
                               <button
                                 onClick={() => handleToggleRollover(cat)}
                                 disabled={toggling === cat.category_id}
-                                className={`text-[8px] font-black uppercase tracking-tighter flex items-center gap-1 p-1 -ml-1 rounded-md transition-all ${cat.is_rollover ? "bg-emerald-50 text-emerald-600" : "bg-slate-50 text-slate-400"}`}
+                                className={`text-[8px] font-black uppercase tracking-tighter flex items-center gap-1 p-1 -ml-1 rounded-md transition-all ${cat.is_rollover ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400" : "bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500"}`}
                               >
                                 <History size={8} />{" "}
                                 {cat.is_rollover
@@ -594,7 +612,7 @@ export const BudgetPage = ({ user }) => {
                               </button>
                             </div>
                             <div className="flex flex-col items-end gap-1">
-                              <div className="flex items-center gap-1.5 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                              <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 p-1 rounded-lg border border-slate-100 dark:border-slate-800">
                                 <input
                                   type="number"
                                   value={cat.budget_amount}
@@ -604,13 +622,13 @@ export const BudgetPage = ({ user }) => {
                                       e.target.value,
                                     )
                                   }
-                                  className="w-16 text-right bg-transparent border-none focus:ring-0 font-black text-slate-700 text-[11px] p-0"
+                                  className="w-16 text-right bg-transparent border-none focus:ring-0 font-black text-slate-700 dark:text-slate-200 text-[11px] p-0"
                                 />
                                 {cat.isModified && (
                                   <button
                                     onClick={() => handleSaveBudget(cat)}
                                     disabled={saving === cat.category_id}
-                                    className="text-emerald-500"
+                                    className="text-emerald-500 dark:text-emerald-400"
                                   >
                                     {saving === cat.category_id ? (
                                       <RefreshCw
@@ -644,7 +662,7 @@ export const BudgetPage = ({ user }) => {
                                 {Math.round(percentUsed)}%
                               </span>
                             </div>
-                            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                               <div
                                 className={`h-full rounded-full transition-all duration-700 ${remaining >= 0 ? "bg-emerald-500" : "bg-rose-500"}`}
                                 style={{ width: `${percentUsed}%` }}
@@ -652,12 +670,12 @@ export const BudgetPage = ({ user }) => {
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-50">
+                          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-50 dark:border-slate-800">
                             <div className="flex flex-col">
-                              <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">
+                              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter">
                                 Spent
                               </span>
-                              <span className="text-[10px] font-bold text-slate-700 tabular-nums">
+                              <span className="text-[10px] font-bold text-slate-700 dark:text-slate-200 tabular-nums">
                                 {formatCurrency(cat.actual_spent)}
                               </span>
                             </div>
@@ -694,11 +712,16 @@ export const BudgetPage = ({ user }) => {
       </div>
 
       {/* Legend / Info */}
-      <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex items-start gap-4">
-        <Info className="text-slate-400 shrink-0" size={20} />
+      <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 flex items-start gap-4">
+        <Info
+          className="text-slate-400 dark:text-slate-500 shrink-0"
+          size={20}
+        />
         <div className="space-y-1">
-          <p className="text-xs font-bold text-slate-700">How Rollover Works</p>
-          <p className="text-xs text-slate-500 leading-relaxed">
+          <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
+            How Rollover Works
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
             When <strong>Rollover</strong> is enabled for a category, any
             leftover budget from previous months will automatically be added to
             the current month's spending capacity. If you overspent, the deficit

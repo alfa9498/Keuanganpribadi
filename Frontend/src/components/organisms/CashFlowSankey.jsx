@@ -95,7 +95,7 @@ export const CashFlowSankey = ({ transactions }) => {
 
   if (transactions.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-[500px] text-slate-400 border border-dashed border-slate-200 rounded-3xl bg-slate-50/50">
+      <div className="flex flex-col items-center justify-center h-[500px] text-slate-400 dark:text-slate-500 border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50/50 dark:bg-slate-900/50">
         <Wallet size={48} className="mb-4 opacity-20" />
         <p className="font-medium">No transactions to visualize</p>
       </div>
@@ -103,8 +103,8 @@ export const CashFlowSankey = ({ transactions }) => {
   }
 
   return (
-    <div className="h-[600px] w-full bg-white rounded-3xl border border-slate-100 shadow-sm p-6 overflow-hidden">
-      <h3 className="text-lg font-black text-slate-700 uppercase tracking-wider mb-6">
+    <div className="h-[600px] w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 overflow-hidden">
+      <h3 className="text-lg font-black text-slate-700 dark:text-white uppercase tracking-wider mb-6">
         Cash Flow Visualization
       </h3>
       <ResponsiveSankey
@@ -131,7 +131,7 @@ export const CashFlowSankey = ({ transactions }) => {
         }}
         // Custom Tooltip
         tooltip={({ node }) => (
-          <div className="bg-slate-900 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-xl">
+          <div className="bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 px-3 py-2 rounded-lg text-xs font-bold shadow-xl">
             {node.id}:{" "}
             {new Intl.NumberFormat("id-ID", {
               style: "currency",
@@ -141,7 +141,7 @@ export const CashFlowSankey = ({ transactions }) => {
           </div>
         )}
         linkTooltip={({ link }) => (
-          <div className="bg-slate-900 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-xl">
+          <div className="bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 px-3 py-2 rounded-lg text-xs font-bold shadow-xl">
             {link.source.id} ➔ {link.target.id}:<br />
             {new Intl.NumberFormat("id-ID", {
               style: "currency",

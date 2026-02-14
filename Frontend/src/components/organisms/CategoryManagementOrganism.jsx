@@ -132,11 +132,13 @@ const CategoryManagementOrganism = () => {
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           <Layers className="text-sky-600" size={20} />
-          <h3 className="text-lg font-bold text-slate-800 uppercase tracking-wider text-xs">Expense Groups</h3>
+          <h3 className="text-lg font-bold text-slate-800 uppercase tracking-wider text-xs">
+            Expense Groups
+          </h3>
         </div>
         <button
           onClick={() => handleOpenModal("create", "group")}
-          className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-slate-900/20 transition-all active:scale-95"
+          className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-slate-900/20 dark:shadow-blue-900/20 transition-all active:scale-95"
         >
           <FolderPlus size={16} />
           <span>New Group</span>
@@ -147,21 +149,27 @@ const CategoryManagementOrganism = () => {
         {data.expense.map((group) => (
           <div
             key={group.id}
-            className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-sky-500/30"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-sky-500/30 dark:hover:border-blue-500/30"
           >
             <div
-              className={`flex items-center justify-between p-5 cursor-pointer transition-colors ${expandedGroups[group.id] ? "bg-slate-50" : "hover:bg-slate-50"}`}
+              className={`flex items-center justify-between p-5 cursor-pointer transition-colors ${expandedGroups[group.id] ? "bg-slate-50 dark:bg-slate-800/50" : "hover:bg-slate-50 dark:hover:bg-slate-800/30"}`}
               onClick={() => toggleGroup(group.id)}
             >
               <div className="flex items-center gap-4">
-                <div className={`p-2 rounded-xl ${expandedGroups[group.id] ? "bg-sky-100 text-sky-600" : "bg-slate-100 text-slate-400"}`}>
-                  {expandedGroups[group.id] ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                <div
+                  className={`p-2 rounded-xl ${expandedGroups[group.id] ? "bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400" : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500"}`}
+                >
+                  {expandedGroups[group.id] ? (
+                    <ChevronDown size={18} />
+                  ) : (
+                    <ChevronRight size={18} />
+                  )}
                 </div>
                 <div>
-                  <span className="font-bold text-slate-900 text-lg block">
+                  <span className="font-bold text-slate-900 dark:text-white text-lg block">
                     {group.name}
                   </span>
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                     {group.subCategories?.length || 0} Sub-Categories
                   </span>
                 </div>
@@ -171,22 +179,27 @@ const CategoryManagementOrganism = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
-                  onClick={() => handleOpenModal("create", "item", null, group.id)}
-                  className="p-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-2xl transition-all shadow-sm group"
+                  onClick={() =>
+                    handleOpenModal("create", "item", null, group.id)
+                  }
+                  className="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 dark:hover:bg-emerald-500 hover:text-white rounded-2xl transition-all shadow-sm group"
                   title="Add Sub-Category"
                 >
-                  <Plus size={20} className="group-hover:scale-110 transition-transform" />
+                  <Plus
+                    size={20}
+                    className="group-hover:scale-110 transition-transform"
+                  />
                 </button>
                 <button
                   onClick={() => handleOpenModal("edit", "group", group)}
-                  className="p-3 bg-slate-50 text-slate-400 hover:bg-sky-50 hover:text-sky-600 rounded-2xl transition-all"
+                  className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-sky-400 rounded-2xl transition-all"
                 >
                   <Edit2 size={18} />
                 </button>
                 {!group.is_default && (
                   <button
                     onClick={() => handleDelete("group", group.id)}
-                    className="p-3 bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 rounded-2xl transition-all"
+                    className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 rounded-2xl transition-all"
                   >
                     <Trash2 size={18} />
                   </button>
@@ -195,16 +208,18 @@ const CategoryManagementOrganism = () => {
             </div>
 
             {expandedGroups[group.id] && (
-              <div className="px-5 pb-5 pt-2 bg-slate-50/50 space-y-2">
+              <div className="px-5 pb-5 pt-2 bg-slate-50/50 dark:bg-slate-800/20 space-y-2">
                 {group.subCategories && group.subCategories.length > 0 ? (
                   group.subCategories.map((cat) => (
                     <div
                       key={cat.id}
-                      className="group flex items-center justify-between p-4 ml-6 bg-white border border-slate-100 rounded-2xl hover:border-sky-200 transition-all shadow-sm"
+                      className="group flex items-center justify-between p-4 ml-6 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl hover:border-sky-200 dark:hover:border-blue-800 transition-all shadow-sm"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]"></div>
-                        <span className="text-slate-700 font-medium">{cat.name}</span>
+                        <span className="text-slate-700 dark:text-slate-200 font-medium">
+                          {cat.name}
+                        </span>
                       </div>
                       <div className="flex gap-2">
                         <button
@@ -225,10 +240,14 @@ const CategoryManagementOrganism = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="p-8 text-center bg-white/50 border border-dashed border-slate-200 rounded-2xl ml-6">
-                    <p className="text-slate-400 text-sm font-medium">No sub-categories yet</p>
-                    <button 
-                      onClick={() => handleOpenModal("create", "item", null, group.id)}
+                  <div className="p-8 text-center bg-white/50 dark:bg-slate-900/50 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl ml-6">
+                    <p className="text-slate-400 dark:text-slate-500 text-sm font-medium">
+                      No sub-categories yet
+                    </p>
+                    <button
+                      onClick={() =>
+                        handleOpenModal("create", "item", null, group.id)
+                      }
                       className="mt-3 text-sky-600 text-[10px] font-black uppercase tracking-widest hover:text-sky-700 transition-colors"
                     >
                       + Add First Sub-Category
@@ -247,8 +266,10 @@ const CategoryManagementOrganism = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
-          <Tag className="text-emerald-600" size={20} />
-          <h3 className="text-lg font-bold text-slate-800 uppercase tracking-wider text-xs">Income Categories</h3>
+          <Tag className="text-emerald-600 dark:text-emerald-400" size={20} />
+          <h3 className="text-lg font-bold text-slate-800 dark:text-white uppercase tracking-wider text-xs">
+            Income Categories
+          </h3>
         </div>
         <button
           onClick={() => handleOpenModal("create", "item")}
@@ -263,23 +284,27 @@ const CategoryManagementOrganism = () => {
         {data.income.map((cat) => (
           <div
             key={cat.id}
-            className="flex items-center justify-between p-5 bg-white border border-slate-200 rounded-3xl shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all group"
+            className="flex items-center justify-between p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm hover:shadow-md hover:border-emerald-500/30 dark:hover:border-emerald-500/20 transition-all group"
           >
             <div>
-              <span className="font-bold text-slate-900 block mb-1">{cat.name}</span>
-              <span className="text-[10px] font-black text-emerald-600/70 uppercase tracking-widest">Income Source</span>
+              <span className="font-bold text-slate-900 dark:text-white block mb-1">
+                {cat.name}
+              </span>
+              <span className="text-[10px] font-black text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-widest">
+                Income Source
+              </span>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => handleOpenModal("edit", "item", cat)}
-                className="p-2.5 bg-slate-50 text-slate-400 hover:bg-sky-50 hover:text-sky-600 rounded-xl transition-all"
+                className="p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-blue-400 rounded-xl transition-all"
               >
                 <Edit2 size={16} />
               </button>
               {!cat.is_default && (
                 <button
                   onClick={() => handleDelete("item", cat.id)}
-                  className="p-2.5 bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all"
+                  className="p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl transition-all"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -295,38 +320,44 @@ const CategoryManagementOrganism = () => {
     <div className="p-4 md:p-8 max-w-6xl mx-auto min-h-screen pb-32">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-100 border border-sky-200 rounded-full">
-            <Tag size={12} className="text-sky-600" />
-            <span className="text-[10px] font-black text-sky-600 uppercase tracking-widest">Structure</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-100 dark:bg-blue-900/20 border border-sky-200 dark:border-blue-800 rounded-full">
+            <Tag size={12} className="text-sky-600 dark:text-blue-400" />
+            <span className="text-[10px] font-black text-sky-600 dark:text-blue-400 uppercase tracking-widest">
+              Structure
+            </span>
           </div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             Manage Categories
           </h1>
-          <p className="text-slate-500 text-sm max-w-md">
-            Organize your income and expenses with a professional hierarchical structure.
+          <p className="text-slate-500 dark:text-slate-400 text-sm max-w-md">
+            Organize your income and expenses with a professional hierarchical
+            structure.
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex p-1.5 bg-slate-200/50 rounded-2xl w-fit mb-10 border border-slate-200 shadow-sm">
+      <div className="flex p-1.5 bg-slate-200/50 dark:bg-slate-800/50 rounded-2xl w-fit mb-10 border border-slate-200 dark:border-slate-800 shadow-sm">
         <button
           onClick={() => setActiveTab("expense")}
           className={`flex items-center gap-2 px-8 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 ${
             activeTab === "expense"
-              ? "bg-slate-900 text-white shadow-lg"
-              : "text-slate-500 hover:text-slate-700"
+              ? "bg-slate-900 dark:bg-blue-600 text-white shadow-lg"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           }`}
         >
-          <Layers size={14} className={activeTab === 'expense' ? 'text-sky-400' : ''} />
+          <Layers
+            size={14}
+            className={activeTab === "expense" ? "text-sky-400" : ""}
+          />
           Expenses
         </button>
         <button
           onClick={() => setActiveTab("income")}
           className={`flex items-center gap-2 px-8 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 ${
             activeTab === "income"
-              ? "bg-emerald-600 text-white shadow-lg"
-              : "text-slate-500 hover:text-slate-700"
+              ? "bg-emerald-600 dark:bg-emerald-500 text-white shadow-lg"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           }`}
         >
           <Tag size={14} />
@@ -337,15 +368,19 @@ const CategoryManagementOrganism = () => {
       {loading ? (
         <div className="flex flex-col h-64 items-center justify-center gap-4">
           <div className="w-10 h-10 border-4 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
-          <span className="text-slate-500 font-black uppercase tracking-widest text-[10px]">Syncing Data...</span>
+          <span className="text-slate-500 dark:text-slate-400 font-black uppercase tracking-widest text-[10px]">
+            Syncing Data...
+          </span>
         </div>
       ) : error ? (
         <div className="p-6 bg-rose-500/10 text-rose-400 rounded-3xl border border-rose-500/20 flex items-center gap-4 animate-in fade-in slide-in-from-top-4">
-          <div className="p-3 bg-rose-500/20 rounded-2xl">
+          <div className="p-3 bg-rose-500/20 dark:bg-rose-900/30 rounded-2xl">
             <AlertCircle size={24} />
           </div>
           <div>
-            <p className="font-bold text-white uppercase tracking-wider text-xs mb-1">Error Occurred</p>
+            <p className="font-bold text-white dark:text-rose-100 uppercase tracking-wider text-xs mb-1">
+              Error Occurred
+            </p>
             <p className="text-sm opacity-80">{error}</p>
           </div>
         </div>
@@ -361,7 +396,9 @@ const CategoryManagementOrganism = () => {
           <div className="bg-slate-900 border border-white/10 rounded-[32px] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
             <div className="flex justify-between items-center p-8 border-b border-white/5 bg-white/5">
               <div>
-                <span className="text-[10px] font-black text-sky-500 uppercase tracking-widest block mb-1">Category Editor</span>
+                <span className="text-[10px] font-black text-sky-500 uppercase tracking-widest block mb-1">
+                  Category Editor
+                </span>
                 <h3 className="font-black text-white text-xl tracking-tight">
                   {modalMode === "create" ? "Add New" : "Edit"}{" "}
                   {modalType === "group" ? "Group" : "Category"}
