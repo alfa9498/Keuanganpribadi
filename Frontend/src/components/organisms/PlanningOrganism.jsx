@@ -432,21 +432,30 @@ export const PlanningOrganism = () => {
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState(
-    new Date().toISOString().slice(0, 7),
-  ); // YYYY-MM
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  }); // YYYY-MM
 
   // Month Navigation Helpers
   const nextMonth = () => {
-    const [year, month] = selectedMonth.split("-").map(Number);
-    const date = new Date(year, month); // javascript months are 0-indexed, so 'month' actually refers to next month
-    setSelectedMonth(date.toISOString().slice(0, 7));
+    let [year, month] = selectedMonth.split("-").map(Number);
+    month++;
+    if (month > 12) {
+      month = 1;
+      year++;
+    }
+    setSelectedMonth(`${year}-${String(month).padStart(2, "0")}`);
   };
 
   const prevMonth = () => {
-    const [year, month] = selectedMonth.split("-").map(Number);
-    const date = new Date(year, month - 2); // go back two months to get previous
-    setSelectedMonth(date.toISOString().slice(0, 7));
+    let [year, month] = selectedMonth.split("-").map(Number);
+    month--;
+    if (month < 1) {
+      month = 12;
+      year--;
+    }
+    setSelectedMonth(`${year}-${String(month).padStart(2, "0")}`);
   };
 
   const formatMonth = (monthStr) => {
