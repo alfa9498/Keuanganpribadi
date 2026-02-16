@@ -109,13 +109,30 @@ exports.deleteGroup = async (userId, groupId) => {
 
 exports.createCategory = async (userId, data) => {
   const { name, type, group_id } = data;
-  const [result] = await db
-    .promise()
-    .query(
-      "INSERT INTO categories (user_id, name, type, group_id) VALUES (?, ?, ?, ?)",
-      [userId, name, type, group_id || null],
+  const promiseConn = db.promise();
+
+  // 1. Create Category
+  const [catResult] = await promiseConn.query(
+    "INSERT INTO categories (user_id, name, type, group_id) VALUES (?, ?, ?, ?)",
+    [userId, name, type, group_id || null],
+  );
+
+  const categoryId = catResult.insertId;
+
+  // 2. Automatically initialize budget for current month (Zero-based starting point)
+  // This ensures the category shows up in the Planning Ledger immediately
+  try {
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    await promiseConn.query(
+      "INSERT IGNORE INTO budgets (user_id, category_id, amount, month) VALUES (?, ?, 0, ?)",
+      [userId, categoryId, currentMonth],
     );
-  return { id: result.insertId, user_id: userId, name, type, group_id };
+  } catch (budgetErr) {
+    console.error("Budget Auto-Init failed (non-critical):", budgetErr);
+    // We don't fail the whole request because the category was created successfully
+  }
+
+  return { id: categoryId, user_id: userId, name, type, group_id };
 };
 
 exports.updateCategory = async (userId, categoryId, data) => {
