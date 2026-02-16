@@ -205,14 +205,14 @@ const GoalCard = ({ goal, onTopUp, onEdit, onDelete }) => {
 
 const KakeiboSummaryCard = ({
   incomeSources,
-  totalIncome, // This is Actual Income
+  totalIncome, // Actual Income
   totalPlannedIncome,
-  fixedExpenses,
+  totalPlannedExpenses,
   savings,
   onEditIncome,
 }) => {
-  const pocketMoney = totalIncome - fixedExpenses - savings;
-  const isNegative = pocketMoney < 0;
+  const unallocated = totalIncome - totalPlannedExpenses - savings;
+  const isOverAllocated = unallocated < 0;
 
   return (
     <div className="bg-white dark:bg-slate-800 border-l-4 border-slate-800 dark:border-slate-500 rounded-r-2xl shadow-sm mb-6 transition-all duration-300 overflow-hidden">
@@ -292,10 +292,10 @@ const KakeiboSummaryCard = ({
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-100 dark:border-slate-700/50">
                 <label className="text-[9px] uppercase font-black text-slate-400 block mb-1">
-                  Fixed
+                  Envelopes (Plan)
                 </label>
-                <p className="text-sm font-bold text-rose-500 font-mono">
-                  -{new Intl.NumberFormat("id-ID").format(fixedExpenses)}
+                <p className="text-sm font-bold text-slate-600 dark:text-slate-300 font-mono">
+                  -{new Intl.NumberFormat("id-ID").format(totalPlannedExpenses)}
                 </p>
               </div>
               <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-100 dark:border-slate-700/50">
@@ -309,20 +309,27 @@ const KakeiboSummaryCard = ({
             </div>
 
             <div
-              className={`flex-1 flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed transition-all ${isNegative ? "bg-rose-50/50 dark:bg-rose-900/10 border-rose-200 dark:border-rose-800/50" : "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50"}`}
+              className={`flex-1 flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed transition-all ${isOverAllocated ? "bg-rose-50/50 dark:bg-rose-900/10 border-rose-200 dark:border-rose-800/50" : "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50"}`}
             >
               <label className="text-[10px] uppercase font-black text-slate-400 tracking-[0.2em] mb-1">
-                Pocket Money
+                {isOverAllocated ? "Over-Allocated" : "Unallocated"}
               </label>
-              <p
-                className={`text-2xl font-black font-mono transition-all ${isNegative ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}
-              >
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                  maximumFractionDigits: 0,
-                }).format(pocketMoney)}
-              </p>
+              <div className="text-center">
+                <p
+                  className={`text-2xl font-black font-mono transition-all ${isOverAllocated ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}
+                >
+                  {new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    maximumFractionDigits: 0,
+                  }).format(Math.abs(unallocated))}
+                </p>
+                <p className="text-[9px] text-slate-400 font-bold uppercase mt-1">
+                  {isOverAllocated
+                    ? "Planned spending exceeds actual income"
+                    : "Actual cash left to allocate"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -538,6 +545,12 @@ export const PlanningOrganism = () => {
     0,
   );
 
+  // Total Planned Expenses (Sum of all explicit budget envelopes)
+  const totalPlannedExpenses = budgets.reduce(
+    (sum, item) => sum + item.budgetLimit,
+    0,
+  );
+
   // Savings (Calculated from Sum of Goals Monthly Targets)
   const savingsTarget = goals.reduce(
     (sum, g) => sum + (parseFloat(g.monthly_target) || 0),
@@ -622,7 +635,7 @@ export const PlanningOrganism = () => {
         incomeSources={incomeSources}
         totalIncome={totalActualIncome}
         totalPlannedIncome={totalPlannedIncome}
-        fixedExpenses={fixedExpenses}
+        totalPlannedExpenses={totalPlannedExpenses}
         savings={savingsTarget}
         onEditIncome={(source) => {
           setSelectedItem(source);
