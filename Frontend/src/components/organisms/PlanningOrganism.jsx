@@ -203,6 +203,48 @@ const GoalCard = ({ goal, onTopUp, onEdit, onDelete }) => {
 
 // --- Kakeibo Components ---
 
+const GroupMetadata = {
+  survival: {
+    title: "Survival (Kebutuhan)",
+    description:
+      "Pengeluaran wajib untuk bertahan hidup (Makan, Transport, Tagihan).",
+    color: "text-rose-500",
+    keywords: ["survival", "kebutuhan", "pokok", "wajib"],
+  },
+  optional: {
+    title: "Optional (Keinginan)",
+    description: "Belanja, Hiburan, dan kesenangan lainnya.",
+    color: "text-amber-500",
+    keywords: ["optional", "keinginan", "jajan", "hiburan"],
+  },
+  culture: {
+    title: "Culture (Kultur)",
+    description: "Pendidikan, Buku, Kursus, dan pengembangan diri.",
+    color: "text-blue-500",
+    keywords: ["culture", "kultur", "pendidikan", "hobi"],
+  },
+  extra: {
+    title: "Extra (Tak Terduga)",
+    description: "Pengeluaran dadakan, hadiah, atau perbaikan.",
+    color: "text-purple-500",
+    keywords: ["extra", "tak terduga", "darurat", "lainnya"],
+  },
+};
+
+const getGroupInfo = (groupName) => {
+  const lowerName = groupName.toLowerCase();
+  for (const key in GroupMetadata) {
+    if (GroupMetadata[key].keywords.some((k) => lowerName.includes(k))) {
+      return GroupMetadata[key];
+    }
+  }
+  return {
+    title: groupName,
+    description: "Kategori pengeluaran kustom Anda.",
+    color: "text-slate-600 dark:text-slate-200",
+  };
+};
+
 const KakeiboSummaryCard = ({
   incomeSources,
   totalIncome, // Actual Income
@@ -515,35 +557,22 @@ export const PlanningOrganism = () => {
       ? incomeSources.reduce((sum, item) => sum + (item.budgetLimit || 0), 0)
       : 0;
 
-  const groupedBudgets = {
-    survival: budgets.filter(
+  // Dynamic Grouping
+  const groupedBudgets = budgets.reduce((acc, budget) => {
+    const group = budget.groupName || "Uncategorized";
+    if (!acc[group]) acc[group] = [];
+    acc[group].push(budget);
+    return acc;
+  }, {});
+
+  // Fixed Expenses = Any items in "Survival" or "Kebutuhan" groups
+  const fixedExpenses = budgets
+    .filter(
       (b) =>
         b.groupName?.toLowerCase().includes("survival") ||
         b.groupName?.toLowerCase().includes("kebutuhan"),
-    ),
-    optional: budgets.filter(
-      (b) =>
-        b.groupName?.toLowerCase().includes("optional") ||
-        b.groupName?.toLowerCase().includes("keinginan"),
-    ),
-    culture: budgets.filter(
-      (b) =>
-        b.groupName?.toLowerCase().includes("culture") ||
-        b.groupName?.toLowerCase().includes("kultur"),
-    ),
-    extra: budgets.filter(
-      (b) =>
-        b.groupName?.toLowerCase().includes("extra") ||
-        b.groupName?.toLowerCase().includes("tak terduga") ||
-        b.groupName === "Uncategorized",
-    ),
-  };
-
-  // Fixed Expenses = Survival Group Needs
-  const fixedExpenses = groupedBudgets.survival.reduce(
-    (sum, item) => sum + item.budgetLimit,
-    0,
-  );
+    )
+    .reduce((sum, item) => sum + item.budgetLimit, 0);
 
   // Total Planned Expenses (Sum of all explicit budget envelopes)
   const totalPlannedExpenses = budgets.reduce(
@@ -669,53 +698,23 @@ export const PlanningOrganism = () => {
 
       {activeTab === "kakeibo" && (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <EnvelopeGroup
-            title="Survival (Kebutuhan)"
-            description="Pengeluaran wajib untuk bertahan hidup (Makan, Transport, Tagihan)."
-            color="text-rose-500"
-            items={groupedBudgets.survival}
-            onEdit={(item) => {
-              setSelectedItem(item);
-              setBudgetModalOpen(true);
-            }}
-            onDelete={handleDeleteBudget}
-          />
-
-          <EnvelopeGroup
-            title="Optional (Keinginan)"
-            description="Belanja, Hiburan, dan kesenangan lainnya."
-            color="text-amber-500"
-            items={groupedBudgets.optional}
-            onEdit={(item) => {
-              setSelectedItem(item);
-              setBudgetModalOpen(true);
-            }}
-            onDelete={handleDeleteBudget}
-          />
-
-          <EnvelopeGroup
-            title="Culture (Kultur)"
-            description="Pendidikan, Buku, Kursus, dan pengembangan diri."
-            color="text-blue-500"
-            items={groupedBudgets.culture}
-            onEdit={(item) => {
-              setSelectedItem(item);
-              setBudgetModalOpen(true);
-            }}
-            onDelete={handleDeleteBudget}
-          />
-
-          <EnvelopeGroup
-            title="Extra (Tak Terduga)"
-            description="Pengeluaran dadakan, hadiah, atau perbaikan."
-            color="text-purple-500"
-            items={groupedBudgets.extra}
-            onEdit={(item) => {
-              setSelectedItem(item);
-              setBudgetModalOpen(true);
-            }}
-            onDelete={handleDeleteBudget}
-          />
+          {Object.entries(groupedBudgets).map(([groupName, items]) => {
+            const info = getGroupInfo(groupName);
+            return (
+              <EnvelopeGroup
+                key={groupName}
+                title={info.title}
+                description={info.description}
+                color={info.color}
+                items={items}
+                onEdit={(item) => {
+                  setSelectedItem(item);
+                  setBudgetModalOpen(true);
+                }}
+                onDelete={handleDeleteBudget}
+              />
+            );
+          })}
         </div>
       )}
 
