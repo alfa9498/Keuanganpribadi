@@ -4,6 +4,16 @@ import { Card } from "../atoms/Card";
 import { FormField } from "../molecules/FormField";
 import { useNotification } from "../../context/NotificationContext";
 import { API_URL } from "../../config/api";
+import {
+  ChevronRight,
+  ChevronLeft,
+  CheckCircle2,
+  Info,
+  Layers,
+  CreditCard,
+  Calendar,
+  Tag,
+} from "lucide-react";
 import { fetchCategories } from "../../services/categoryService";
 
 export const TransactionFormOrganism = ({
@@ -46,6 +56,7 @@ export const TransactionFormOrganism = ({
     status: initialData?.status || "done",
   });
 
+  const [activeStep, setActiveStep] = useState(1);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -213,249 +224,372 @@ export const TransactionFormOrganism = ({
     return group ? group.subCategories : [];
   };
 
+  const validateStep = (step) => {
+    let newErrors = {};
+    if (step === 1) {
+      if (!formData.amount) newErrors.amount = "Nominal wajib diisi";
+      if (!formData.date) newErrors.date = "Tanggal wajib diisi";
+    } else if (step === 2) {
+      if (formData.type !== "transfer" && !formData.category)
+        newErrors.category = "Kategori wajib dipilih";
+    } else if (step === 3) {
+      if (!formData.account) newErrors.account = "Akun wajib dipilih";
+      if (formData.type === "transfer" && !formData.to_account)
+        newErrors.to_account = "Akun tujuan wajib dipilih";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (validateStep(activeStep)) {
+      setActiveStep((prev) => Math.min(prev + 1, 3));
+    }
+  };
+
+  const handleBack = () => {
+    setActiveStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const steps = [
+    { id: 1, label: "Info Utama", icon: <Info size={16} /> },
+    { id: 2, label: "Klasifikasi", icon: <Layers size={16} /> },
+    { id: 3, label: "Detail Akun", icon: <CreditCard size={16} /> },
+  ];
+
   return (
-    <div className="flex justify-center w-full animate-fade-in">
+    <div className="flex justify-center w-full animate-fade-in p-2 md:p-0">
       <Card
-        className={`w-full ${!isEdit ? "max-w-2xl border-t-8 border-t-finance-primary" : "p-0 shadow-none border-0"}`}
+        className={`w-full overflow-hidden ${!isEdit ? "max-w-xl border-t-8 border-t-finance-primary shadow-2xl" : "p-0 shadow-none border-0"}`}
       >
         {!isEdit && (
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-finance-primary dark:text-blue-400">
-              Add New Transaction
-            </h2>
+          <div className="p-6 pb-0">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                  {isEdit ? "Edit Transaksi" : "Tambah Transaksi"}
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                  Step {activeStep} of 3: {steps[activeStep - 1].label}
+                </p>
+              </div>
+              <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl">
+                {steps.map((step) => (
+                  <div
+                    key={step.id}
+                    className={`flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-500 ${
+                      activeStep === step.id
+                        ? "bg-finance-primary text-white shadow-lg shadow-finance-primary/20 scale-110"
+                        : activeStep > step.id
+                          ? "bg-emerald-500 text-white"
+                          : "text-slate-400 dark:text-slate-500"
+                    }`}
+                  >
+                    {activeStep > step.id ? (
+                      <CheckCircle2 size={16} />
+                    ) : (
+                      step.icon
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Progress Bar Container */}
+            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-8">
+              <div
+                className="h-full bg-finance-primary transition-all duration-700 ease-out shadow-[0_0_10px_rgba(var(--finance-primary-rgb),0.3)]"
+                style={{ width: `${(activeStep / 3) * 100}%` }}
+              />
+            </div>
           </div>
         )}
 
-        <form
-          onSubmit={handleSubmit}
-          className={isEdit ? "space-y-3" : "space-y-5"}
-        >
-          {/* Top Row: Date & Type */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              label="Transaction Date"
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-            />
-            <div className="space-y-1">
-              <FormField
-                label="Type"
-                component="select"
-                name="type"
-                value={formData.type}
-                onChange={(e) => {
-                  handleChange(e);
-                  setCategoryGroup(""); // Reset group on type switch
-                }}
-              >
-                <option value="expense">Expense (Pengeluaran)</option>
-                <option value="income">Income (Pemasukan)</option>
-                <option value="transfer">Pindah Saldo / Tarik Tunai</option>
-              </FormField>
-              {/* Type Description Helper */}
-              <div className="text-xs text-slate-500 dark:text-slate-400 px-1">
-                {formData.type === "expense" &&
-                  "Uang keluar untuk belanja/bayar (Harta berkurang)."}
-                {formData.type === "income" &&
-                  "Uang masuk/gaji (Harta bertambah)."}
-                {formData.type === "transfer" &&
-                  "Pindah uang antar akun/tarik tunai (Harta tetap)."}
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          <div className="p-6 min-h-[300px] md:min-h-[250px] space-y-5">
+            {/* STEP 1: Info Utama */}
+            {activeStep === 1 && (
+              <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    label="Pilih Tanggal"
+                    type="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleChange}
+                    error={errors.date}
+                    icon={<Calendar size={14} />}
+                  />
+                  <FormField
+                    label="Jenis Transaksi"
+                    component="select"
+                    name="type"
+                    value={formData.type}
+                    onChange={(e) => {
+                      handleChange(e);
+                      setCategoryGroup("");
+                    }}
+                    icon={<Tag size={14} />}
+                  >
+                    <option value="expense">Pengeluaran (Uang Keluar)</option>
+                    <option value="income">Pemasukan (Uang Masuk)</option>
+                    <option value="transfer">Pindah Saldo / Tarik Tunai</option>
+                  </FormField>
+                </div>
+
+                <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-inner">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">
+                    Jumlah Nominal (IDR)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-black text-slate-400">
+                      Rp
+                    </span>
+                    <input
+                      type="text"
+                      name="amount"
+                      value={formatRupiah(formData.amount)}
+                      onChange={handleAmountChange}
+                      placeholder="0"
+                      className={`w-full bg-transparent border-0 border-b-2 ${errors.amount ? "border-rose-500" : "border-slate-200 dark:border-slate-700"} focus:ring-0 focus:border-finance-primary transition-all px-12 py-4 text-4xl font-black text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700`}
+                    />
+                  </div>
+                  {errors.amount && (
+                    <p className="text-xs text-rose-500 font-bold mt-2 ml-1">
+                      {errors.amount}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
-
-          {/* Amount */}
-          <FormField
-            label="Amount (Rp)"
-            type="text"
-            name="amount"
-            value={formatRupiah(formData.amount)}
-            onChange={handleAmountChange}
-            placeholder="0"
-            error={errors.amount}
-            className="text-lg font-semibold"
-          />
-
-          {/* Category Selection Logic */}
-          {formData.type === "transfer" ? (
-            <div className="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100/50 dark:border-blue-800/50">
-              <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">
-                Internal Transfer
-              </p>
-              <p className="text-xs text-blue-600 dark:text-blue-400">
-                This transaction will move money between your accounts.
-              </p>
-            </div>
-          ) : formData.type === "expense" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Main Category */}
-              <FormField
-                label="Main Category"
-                component="select"
-                value={categoryGroup}
-                onChange={handleGroupChange}
-              >
-                <option value="">Select Main Category</option>
-                {categoriesData.expense.map((group) => (
-                  <option key={group.id} value={group.name}>
-                    {group.name}
-                  </option>
-                ))}
-              </FormField>
-
-              {/* Sub Category */}
-              <FormField
-                label="Sub Category"
-                component="select"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                error={errors.category}
-                disabled={!categoryGroup}
-              >
-                <option value="">Select Sub Category</option>
-                {getActiveSubCategories().map((cat) => (
-                  <option key={cat.id} value={cat.name}>
-                    {cat.name}
-                  </option>
-                ))}
-              </FormField>
-            </div>
-          ) : (
-            <FormField
-              label="Category"
-              component="select"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              error={errors.category}
-            >
-              <option value="">Select Category</option>
-              {categoriesData.income.map((cat) => (
-                <option key={cat.id} value={cat.name}>
-                  {cat.name}
-                </option>
-              ))}
-            </FormField>
-          )}
-
-          {/* Description */}
-          <FormField
-            label="Description"
-            component="textarea"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Add notes..."
-            rows={1}
-          />
-
-          {/* Details Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {formData.type === "transfer" ? (
-              <>
-                <FormField
-                  label="From Account"
-                  component="select"
-                  name="account"
-                  value={formData.account}
-                  onChange={handleChange}
-                  error={errors.account}
-                >
-                  {accounts.map((acc) => (
-                    <option key={`from-${acc.id}`} value={acc.name}>
-                      {acc.name}
-                    </option>
-                  ))}
-                  {accounts.length === 0 && (
-                    <option value="Cash Account">Cash Account</option>
-                  )}
-                </FormField>
-                <FormField
-                  label="To Account"
-                  component="select"
-                  name="to_account"
-                  value={formData.to_account}
-                  onChange={handleChange}
-                  error={errors.to_account}
-                >
-                  <option value="">Select Destination</option>
-                  {accounts.map((acc) => (
-                    <option key={`to-${acc.id}`} value={acc.name}>
-                      {acc.name}
-                    </option>
-                  ))}
-                </FormField>
-              </>
-            ) : (
-              <>
-                <FormField
-                  label="Payment Method"
-                  component="select"
-                  name="payment_method"
-                  value={formData.payment_method}
-                  onChange={handleChange}
-                >
-                  <option value="Cash">Tunai (Cash)</option>
-                  <option value="Transfer">Transfer Bank</option>
-                  <option value="Debit">Kartu Debit</option>
-                  <option value="Credit Card">Kartu Kredit</option>
-                  <option value="QRIS">QRIS / E-Wallet</option>
-                  <option value="Internal / Balance">
-                    System / Saldo Awal
-                  </option>
-                </FormField>
-                <FormField
-                  label="Account"
-                  component="select"
-                  name="account"
-                  value={formData.account}
-                  onChange={handleChange}
-                >
-                  {accounts.map((acc) => (
-                    <option key={`acc-${acc.id}`} value={acc.name}>
-                      {acc.name}
-                    </option>
-                  ))}
-                  {accounts.length === 0 && (
-                    <option value="Cash Account">Cash Account</option>
-                  )}
-                </FormField>
-              </>
             )}
 
-            <FormField
-              label="Status"
-              component="select"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-            >
-              <option value="done">Done</option>
-              <option value="pending">Not Yet / Pending</option>
-            </FormField>
+            {/* STEP 2: Klasifikasi */}
+            {activeStep === 2 && (
+              <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+                {formData.type === "transfer" ? (
+                  <div className="p-8 bg-blue-50 dark:bg-blue-900/20 rounded-[32px] border border-blue-100 dark:border-blue-800 text-center space-y-3">
+                    <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <ChevronRight
+                        className="text-blue-600 dark:text-blue-400"
+                        size={32}
+                      />
+                    </div>
+                    <h3 className="text-lg font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">
+                      Internal Transfer
+                    </h3>
+                    <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                      Otomatis diklasifikasikan sebagai perpindahan dana antar
+                      akun.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-5">
+                    {formData.type === "expense" ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          label="Grup Utama"
+                          component="select"
+                          value={categoryGroup}
+                          onChange={handleGroupChange}
+                          icon={<Layers size={14} />}
+                        >
+                          <option value="">Pilih Grup</option>
+                          {categoriesData.expense.map((group) => (
+                            <option key={group.id} value={group.name}>
+                              {group.name}
+                            </option>
+                          ))}
+                        </FormField>
+                        <FormField
+                          label="Sub Kategori"
+                          component="select"
+                          name="category"
+                          value={formData.category}
+                          onChange={handleChange}
+                          error={errors.category}
+                          disabled={!categoryGroup}
+                          icon={<Tag size={14} />}
+                        >
+                          <option value="">Pilih Sub Kategori</option>
+                          {getActiveSubCategories().map((cat) => (
+                            <option key={cat.id} value={cat.name}>
+                              {cat.name}
+                            </option>
+                          ))}
+                        </FormField>
+                      </div>
+                    ) : (
+                      <FormField
+                        label="Kategori Pemasukan"
+                        component="select"
+                        name="category"
+                        value={formData.category}
+                        onChange={handleChange}
+                        error={errors.category}
+                        icon={<Tag size={14} />}
+                      >
+                        <option value="">Pilih Kategori</option>
+                        {categoriesData.income.map((cat) => (
+                          <option key={cat.id} value={cat.name}>
+                            {cat.name}
+                          </option>
+                        ))}
+                      </FormField>
+                    )}
+                  </div>
+                )}
+                <FormField
+                  label="Catatan / Deskripsi"
+                  component="textarea"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Beli apa? Atau catatan tambahan..."
+                  rows={2}
+                  className="rounded-[24px]"
+                />
+              </div>
+            )}
+
+            {/* STEP 3: Detail Akun */}
+            {activeStep === 3 && (
+              <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {formData.type === "transfer" ? (
+                    <>
+                      <FormField
+                        label="Dari Akun"
+                        component="select"
+                        name="account"
+                        value={formData.account}
+                        onChange={handleChange}
+                        error={errors.account}
+                        icon={<CreditCard size={14} />}
+                      >
+                        {accounts.map((acc) => (
+                          <option key={`from-${acc.id}`} value={acc.name}>
+                            {acc.name}
+                          </option>
+                        ))}
+                      </FormField>
+                      <FormField
+                        label="Ke Akun"
+                        component="select"
+                        name="to_account"
+                        value={formData.to_account}
+                        onChange={handleChange}
+                        error={errors.to_account}
+                        icon={<ChevronRight size={14} />}
+                      >
+                        <option value="">Pilih Tujuan</option>
+                        {accounts.map((acc) => (
+                          <option key={`to-${acc.id}`} value={acc.name}>
+                            {acc.name}
+                          </option>
+                        ))}
+                      </FormField>
+                    </>
+                  ) : (
+                    <>
+                      <FormField
+                        label="Metode Bayar"
+                        component="select"
+                        name="payment_method"
+                        value={formData.payment_method}
+                        onChange={handleChange}
+                      >
+                        <option value="Cash">Tunai (Cash)</option>
+                        <option value="Transfer">Transfer Bank</option>
+                        <option value="Debit">Kartu Debit</option>
+                        <option value="Credit Card">Kartu Kredit</option>
+                        <option value="QRIS">QRIS / E-Wallet</option>
+                        <option value="Internal / Balance">
+                          System / Saldo Awal
+                        </option>
+                      </FormField>
+                      <FormField
+                        label="Akun"
+                        component="select"
+                        name="account"
+                        value={formData.account}
+                        onChange={handleChange}
+                        icon={<CreditCard size={14} />}
+                      >
+                        {accounts.map((acc) => (
+                          <option key={`acc-${acc.id}`} value={acc.name}>
+                            {acc.name}
+                          </option>
+                        ))}
+                      </FormField>
+                    </>
+                  )}
+                </div>
+                <FormField
+                  label="Status Transaksi"
+                  component="select"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                >
+                  <option value="done">Selesai (Sudah Dibayar)</option>
+                  <option value="pending">Tertunda / Belum Lunas</option>
+                </FormField>
+              </div>
+            )}
           </div>
 
-          <div className="flex gap-3 mt-4">
-            <Button
-              type="button"
-              variant="ghost"
-              className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600"
-              onClick={() =>
-                onCancel
-                  ? onCancel()
-                  : setSection
-                    ? setSection("dashboard")
-                    : window.history.back()
-              }
-            >
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" className="flex-1">
-              {isEdit ? "Update Transaction" : "Save Transaction"}
-            </Button>
+          {/* Action Buttons */}
+          <div className="p-6 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-3">
+            <div className="flex gap-3 flex-1">
+              {activeStep === 1 ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-100 rounded-2xl h-14 font-black uppercase tracking-widest text-[10px]"
+                  onClick={() =>
+                    onCancel
+                      ? onCancel()
+                      : setSection
+                        ? setSection("dashboard")
+                        : window.history.back()
+                  }
+                >
+                  Batal
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-100 rounded-2xl h-14 font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2"
+                  onClick={handleBack}
+                >
+                  <ChevronLeft size={16} />
+                  Kembali
+                </Button>
+              )}
+
+              {activeStep < 3 ? (
+                <Button
+                  type="button"
+                  variant="primary"
+                  className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 shadow-lg shadow-finance-primary/20"
+                  onClick={handleNext}
+                >
+                  Lanjut
+                  <ChevronRight size={16} />
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="flex-[2] h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+                >
+                  <CheckCircle2 size={16} />
+                  {isEdit ? "Update Transaksi" : "Simpan Transaksi"}
+                </Button>
+              )}
+            </div>
           </div>
         </form>
       </Card>
