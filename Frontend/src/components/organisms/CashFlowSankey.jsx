@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { ResponsiveSankey } from "@nivo/sankey";
 import { Wallet } from "lucide-react";
 
@@ -8,6 +8,16 @@ import { Wallet } from "lucide-react";
  * Also shows Savings if Income > Expenses
  */
 export const CashFlowSankey = ({ transactions }) => {
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1200,
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const data = useMemo(() => {
     // 1. Calculate Totals
     let totalIncome = 0;
@@ -99,31 +109,45 @@ export const CashFlowSankey = ({ transactions }) => {
   }
 
   return (
-    <div className="h-[420px] w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 overflow-hidden">
-      <h3 className="text-lg font-black text-slate-700 dark:text-white uppercase tracking-wider mb-6">
+    <div className="h-[420px] w-full bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm p-4 md:p-6 overflow-hidden">
+      <h3 className="text-sm md:text-lg font-black text-slate-700 dark:text-white uppercase tracking-wider mb-6">
         Cash Flow Visualization
       </h3>
       <ResponsiveSankey
         data={data}
-        margin={{ top: 20, right: 160, bottom: 40, left: 120 }} // Extra margins for labels
+        margin={{
+          top: 20,
+          right: windowWidth < 768 ? 40 : 160,
+          bottom: 40,
+          left: windowWidth < 768 ? 40 : 120,
+        }} // Responsive margins
         align="justify"
         colors={(node) => node.nodeColor || node.color}
         nodeOpacity={1}
         nodeHoverOthersOpacity={0.35}
-        nodeThickness={18}
-        nodeSpacing={24}
+        nodeThickness={windowWidth < 768 ? 12 : 18}
+        nodeSpacing={windowWidth < 768 ? 16 : 24}
         nodeBorderWidth={0}
-        nodeBorderRadius={6} // Rounded nodes like the reference
+        nodeBorderRadius={6}
         linkOpacity={0.2}
         linkHoverOthersOpacity={0.1}
-        linkContract={3} // Gap between link and node
+        linkContract={3}
         enableLinkGradient={true}
         labelPosition="outside"
         labelOrientation="horizontal"
-        labelPadding={16}
+        labelPadding={windowWidth < 768 ? 8 : 16}
         labelTextColor={{
           from: "color",
           modifiers: [["darker", 1]],
+        }}
+        // Smaller labels for mobile
+        theme={{
+          labels: {
+            text: {
+              fontSize: windowWidth < 768 ? 8 : 11,
+              fontWeight: 600,
+            },
+          },
         }}
         // Custom Tooltip
         tooltip={({ node }) => (

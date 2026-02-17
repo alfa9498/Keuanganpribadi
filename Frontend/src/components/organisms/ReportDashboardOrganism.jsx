@@ -692,29 +692,7 @@ export const ReportDashboardOrganism = ({ user }) => {
 
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           {reportTab === "cashflow" && (
-            <>
-              {/* Desktop Sankey */}
-              <div className="hidden md:block">
-                <CashFlowSankey transactions={filteredTransactions} />
-              </div>
-
-              {/* Mobile Simplified Bar View */}
-              <div className="md:hidden bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-slate-800 dark:text-white">
-                    Cash Flow Trend
-                  </h3>
-                  <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-400">
-                    <TrendingUp size={16} />
-                  </div>
-                </div>
-
-                {/* Cash Flow Bar Chart */}
-                <div className="w-full h-[320px] -mx-4">
-                  <ReportCashFlowChart transactions={filteredTransactions} />
-                </div>
-              </div>
-            </>
+            <CashFlowSankey transactions={filteredTransactions} />
           )}
 
           {reportTab === "spending" && (
