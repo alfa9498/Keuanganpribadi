@@ -52,22 +52,22 @@ export const LoginFormOrganism = ({
 
   return (
     <div className="w-full">
-      <div className="text-center mb-4 md:mb-8">
-        <div className="inline-flex items-center justify-center p-2.5 bg-sky-500/10 rounded-2xl border border-sky-500/20 mb-3">
+      <div className="text-center mb-4 md:mb-6">
+        <div className="inline-flex items-center justify-center p-2 bg-sky-500/10 rounded-xl border border-sky-500/20 mb-3">
           <img
             src="/logo.png"
             alt="Logo"
-            className="w-10 h-10 object-contain"
+            className="w-8 h-8 object-contain"
             onError={(e) => (e.target.style.display = "none")}
           />
-          <div className="text-sky-500 font-black text-2xl tracking-tighter">
+          <div className="text-sky-500 font-black text-xl tracking-tighter">
             FinVeda
           </div>
         </div>
-        <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+        <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">
           Welcome Back
         </h2>
-        <p className="text-slate-400 mt-2 text-sm">
+        <p className="text-slate-400 mt-1 text-xs">
           Sign in to continue your financial journey
         </p>
       </div>
@@ -91,7 +91,7 @@ export const LoginFormOrganism = ({
               onChange={handleChange}
               placeholder="name@company.com"
               autoComplete="off"
-              className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm"
+              className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-xs"
             />
           </div>
         </div>
@@ -139,8 +139,8 @@ export const LoginFormOrganism = ({
         </Button>
       </form>
 
-      <div className="mt-4 md:mt-8 text-center">
-        <p className="text-slate-500 text-sm">
+      <div className="mt-4 md:mt-6 text-center">
+        <p className="text-slate-500 text-xs">
           New here?{" "}
           <button
             onClick={onSwitchToRegister}

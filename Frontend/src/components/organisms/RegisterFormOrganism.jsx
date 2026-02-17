@@ -78,29 +78,29 @@ export const RegisterFormOrganism = ({
 
   return (
     <div className="w-full">
-      <div className="text-center mb-4 md:mb-6">
-        <div className="inline-flex items-center justify-center p-2 bg-sky-500/10 rounded-2xl border border-sky-500/20 mb-3">
+      <div className="text-center mb-3 md:mb-5">
+        <div className="inline-flex items-center justify-center p-1.5 bg-sky-500/10 rounded-xl border border-sky-500/20 mb-2">
           <img
             src="/logo.png"
             alt="Logo"
-            className="w-10 h-10 object-contain"
+            className="w-8 h-8 object-contain"
             onError={(e) => (e.target.style.display = "none")}
           />
-          <div className="text-sky-500 font-black text-2xl tracking-tighter">
+          <div className="text-sky-500 font-black text-xl tracking-tighter">
             FinVeda
           </div>
         </div>
-        <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+        <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">
           Create Account
         </h2>
-        <p className="text-slate-400 mt-2 text-sm">
+        <p className="text-slate-400 mt-1 text-[11px] md:text-xs">
           Join the elite financial community
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-2.5 md:space-y-3">
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+      <form onSubmit={handleSubmit} className="space-y-1.5 md:space-y-2">
+        <div className="space-y-1">
+          <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">
             Full Name
           </label>
           <input
@@ -109,13 +109,13 @@ export const RegisterFormOrganism = ({
             value={formData.fullName}
             onChange={handleChange}
             placeholder="John Doe"
-            className={`w-full bg-slate-950/50 border ${errors.fullName ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm`}
+            className={`w-full bg-slate-950/50 border ${errors.fullName ? "border-rose-500/50" : "border-white/5"} rounded-xl px-4 py-2 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-xs`}
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">
               Email
             </label>
             <input
@@ -124,12 +124,12 @@ export const RegisterFormOrganism = ({
               value={formData.email}
               onChange={handleChange}
               placeholder="john@example.com"
-              className={`w-full bg-slate-950/50 border ${errors.email ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm`}
+              className={`w-full bg-slate-950/50 border ${errors.email ? "border-rose-500/50" : "border-white/5"} rounded-xl px-4 py-2 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-xs`}
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+          <div className="space-y-1">
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">
               Phone
             </label>
             <input
@@ -138,51 +138,53 @@ export const RegisterFormOrganism = ({
               value={formData.phone}
               onChange={handleChange}
               placeholder="0812..."
-              className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm"
+              className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-2 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-xs"
             />
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-            Gender
-          </label>
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-2.5 text-white focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm appearance-none"
-          >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-            Password
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              value={formData.password}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">
+              Gender
+            </label>
+            <select
+              name="gender"
+              value={formData.gender}
               onChange={handleChange}
-              placeholder="••••••••"
-              className={`w-full bg-slate-950/50 border ${errors.password ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm pr-12`}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+              className="w-full h-[34px] bg-slate-950/50 border border-white/5 rounded-xl px-4 py-0 text-white focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-xs appearance-none"
             >
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                className={`w-full bg-slate-950/50 border ${errors.password ? "border-rose-500/50" : "border-white/5"} rounded-xl px-4 py-2 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-xs pr-10`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+              >
+                {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+        <div className="space-y-1">
+          <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">
             Confirm Password
           </label>
           <div className="relative">
@@ -192,14 +194,14 @@ export const RegisterFormOrganism = ({
               value={formData.confirmPassword}
               onChange={handleChange}
               placeholder="••••••••"
-              className={`w-full bg-slate-950/50 border ${errors.confirmPassword ? "border-rose-500/50" : "border-white/5"} rounded-2xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-sm pr-12`}
+              className={`w-full bg-slate-950/50 border ${errors.confirmPassword ? "border-rose-500/50" : "border-white/5"} rounded-xl px-4 py-2 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-xs pr-10`}
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
             >
-              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
             </button>
           </div>
         </div>
@@ -207,15 +209,15 @@ export const RegisterFormOrganism = ({
         <Button
           type="submit"
           variant="primary"
-          className="w-full py-3 md:py-3.5 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-sky-500/20 transition-all active:scale-95 mt-2"
+          className="w-full py-3 bg-sky-500 hover:bg-sky-400 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-sky-500/20 transition-all active:scale-95 mt-2"
           disabled={loading}
         >
           {loading ? "Registering..." : "Complete Registration"}
         </Button>
       </form>
 
-      <div className="mt-4 md:mt-6 text-center">
-        <p className="text-slate-500 text-sm">
+      <div className="mt-3 md:mt-4 text-center">
+        <p className="text-slate-500 text-[11px] md:text-xs">
           Already a member?{" "}
           <button
             onClick={onSwitchToLogin}
