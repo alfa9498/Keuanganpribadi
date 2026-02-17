@@ -13,7 +13,18 @@ import {
 } from "lucide-react";
 
 export const GuideOrganism = () => {
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [expandedSections, setExpandedSections] = useState([
+    "accounts",
+    "categories",
+    "transactions",
+  ]);
+
+  const toggleSection = (id) => {
+    setExpandedSections((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
+    );
+  };
+
   const sections = [
     {
       id: "accounts",
@@ -60,112 +71,124 @@ export const GuideOrganism = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden transition-all duration-300">
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-md">
-              <BookOpen size={32} className="text-sky-400" />
-            </div>
-            <div className="text-left">
-              <h2 className="text-2xl font-black">Pusat Bantuan</h2>
-              {!isMinimized && (
-                <p className="text-slate-300 text-sm">
-                  Pelajari cara mengoptimalkan pencatatan keuangan Anda.
-                </p>
-              )}
-            </div>
+      <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden">
+        <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+          <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-md">
+            <BookOpen size={40} className="text-sky-400" />
           </div>
-
-          <button
-            onClick={() => setIsMinimized(!isMinimized)}
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-black uppercase tracking-widest transition-all border border-white/10 active:scale-95 whitespace-nowrap"
-          >
-            {isMinimized ? "Tampilkan Panduan" : "Sembunyikan"}
-          </button>
+          <div className="text-center md:text-left">
+            <h2 className="text-2xl font-black mb-1">Pusat Bantuan</h2>
+            <p className="text-slate-300 text-sm">
+              Pelajari cara mengoptimalkan pencatatan keuangan Anda dengan
+              langkah-langkah mudah di bawah ini.
+            </p>
+          </div>
         </div>
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl"></div>
       </div>
 
-      {!isMinimized && (
-        <div className="space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
-          {/* Guide Sections */}
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-            {sections.map((section) => (
+      <div className="space-y-6">
+        {/* Guide Sections */}
+        <div className="grid grid-cols-1 gap-4">
+          {sections.map((section) => {
+            const isExpanded = expandedSections.includes(section.id);
+            return (
               <div
                 key={section.id}
-                className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden transform transition-all hover:scale-[1.01]"
+                className="bg-white rounded-3xl shadow-lg shadow-slate-200/40 border border-slate-100 overflow-hidden transform transition-all"
               >
-                <div className="p-6 md:p-8">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className={`p-3 rounded-2xl ${section.color}`}>
-                      {section.icon}
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-800">
-                      {section.title}
-                    </h3>
-                  </div>
-
-                  <p className="text-slate-500 mb-6 font-medium">
-                    {section.content}
-                  </p>
-
-                  <div className="space-y-3">
-                    {section.steps.map((step, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-start gap-3 text-slate-600 bg-slate-50/50 p-3 rounded-xl border border-slate-100"
-                      >
-                        <CheckCircle
-                          size={18}
-                          className="text-emerald-500 mt-0.5 flex-shrink-0"
-                        />
-                        <span className="text-sm font-semibold">{step}</span>
+                <div
+                  className="p-5 md:p-6 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                  onClick={() => toggleSection(section.id)}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-2.5 rounded-2xl ${section.color}`}>
+                        {React.cloneElement(section.icon, { size: 20 })}
                       </div>
-                    ))}
+                      <h3 className="text-lg font-bold text-slate-800">
+                        {section.title}
+                      </h3>
+                    </div>
+                    <div
+                      className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                    >
+                      <ArrowRight
+                        className="text-slate-400 rotate-90"
+                        size={18}
+                      />
+                    </div>
                   </div>
+
+                  {isExpanded && (
+                    <div className="mt-5 animate-in fade-in slide-in-from-top-1 duration-200">
+                      <p className="text-slate-500 mb-5 text-sm font-medium">
+                        {section.content}
+                      </p>
+
+                      <div className="space-y-2.5">
+                        {section.steps.map((step, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-start gap-3 text-slate-600 bg-slate-50/50 p-2.5 rounded-xl border border-slate-100"
+                          >
+                            <CheckCircle
+                              size={16}
+                              className="text-emerald-500 mt-0.5 flex-shrink-0"
+                            />
+                            <span className="text-xs font-semibold">
+                              {step}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
+            );
+          })}
+        </div>
+
+        {/* Tips Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-amber-50/50 border border-amber-100/50 rounded-3xl p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <Lightbulb className="text-amber-500" size={20} />
+              <h4 className="font-bold text-amber-800 text-sm">Tips Hemat</h4>
+            </div>
+            <p className="text-xs text-amber-700 leading-relaxed">
+              Gunakan fitur <strong>Transfer</strong> untuk memindahkan uang
+              antar akun tanpa mempengaruhi total kekayaan Anda (misal: Tarik
+              Tunai dari ATM).
+            </p>
           </div>
 
-          {/* Tips Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-amber-50 border border-amber-100 rounded-3xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Lightbulb className="text-amber-500" size={24} />
-                <h4 className="font-bold text-amber-800">Tips Hemat</h4>
-              </div>
-              <p className="text-sm text-amber-700 leading-relaxed">
-                Gunakan fitur <strong>Transfer</strong> untuk memindahkan uang
-                antar akun tanpa mempengaruhi total kekayaan Anda (misal: Tarik
-                Tunai dari ATM).
-              </p>
+          <div className="bg-indigo-50/50 border border-indigo-100/50 rounded-3xl p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <Smartphone className="text-indigo-500" size={20} />
+              <h4 className="font-bold text-indigo-800 text-sm">
+                Cek Bot Telegram
+              </h4>
             </div>
-
-            <div className="bg-indigo-50 border border-indigo-100 rounded-3xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Smartphone className="text-indigo-500" size={24} />
-                <h4 className="font-bold text-indigo-800">Cek Bot Telegram</h4>
-              </div>
-              <p className="text-sm text-indigo-700 leading-relaxed">
-                Hubungkan akun Anda dengan Telegram untuk mencatat transaksi
-                lebih cepat langsung dari chat! Buka menu{" "}
-                <strong>Telegram Bot</strong> untuk mulai.
-              </p>
-            </div>
-          </div>
-
-          {/* Footer Info */}
-          <div className="text-center pb-8">
-            <div className="inline-flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-full text-xs font-bold text-slate-500 uppercase tracking-widest">
-              <ShieldCheck size={14} /> Keamanan Data Terjamin
-            </div>
+            <p className="text-xs text-indigo-700 leading-relaxed">
+              Hubungkan akun Anda dengan Telegram untuk mencatat transaksi lebih
+              cepat langsung dari chat! Buka menu <strong>Telegram Bot</strong>{" "}
+              untuk mulai.
+            </p>
           </div>
         </div>
-      )}
+
+        {/* Footer Info */}
+        <div className="text-center pb-4">
+          <div className="inline-flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            <ShieldCheck size={12} /> Keamanan Data Terjamin
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
