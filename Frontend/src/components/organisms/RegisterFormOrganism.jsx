@@ -78,8 +78,8 @@ export const RegisterFormOrganism = ({
 
   return (
     <div className="w-full">
-      <div className="text-center mb-6 md:mb-10">
-        <div className="inline-flex items-center justify-center p-3 bg-sky-500/10 rounded-2xl border border-sky-500/20 mb-4">
+      <div className="text-center mb-4 md:mb-6">
+        <div className="inline-flex items-center justify-center p-2 bg-sky-500/10 rounded-2xl border border-sky-500/20 mb-3">
           <img
             src="/logo.png"
             alt="Logo"
@@ -98,7 +98,7 @@ export const RegisterFormOrganism = ({
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-2.5 md:space-y-3">
         <div className="space-y-1.5">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
             Full Name
@@ -207,14 +207,14 @@ export const RegisterFormOrganism = ({
         <Button
           type="submit"
           variant="primary"
-          className="w-full py-3.5 md:py-4 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-sky-500/20 transition-all active:scale-95 mt-4"
+          className="w-full py-3 md:py-3.5 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-sky-500/20 transition-all active:scale-95 mt-2"
           disabled={loading}
         >
           {loading ? "Registering..." : "Complete Registration"}
         </Button>
       </form>
 
-      <div className="mt-6 md:mt-8 text-center">
+      <div className="mt-4 md:mt-6 text-center">
         <p className="text-slate-500 text-sm">
           Already a member?{" "}
           <button
