@@ -65,11 +65,11 @@ export const SpendingBreakdown = ({ transactions, totalExpense }) => {
   return (
     <div className="flex flex-col xl:flex-row gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* LEFT: DONUT CHART */}
-      <div className="w-full xl:w-5/12 bg-white dark:bg-slate-900 p-4 md:p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center relative min-h-[320px] md:min-h-[400px]">
+      <div className="w-full xl:w-5/12 bg-white dark:bg-slate-900 p-4 md:p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center relative min-h-[250px] md:min-h-[320px]">
         <h3 className="absolute top-6 left-6 text-sm font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
           Spending Share
         </h3>
-        <div className="h-[260px] md:h-[350px] w-full mt-6 md:mt-0">
+        <div className="h-[200px] md:h-[280px] w-full mt-6 md:mt-0">
           <ResponsivePie
             data={data}
             margin={{ top: 20, right: 40, bottom: 40, left: 40 }}
@@ -130,7 +130,7 @@ export const SpendingBreakdown = ({ transactions, totalExpense }) => {
           </span>
         </div>
 
-        <div className="overflow-y-auto max-h-[500px] p-2">
+        <div className="overflow-y-auto max-h-[350px] p-2">
           <table className="w-full">
             <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
               {data.map((item, idx) => {

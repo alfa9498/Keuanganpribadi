@@ -99,7 +99,7 @@ export const CashFlowSankey = ({ transactions }) => {
   }
 
   return (
-    <div className="h-[600px] w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 overflow-hidden">
+    <div className="h-[420px] w-full bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 overflow-hidden">
       <h3 className="text-lg font-black text-slate-700 dark:text-white uppercase tracking-wider mb-6">
         Cash Flow Visualization
       </h3>

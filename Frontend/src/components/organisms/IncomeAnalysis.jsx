@@ -119,7 +119,7 @@ export const IncomeAnalysis = ({ transactions, totalIncome }) => {
         </div>
 
         {/* Bar Chart */}
-        <div className="h-[250px] w-full">
+        <div className="h-[180px] w-full">
           <ResponsiveBar
             data={trendData}
             keys={["value"]}
@@ -172,11 +172,11 @@ export const IncomeAnalysis = ({ transactions, totalIncome }) => {
       {/* SECTION 2: BREAKDOWN (Donut + List) */}
       <div className="flex flex-col xl:flex-row gap-8">
         {/* DONUT CHART */}
-        <div className="w-full xl:w-5/12 bg-white dark:bg-slate-900 p-4 md:p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center relative min-h-[320px] md:min-h-[400px]">
+        <div className="w-full xl:w-5/12 bg-white dark:bg-slate-900 p-4 md:p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center relative min-h-[250px] md:min-h-[320px]">
           <h3 className="absolute top-6 left-6 text-sm font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
             Income Sources
           </h3>
-          <div className="h-[260px] md:h-[350px] w-full mt-6 md:mt-0">
+          <div className="h-[200px] md:h-[280px] w-full mt-6 md:mt-0">
             <ResponsivePie
               data={breakdownData}
               margin={{ top: 20, right: 40, bottom: 40, left: 40 }}
@@ -235,7 +235,7 @@ export const IncomeAnalysis = ({ transactions, totalIncome }) => {
             </span>
           </div>
 
-          <div className="overflow-y-auto max-h-[500px] p-2">
+          <div className="overflow-y-auto max-h-[350px] p-2">
             <table className="w-full">
               <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                 {breakdownData.map((item, idx) => {
