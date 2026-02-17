@@ -204,7 +204,7 @@ export const SidebarOrganism = ({
             {!isMinimized ? (
               <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap overflow-hidden transition-all duration-300">
                 Finance
-                <span className="text-finance-primary uppercase italic text-lg ml-1">
+                <span className="text-finance-accent uppercase italic text-lg ml-1">
                   App
                 </span>
               </h1>
