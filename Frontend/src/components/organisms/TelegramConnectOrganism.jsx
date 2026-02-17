@@ -66,14 +66,14 @@ export const TelegramConnectOrganism = ({ user }) => {
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-8">
       {/* Header Section */}
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center p-4 bg-sky-500/10 rounded-3xl border border-sky-500/20 mb-6 group transition-all hover:scale-110">
-          <Send className="w-12 h-12 text-sky-500 group-hover:rotate-12 transition-transform" />
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center p-3 bg-sky-500/10 rounded-3xl border border-sky-500/20 mb-4 group transition-all hover:scale-110">
+          <Send className="w-10 h-10 text-sky-500 group-hover:rotate-12 transition-transform" />
         </div>
-        <h1 className="text-4xl font-black text-white tracking-tight mb-4">
+        <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-2">
           Telegram <span className="text-sky-500">Bot Connection</span>
         </h1>
-        <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+        <p className="text-slate-400 text-sm max-w-2xl mx-auto">
           Hubungkan akun Anda dengan Telegram untuk mencatat transaksi lebih
           cepat melalui chat atau foto struk.
         </p>
@@ -81,9 +81,9 @@ export const TelegramConnectOrganism = ({ user }) => {
 
       {isConnected ? (
         /* Connected State */
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-emerald-500/20 rounded-3xl p-8 md:p-12 text-center animate-in fade-in zoom-in duration-500 shadow-2xl shadow-emerald-500/5">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-500/20 rounded-full mb-6 text-emerald-500">
-            <CheckCircle2 size={48} />
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-emerald-500/20 rounded-3xl p-6 md:p-8 text-center animate-in fade-in zoom-in duration-500 shadow-2xl shadow-emerald-500/5">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-500/20 rounded-full mb-4 text-emerald-500">
+            <CheckCircle2 size={36} />
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">
             Akun Berhasil Terhubung!
@@ -123,24 +123,24 @@ export const TelegramConnectOrganism = ({ user }) => {
         </div>
       ) : (
         /* Unconnected State */
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Method 1: Magic Link */}
           <div className="group relative">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-            <div className="relative h-full bg-slate-900/80 backdrop-blur-xl border border-white/5 rounded-3xl p-8 flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-sky-500/10 rounded-2xl flex items-center justify-center text-sky-500 mb-6">
-                <ExternalLink size={24} />
+            <div className="relative h-full bg-slate-900/80 backdrop-blur-xl border border-white/5 rounded-3xl p-6 flex flex-col items-center text-center">
+              <div className="w-10 h-10 bg-sky-500/10 rounded-2xl flex items-center justify-center text-sky-500 mb-4">
+                <ExternalLink size={20} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">
+              <h3 className="text-lg font-bold text-white mb-2">
                 Cara 1: Link Otomatis
               </h3>
-              <p className="text-slate-400 text-sm mb-8 flex-1">
+              <p className="text-slate-400 text-xs mb-4 flex-1">
                 Klik tombol di bawah ini untuk membuka bot Telegram dan
                 hubungkan akun secara instan tanpa perlu ketik manual.
               </p>
               <button
                 onClick={() => window.open(linkData?.url || "#", "_blank")}
-                className="w-full py-4 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-sky-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+                className="w-full py-3 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-sky-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
               >
                 Hubungkan Sekarang
                 <ExternalLink size={14} />
@@ -151,20 +151,20 @@ export const TelegramConnectOrganism = ({ user }) => {
           {/* Method 2: Verification Code */}
           <div className="group relative">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-            <div className="relative h-full bg-slate-900/80 backdrop-blur-xl border border-white/5 rounded-3xl p-8 flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-500 mb-6">
-                <span className="font-black text-xl">#</span>
+            <div className="relative h-full bg-slate-900/80 backdrop-blur-xl border border-white/5 rounded-3xl p-6 flex flex-col items-center text-center">
+              <div className="w-10 h-10 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-500 mb-4">
+                <span className="font-black text-lg">#</span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">
+              <h3 className="text-lg font-bold text-white mb-2">
                 Cara 2: Kode Verifikasi
               </h3>
-              <p className="text-slate-400 text-sm mb-6 flex-1">
+              <p className="text-slate-400 text-xs mb-4 flex-1">
                 Jika Link di samping tidak terbuka, kirimkan kode verifikasi
                 berikut ke bot kami secara manual.
               </p>
 
-              <div className="w-full bg-slate-950/80 border border-white/5 rounded-2xl p-4 mb-3 flex items-center justify-between group/code">
-                <span className="text-2xl font-black text-white tracking-[0.2em] ml-2">
+              <div className="w-full bg-slate-950/80 border border-white/5 rounded-2xl p-3 mb-2 flex items-center justify-between group/code">
+                <span className="text-xl font-black text-white tracking-[0.2em] ml-2">
                   {verificationCode || "------"}
                 </span>
                 <button
