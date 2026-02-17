@@ -13,11 +13,7 @@ import {
 } from "lucide-react";
 
 export const GuideOrganism = () => {
-  const [expandedSections, setExpandedSections] = useState([
-    "accounts",
-    "categories",
-    "transactions",
-  ]);
+  const [expandedSections, setExpandedSections] = useState([]);
 
   const toggleSection = (id) => {
     setExpandedSections((prev) =>
