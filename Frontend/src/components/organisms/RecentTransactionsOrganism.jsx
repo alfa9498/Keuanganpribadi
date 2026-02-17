@@ -658,7 +658,7 @@ export const RecentTransactionsOrganism = ({
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         title="Edit Transaksi"
-        maxWidth="max-w-xl"
+        maxWidth="max-w-md"
       >
         {selectedTx && (
           <TransactionFormOrganism

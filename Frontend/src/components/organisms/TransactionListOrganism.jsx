@@ -25,7 +25,10 @@ export const TransactionListOrganism = ({
   const [activeListTab, setActiveListTab] = useState("all"); // all, income, expense
   const [refreshKey, setRefreshKey] = useState(0);
   const [accounts, setAccounts] = useState([]);
-  const [categoriesData, setCategoriesData] = useState({ expense: [], income: [] });
+  const [categoriesData, setCategoriesData] = useState({
+    expense: [],
+    income: [],
+  });
 
   useEffect(() => {
     if (user?.id) {
@@ -186,7 +189,7 @@ export const TransactionListOrganism = ({
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
         title="Add New Transaction"
-        maxWidth="max-w-4xl"
+        maxWidth="max-w-md"
       >
         <TransactionFormOrganism
           user={user}

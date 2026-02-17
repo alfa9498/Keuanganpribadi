@@ -38,8 +38,8 @@ export const Modal = ({
         className={`relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full ${maxWidth} transform transition-all duration-300 ${isOpen ? "scale-100 translate-y-0" : "scale-95 translate-y-4"} border border-slate-200 dark:border-slate-800`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
-          <h3 className="text-xl font-bold text-slate-800 dark:text-white">
+        <div className="flex items-center justify-between p-3.5 md:p-4 border-b border-slate-100 dark:border-slate-800">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-white">
             {title}
           </h3>
           <button
@@ -51,7 +51,7 @@ export const Modal = ({
         </div>
 
         {/* Body */}
-        <div className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
+        <div className="p-3 md:p-4 max-h-[85vh] overflow-y-auto custom-scrollbar">
           {children}
         </div>
       </div>

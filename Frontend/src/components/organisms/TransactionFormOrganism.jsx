@@ -268,18 +268,18 @@ export const TransactionFormOrganism = ({
   ];
 
   return (
-    <div className="flex justify-center w-full animate-fade-in p-1 md:p-0">
-      <Card
-        className={`w-full overflow-hidden ${!isEdit ? "max-w-md border-t-2 border-t-finance-primary shadow-lg" : "p-0 shadow-none border-0"}`}
+    <div className="flex justify-center w-full animate-fade-in p-0">
+      <div
+        className={`w-full overflow-hidden ${!isEdit && !onCancel ? "max-w-md border-t-2 border-t-finance-primary shadow-lg bg-white dark:bg-slate-900 rounded-2xl" : "p-0 shadow-none border-0 bg-transparent"}`}
       >
         {!isEdit && (
-          <div className="p-2 md:p-4 pb-0">
-            <div className="flex items-center justify-between mb-2 md:mb-4">
+          <div className="p-1 md:p-2 pb-0">
+            <div className="flex items-center justify-between mb-1 md:mb-2 text-slate-800 dark:text-white">
               <div>
-                <h2 className="text-base md:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                <p className="text-[9px] md:text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-tight">
                   {isEdit ? "Edit" : "Tambah"} Transaksi
-                </h2>
-                <p className="text-[8px] md:text-[9px] text-slate-500 dark:text-slate-400 font-bold mt-0">
+                </p>
+                <p className="text-[8px] md:text-[9px] text-slate-400 dark:text-slate-500 font-medium">
                   Step {activeStep} / 4: {steps[activeStep - 1].label}
                 </p>
               </div>
@@ -306,9 +306,9 @@ export const TransactionFormOrganism = ({
             </div>
 
             {/* Progress Bar Container */}
-            <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-2 md:mb-4">
+            <div className="w-full h-0.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1 md:mb-2 text-slate-800 dark:text-white">
               <div
-                className="h-full bg-finance-primary transition-all duration-700 ease-out shadow-[0_0_10px_rgba(var(--finance-primary-rgb),0.3)]"
+                className="h-full bg-finance-primary transition-all duration-700 ease-out"
                 style={{ width: `${(activeStep / 4) * 100}%` }}
               />
             </div>
@@ -325,7 +325,7 @@ export const TransactionFormOrganism = ({
           }}
           className="flex flex-col"
         >
-          <div className="p-2 md:p-4 min-h-[200px] space-y-2 md:space-y-3">
+          <div className="p-1 md:p-2 min-h-[180px] space-y-2">
             {/* STEP 1: Info Utama */}
             {activeStep === 1 && (
               <div className="space-y-4 md:space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -688,7 +688,7 @@ export const TransactionFormOrganism = ({
             </div>
           </div>
         </form>
-      </Card>
+      </div>
     </div>
   );
 };
