@@ -394,7 +394,7 @@ const EnvelopeGroup = ({
 
   const totalBudget = items.reduce((sum, item) => sum + item.budgetLimit, 0);
   const totalSpent = items.reduce((sum, item) => sum + item.currentSpent, 0);
-  const totalRemaining = Math.max(0, totalBudget - totalSpent);
+  const totalRemaining = totalBudget - totalSpent;
   const percent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
   return (
