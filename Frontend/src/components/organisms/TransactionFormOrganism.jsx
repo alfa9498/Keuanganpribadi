@@ -13,6 +13,8 @@ import {
   CreditCard,
   Calendar,
   Tag,
+  Eye,
+  Wallet,
 } from "lucide-react";
 import { fetchCategories } from "../../services/categoryService";
 
@@ -244,7 +246,7 @@ export const TransactionFormOrganism = ({
 
   const handleNext = () => {
     if (validateStep(activeStep)) {
-      setActiveStep((prev) => Math.min(prev + 1, 3));
+      setActiveStep((prev) => Math.min(prev + 1, 4));
     }
   };
 
@@ -253,34 +255,35 @@ export const TransactionFormOrganism = ({
   };
 
   const steps = [
-    { id: 1, label: "Info Utama", icon: <Info size={16} /> },
-    { id: 2, label: "Klasifikasi", icon: <Layers size={16} /> },
-    { id: 3, label: "Detail Akun", icon: <CreditCard size={16} /> },
+    { id: 1, label: "Info", icon: <Info size={14} /> },
+    { id: 2, label: "Kategori", icon: <Layers size={14} /> },
+    { id: 3, label: "Akun", icon: <CreditCard size={14} /> },
+    { id: 4, label: "Review", icon: <Eye size={14} /> },
   ];
 
   return (
-    <div className="flex justify-center w-full animate-fade-in p-2 md:p-0">
+    <div className="flex justify-center w-full animate-fade-in p-1 md:p-0">
       <Card
-        className={`w-full overflow-hidden ${!isEdit ? "max-w-xl border-t-8 border-t-finance-primary shadow-2xl" : "p-0 shadow-none border-0"}`}
+        className={`w-full overflow-hidden ${!isEdit ? "max-w-lg border-t-4 border-t-finance-primary shadow-xl" : "p-0 shadow-none border-0"}`}
       >
         {!isEdit && (
-          <div className="p-4 md:p-6 pb-0">
-            <div className="flex items-center justify-between mb-4 md:mb-8">
+          <div className="p-3 md:p-4 pb-0">
+            <div className="flex items-center justify-between mb-3 md:mb-5">
               <div>
-                <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                  {isEdit ? "Edit Transaksi" : "Tambah Transaksi"}
+                <h2 className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  {isEdit ? "Edit" : "Tambah"} Transaksi
                 </h2>
-                <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
-                  Step {activeStep} of 3: {steps[activeStep - 1].label}
+                <p className="text-[9px] md:text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                  Step {activeStep} / 4: {steps[activeStep - 1].label}
                 </p>
               </div>
-              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 md:p-1.5 rounded-xl md:rounded-2xl">
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                 {steps.map((step) => (
                   <div
                     key={step.id}
-                    className={`flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl transition-all duration-500 ${
+                    className={`flex items-center justify-center w-6 h-6 md:w-7 md:h-7 rounded-md md:rounded-lg transition-all duration-300 ${
                       activeStep === step.id
-                        ? "bg-finance-primary text-white shadow-lg shadow-finance-primary/20 scale-105"
+                        ? "bg-finance-primary text-white shadow-md shadow-finance-primary/20 scale-105"
                         : activeStep > step.id
                           ? "bg-emerald-500 text-white"
                           : "text-slate-400 dark:text-slate-500"
@@ -297,17 +300,17 @@ export const TransactionFormOrganism = ({
             </div>
 
             {/* Progress Bar Container */}
-            <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-4 md:mb-8">
+            <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-3 md:mb-5">
               <div
                 className="h-full bg-finance-primary transition-all duration-700 ease-out shadow-[0_0_10px_rgba(var(--finance-primary-rgb),0.3)]"
-                style={{ width: `${(activeStep / 3) * 100}%` }}
+                style={{ width: `${(activeStep / 4) * 100}%` }}
               />
             </div>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col">
-          <div className="p-4 md:p-6 min-h-[250px] space-y-4 md:space-y-5">
+          <div className="p-3 md:p-5 min-h-[220px] space-y-3 md:space-y-4">
             {/* STEP 1: Info Utama */}
             {activeStep === 1 && (
               <div className="space-y-4 md:space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -538,6 +541,83 @@ export const TransactionFormOrganism = ({
                 </FormField>
               </div>
             )}
+
+            {/* STEP 4: Konfirmasi (Review) */}
+            {activeStep === 4 && (
+              <div className="space-y-3 animate-in fade-in zoom-in-95 duration-300">
+                <div className="bg-emerald-50/50 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/50 text-center mb-2">
+                  <div className="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400 mb-1">
+                    <CheckCircle2 size={16} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      Tinjau Transaksi
+                    </span>
+                  </div>
+                  <p className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">
+                    Rp {formatRupiah(formData.amount)}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-1.5 text-slate-400 mb-1">
+                      <Tag size={12} />
+                      <span className="text-[9px] font-bold uppercase">
+                        Kategori
+                      </span>
+                    </div>
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">
+                      {formData.type === "transfer"
+                        ? "Internal Transfer"
+                        : formData.category || "-"}
+                    </p>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-1.5 text-slate-400 mb-1">
+                      <Wallet size={12} />
+                      <span className="text-[9px] font-bold uppercase">
+                        Sumber Akun
+                      </span>
+                    </div>
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">
+                      {formData.account}
+                    </p>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-1.5 text-slate-400 mb-1">
+                      <Calendar size={12} />
+                      <span className="text-[9px] font-bold uppercase">
+                        Tanggal
+                      </span>
+                    </div>
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                      {formData.date}
+                    </p>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-1.5 text-slate-400 mb-1">
+                      <Layers size={12} />
+                      <span className="text-[9px] font-bold uppercase">
+                        Jenis
+                      </span>
+                    </div>
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-200 capitalize">
+                      {formData.type}
+                    </p>
+                  </div>
+                </div>
+
+                {formData.description && (
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                      Catatan
+                    </span>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 italic">
+                      "{formData.description}"
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -570,11 +650,11 @@ export const TransactionFormOrganism = ({
                 </Button>
               )}
 
-              {activeStep < 3 ? (
+              {activeStep < 4 ? (
                 <Button
                   type="button"
                   variant="primary"
-                  className="flex-[2] h-12 md:h-14 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[9px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2 shadow-lg shadow-finance-primary/20"
+                  className="flex-[2] h-11 md:h-12 rounded-lg md:rounded-xl font-black uppercase tracking-widest text-[9px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2 shadow-lg shadow-finance-primary/20"
                   onClick={handleNext}
                 >
                   Lanjut
@@ -584,7 +664,7 @@ export const TransactionFormOrganism = ({
                 <Button
                   type="submit"
                   variant="primary"
-                  className="flex-[2] h-12 md:h-14 rounded-xl md:rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-black uppercase tracking-widest text-[9px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2 shadow-lg shadow-emerald-500/20"
+                  className="flex-[2] h-11 md:h-12 rounded-lg md:rounded-xl bg-emerald-600 hover:bg-emerald-500 font-black uppercase tracking-widest text-[9px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2 shadow-lg shadow-emerald-500/20"
                 >
                   <CheckCircle2 size={14} md:size={16} />
                   {isEdit ? "Update" : "Simpan"}
