@@ -264,23 +264,23 @@ export const TransactionFormOrganism = ({
         className={`w-full overflow-hidden ${!isEdit ? "max-w-xl border-t-8 border-t-finance-primary shadow-2xl" : "p-0 shadow-none border-0"}`}
       >
         {!isEdit && (
-          <div className="p-6 pb-0">
-            <div className="flex items-center justify-between mb-8">
+          <div className="p-4 md:p-6 pb-0">
+            <div className="flex items-center justify-between mb-4 md:mb-8">
               <div>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                   {isEdit ? "Edit Transaksi" : "Tambah Transaksi"}
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
                   Step {activeStep} of 3: {steps[activeStep - 1].label}
                 </p>
               </div>
-              <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl">
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 md:p-1.5 rounded-xl md:rounded-2xl">
                 {steps.map((step) => (
                   <div
                     key={step.id}
-                    className={`flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-500 ${
+                    className={`flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl transition-all duration-500 ${
                       activeStep === step.id
-                        ? "bg-finance-primary text-white shadow-lg shadow-finance-primary/20 scale-110"
+                        ? "bg-finance-primary text-white shadow-lg shadow-finance-primary/20 scale-105"
                         : activeStep > step.id
                           ? "bg-emerald-500 text-white"
                           : "text-slate-400 dark:text-slate-500"
@@ -297,7 +297,7 @@ export const TransactionFormOrganism = ({
             </div>
 
             {/* Progress Bar Container */}
-            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-8">
+            <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-4 md:mb-8">
               <div
                 className="h-full bg-finance-primary transition-all duration-700 ease-out shadow-[0_0_10px_rgba(var(--finance-primary-rgb),0.3)]"
                 style={{ width: `${(activeStep / 3) * 100}%` }}
@@ -307,11 +307,11 @@ export const TransactionFormOrganism = ({
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col">
-          <div className="p-6 min-h-[300px] md:min-h-[250px] space-y-5">
+          <div className="p-4 md:p-6 min-h-[250px] space-y-4 md:space-y-5">
             {/* STEP 1: Info Utama */}
             {activeStep === 1 && (
-              <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4 md:space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   <FormField
                     label="Pilih Tanggal"
                     type="date"
@@ -338,12 +338,12 @@ export const TransactionFormOrganism = ({
                   </FormField>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-inner">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block">
+                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 md:p-6 rounded-2xl md:rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-inner">
+                  <label className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1.5 block">
                     Jumlah Nominal (IDR)
                   </label>
                   <div className="relative">
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-black text-slate-400">
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 text-xl md:text-3xl font-black text-slate-400">
                       Rp
                     </span>
                     <input
@@ -352,7 +352,7 @@ export const TransactionFormOrganism = ({
                       value={formatRupiah(formData.amount)}
                       onChange={handleAmountChange}
                       placeholder="0"
-                      className={`w-full bg-transparent border-0 border-b-2 ${errors.amount ? "border-rose-500" : "border-slate-200 dark:border-slate-700"} focus:ring-0 focus:border-finance-primary transition-all px-12 py-4 text-4xl font-black text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700`}
+                      className={`w-full bg-transparent border-0 border-b-2 ${errors.amount ? "border-rose-500" : "border-slate-200 dark:border-slate-700"} focus:ring-0 focus:border-finance-primary transition-all px-9 md:px-12 py-2 md:py-4 text-2xl md:text-4xl font-black text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700`}
                     />
                   </div>
                   {errors.amount && (
@@ -366,13 +366,14 @@ export const TransactionFormOrganism = ({
 
             {/* STEP 2: Klasifikasi */}
             {activeStep === 2 && (
-              <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+              <div className="space-y-4 md:space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
                 {formData.type === "transfer" ? (
-                  <div className="p-8 bg-blue-50 dark:bg-blue-900/20 rounded-[32px] border border-blue-100 dark:border-blue-800 text-center space-y-3">
-                    <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="p-6 md:p-8 bg-blue-50 dark:bg-blue-900/20 rounded-2xl md:rounded-[32px] border border-blue-100 dark:border-blue-800 text-center space-y-2 md:space-y-3">
+                    <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-4">
                       <ChevronRight
                         className="text-blue-600 dark:text-blue-400"
-                        size={32}
+                        size={24}
+                        md:size={32}
                       />
                     </div>
                     <h3 className="text-lg font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">
@@ -540,13 +541,13 @@ export const TransactionFormOrganism = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="p-6 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-3">
-            <div className="flex gap-3 flex-1">
+          <div className="p-4 md:p-6 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-2 md:gap-3">
+            <div className="flex gap-2 md:gap-3 flex-1">
               {activeStep === 1 ? (
                 <Button
                   type="button"
                   variant="ghost"
-                  className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-100 rounded-2xl h-14 font-black uppercase tracking-widest text-[10px]"
+                  className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-100 rounded-xl md:rounded-2xl h-12 md:h-14 font-black uppercase tracking-widest text-[9px] md:text-[10px]"
                   onClick={() =>
                     onCancel
                       ? onCancel()
@@ -561,10 +562,10 @@ export const TransactionFormOrganism = ({
                 <Button
                   type="button"
                   variant="ghost"
-                  className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-100 rounded-2xl h-14 font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2"
+                  className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-100 rounded-xl md:rounded-2xl h-12 md:h-14 font-black uppercase tracking-widest text-[9px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2"
                   onClick={handleBack}
                 >
-                  <ChevronLeft size={16} />
+                  <ChevronLeft size={14} md:size={16} />
                   Kembali
                 </Button>
               )}
@@ -573,20 +574,20 @@ export const TransactionFormOrganism = ({
                 <Button
                   type="button"
                   variant="primary"
-                  className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 shadow-lg shadow-finance-primary/20"
+                  className="flex-[2] h-12 md:h-14 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[9px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2 shadow-lg shadow-finance-primary/20"
                   onClick={handleNext}
                 >
                   Lanjut
-                  <ChevronRight size={16} />
+                  <ChevronRight size={14} md:size={16} />
                 </Button>
               ) : (
                 <Button
                   type="submit"
                   variant="primary"
-                  className="flex-[2] h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+                  className="flex-[2] h-12 md:h-14 rounded-xl md:rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-black uppercase tracking-widest text-[9px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2 shadow-lg shadow-emerald-500/20"
                 >
-                  <CheckCircle2 size={16} />
-                  {isEdit ? "Update Transaksi" : "Simpan Transaksi"}
+                  <CheckCircle2 size={14} md:size={16} />
+                  {isEdit ? "Update" : "Simpan"}
                 </Button>
               )}
             </div>
