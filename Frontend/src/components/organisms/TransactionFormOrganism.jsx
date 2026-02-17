@@ -15,6 +15,7 @@ import {
   Tag,
   Eye,
   Wallet,
+  Pencil,
 } from "lucide-react";
 import { fetchCategories } from "../../services/categoryService";
 
@@ -460,13 +461,12 @@ export const TransactionFormOrganism = ({
                 )}
                 <FormField
                   label="Catatan / Deskripsi"
-                  component="textarea"
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   placeholder="Beli apa? Atau catatan tambahan..."
-                  rows={2}
-                  className="rounded-[24px]"
+                  className="rounded-xl h-10 md:h-11"
+                  icon={<Pencil size={14} />}
                 />
               </div>
             )}
