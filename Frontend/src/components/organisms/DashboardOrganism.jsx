@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { fetchCategories } from "../../services/categoryService";
+import { normalizeCategory } from "../../utils/categoryUtils";
 import { Button } from "../atoms/Button";
 import { StatCard } from "../molecules/StatCard";
 import { BentoGrid, BentoCard } from "../atoms/BentoGrid";
@@ -210,11 +211,14 @@ export const DashboardOrganism = ({
     // 1. Filter by Category first if selected
     if (category) {
       filtered = filtered.filter((tx) => {
-        if (tx.category === category) return true;
+        const normalizedTxCat = normalizeCategory(tx.category);
+        if (normalizedTxCat === category) return true;
         // Check if the selected category is a Group Name
         const group = categoriesData.expense.find((g) => g.name === category);
         if (group) {
-          return group.subCategories.some((sub) => sub.name === tx.category);
+          return group.subCategories.some(
+            (sub) => normalizeCategory(sub.name) === normalizedTxCat,
+          );
         }
         return false;
       });
@@ -303,7 +307,7 @@ export const DashboardOrganism = ({
     const reverseCategoryMap = {};
     categoriesData.expense.forEach((group) => {
       group.subCategories.forEach((subCat) => {
-        reverseCategoryMap[subCat.name] = group.name;
+        reverseCategoryMap[normalizeCategory(subCat.name)] = group.name;
       });
     });
 
@@ -461,8 +465,9 @@ export const DashboardOrganism = ({
       else if (tx.type === "expense") dateMap[dateStr].expense += amt;
 
       if (tx.type === "expense") {
-        // Map to Main Category
-        const mainCategory = reverseCategoryMap[tx.category] || "Lainnya";
+        // Map to Main Category with normalization
+        const normalizedCat = normalizeCategory(tx.category);
+        const mainCategory = reverseCategoryMap[normalizedCat] || "Lainnya";
         if (!categoryMap[mainCategory]) categoryMap[mainCategory] = 0;
         categoryMap[mainCategory] += amt;
       }
@@ -495,7 +500,7 @@ export const DashboardOrganism = ({
         return;
 
       if (tx.type === "expense") {
-        const subCat = tx.category || "Lainnya";
+        const subCat = normalizeCategory(tx.category) || "Lainnya";
         if (!subCategoryMap[subCat]) subCategoryMap[subCat] = 0;
         subCategoryMap[subCat] += parseFloat(tx.amount);
       }

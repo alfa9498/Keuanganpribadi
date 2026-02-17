@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { PieChart, ArrowDownRight, Tag } from "lucide-react";
+import { normalizeCategory } from "../../utils/categoryUtils";
 
 /**
  * SpendingBreakdown Component
@@ -11,7 +12,7 @@ export const SpendingBreakdown = ({ transactions, totalExpense }) => {
   const data = useMemo(() => {
     const expenseTx = transactions.filter((tx) => tx.type === "expense");
     const breakdown = expenseTx.reduce((acc, tx) => {
-      const cat = tx.category || "Uncategorized";
+      const cat = normalizeCategory(tx.category) || "Uncategorized";
       if (!acc[cat]) {
         acc[cat] = {
           id: cat,

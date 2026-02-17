@@ -18,6 +18,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { API_URL } from "../../config/api";
 import { fetchCategories } from "../../services/categoryService";
+import { normalizeCategory } from "../../utils/categoryUtils";
 import { CashFlowSankey } from "./CashFlowSankey";
 import { SpendingBreakdown } from "./SpendingBreakdown";
 import { ReportCashFlowChart } from "./ReportCashFlowChart";
@@ -159,6 +160,13 @@ export const ReportDashboardOrganism = ({ user }) => {
 
   const filteredTransactions = useMemo(() => {
     let data = applyTimeFilter(allTransactions, filterRange);
+
+    // Normalize categories to avoid issues like "traveling" showing as separate from "Jalan-jalan"
+    data = data.map((tx) => ({
+      ...tx,
+      category: normalizeCategory(tx.category),
+    }));
+
     if (filterCategory) {
       data = data.filter((tx) => {
         if (tx.category === filterCategory) return true;
@@ -197,8 +205,9 @@ export const ReportDashboardOrganism = ({ user }) => {
     const breakdown = filteredTransactions
       .filter((tx) => tx.type === "expense")
       .reduce((acc, tx) => {
-        if (!acc[tx.category]) acc[tx.category] = 0;
-        acc[tx.category] += parseFloat(tx.amount);
+        const catName = normalizeCategory(tx.category);
+        if (!acc[catName]) acc[catName] = 0;
+        acc[catName] += parseFloat(tx.amount);
         return acc;
       }, {});
 
