@@ -361,7 +361,7 @@ export const TransactionFormOrganism = ({
                     Jumlah Nominal (IDR)
                   </label>
                   <div className="relative">
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 text-lg md:text-2xl font-black text-slate-400">
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 text-sm md:text-lg font-black text-slate-400">
                       Rp
                     </span>
                     <input
@@ -370,7 +370,7 @@ export const TransactionFormOrganism = ({
                       value={formatRupiah(formData.amount)}
                       onChange={handleAmountChange}
                       placeholder="0"
-                      className={`w-full bg-transparent border-0 border-b-2 ${errors.amount ? "border-rose-500" : "border-slate-200 dark:border-slate-700"} focus:ring-0 focus:border-finance-primary transition-all px-7 md:px-10 py-1 md:py-3 text-xl md:text-3xl font-black text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700`}
+                      className={`w-full bg-transparent border-0 border-b-2 ${errors.amount ? "border-rose-500" : "border-slate-200 dark:border-slate-700"} focus:ring-0 focus:border-finance-primary transition-all px-6 md:px-8 py-1 md:py-3 text-lg md:text-2xl font-black text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700`}
                     />
                   </div>
                   {errors.amount && (

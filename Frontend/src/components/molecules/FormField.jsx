@@ -38,7 +38,7 @@ export const FormField = ({
             value={value}
             onChange={onChange}
             error={error}
-            className={`${icon ? "pl-11" : ""} rounded-2xl h-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 transition-all font-medium`}
+            className={`${icon ? "pl-11" : ""} rounded-2xl h-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 transition-all font-medium text-[11px] md:text-sm`}
             {...props}
           >
             {children ||
@@ -54,7 +54,7 @@ export const FormField = ({
             value={value}
             onChange={onChange}
             placeholder={placeholder}
-            className={`w-full ${icon ? "pl-11" : "px-4"} py-3 border rounded-2xl focus:ring-4 focus:ring-finance-primary/10 focus:border-finance-primary outline-none transition-all duration-300 ${error ? "border-rose-500 bg-rose-50 dark:bg-rose-950/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]" : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-sm"}`}
+            className={`w-full ${icon ? "pl-11" : "px-4"} py-3 border rounded-2xl focus:ring-4 focus:ring-finance-primary/10 focus:border-finance-primary outline-none transition-all duration-300 ${error ? "border-rose-500 bg-rose-50 dark:bg-rose-950/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]" : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-sm"} text-[11px] md:text-sm`}
             {...props}
           />
         ) : (
@@ -65,7 +65,7 @@ export const FormField = ({
             onChange={onChange}
             placeholder={placeholder}
             error={error}
-            className={`${icon ? "pl-11" : ""} rounded-2xl h-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 transition-all font-medium`}
+            className={`${icon ? "pl-11" : ""} rounded-2xl h-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 transition-all font-medium text-[11px] md:text-sm`}
             {...props}
           />
         )}
