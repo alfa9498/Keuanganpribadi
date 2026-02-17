@@ -201,7 +201,7 @@ const GoalCard = ({ goal, onTopUp, onEdit, onDelete }) => {
 
 // --- Main Container ---
 
-// --- Kakeibo Components ---
+// --- Planning Components ---
 
 const GroupMetadata = {
   survival: {
@@ -245,7 +245,7 @@ const getGroupInfo = (groupName) => {
   };
 };
 
-const KakeiboSummaryCard = ({
+const LedgerSummaryCard = ({
   incomeSources,
   totalIncome, // Actual Income
   totalPlannedIncome,
@@ -469,7 +469,7 @@ const EnvelopeGroup = ({
 // --- Main Container ---
 
 export const PlanningOrganism = () => {
-  const [activeTab, setActiveTab] = useState("kakeibo");
+  const [activeTab, setActiveTab] = useState("planning");
   const [budgets, setBudgets] = useState([]);
   const [incomeSources, setIncomeSources] = useState([]); // New state for income breakdown
   const [goals, setGoals] = useState([]);
@@ -660,7 +660,7 @@ export const PlanningOrganism = () => {
         </div>
       </div>
 
-      <KakeiboSummaryCard
+      <LedgerSummaryCard
         incomeSources={incomeSources}
         totalIncome={totalActualIncome}
         totalPlannedIncome={totalPlannedIncome}
@@ -675,14 +675,14 @@ export const PlanningOrganism = () => {
       {/* Tabs */}
       <div className="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl w-fit">
         <button
-          onClick={() => setActiveTab("kakeibo")}
+          onClick={() => setActiveTab("planning")}
           className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-            activeTab === "kakeibo"
+            activeTab === "planning"
               ? "bg-white dark:bg-slate-700 text-finance-primary dark:text-white shadow-sm"
               : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
           }`}
         >
-          Kakeibo Plan
+          Planning
         </button>
         <button
           onClick={() => setActiveTab("goals")}
@@ -696,7 +696,7 @@ export const PlanningOrganism = () => {
         </button>
       </div>
 
-      {activeTab === "kakeibo" && (
+      {activeTab === "planning" && (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {Object.entries(groupedBudgets).map(([groupName, items]) => {
             const info = getGroupInfo(groupName);
@@ -941,7 +941,7 @@ const GoalForm = ({ goal, onSuccess }) => {
             placeholder="0"
           />
           <p className="text-[10px] text-slate-400 mt-1">
-            Opsional, akan muncul di Kakeibo Save Target
+            Opsional, akan muncul di Goals Save Target
           </p>
         </div>
       </div>
