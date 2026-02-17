@@ -12,7 +12,7 @@ export const AuthContainer = ({ children, activeTab }) => {
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] -z-5" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] -z-5" />
 
-      <div className="w-full max-w-md relative z-10 px-4 md:px-0">
+      <div className="w-full max-w-md relative z-10">
         <ElectricBorder>
           <div className="relative overflow-hidden">
             <AnimatePresence mode="wait" initial={false}>
@@ -27,7 +27,7 @@ export const AuthContainer = ({ children, activeTab }) => {
                   damping: 30,
                   duration: 0.5,
                 }}
-                className="w-full h-full p-5 md:p-7 flex flex-col justify-center"
+                className="w-full h-full p-6 md:p-8 flex flex-col justify-center"
               >
                 {children}
               </motion.div>

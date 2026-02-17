@@ -37,30 +37,30 @@ export const VerifyOtpOrganism = ({ email, onSuccess, onBack }) => {
 
   return (
     <div className="w-full">
-      <div className="text-center mb-10">
-        <div className="inline-flex items-center justify-center p-3 bg-sky-500/10 rounded-2xl border border-sky-500/20 mb-4">
-          <div className="text-sky-500 font-black text-2xl tracking-tighter">
+      <div className="text-center mb-6 md:mb-8">
+        <div className="inline-flex items-center justify-center p-2 bg-sky-500/10 rounded-xl border border-sky-500/20 mb-3">
+          <div className="text-sky-500 font-black text-xl tracking-tighter">
             FinVeda
           </div>
         </div>
-        <h2 className="text-3xl font-black text-white tracking-tight">
+        <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">
           Verifikasi OTP
         </h2>
-        <p className="text-slate-400 mt-2 text-sm">
-          Cek Email/WhatsApp untuk kode OTP
+        <p className="text-slate-400 mt-1 text-xs">
+          Masukkan kode yang dikirim ke email
         </p>
       </div>
 
       {error && (
-        <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-4 rounded-2xl mb-6 text-sm text-center font-medium animate-pulse">
+        <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-4 rounded-xl mb-6 text-sm text-center font-medium animate-pulse">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 text-center block w-full">
-            Masukkan Kode OTP
+          <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1 text-center block w-full">
+            Kode OTP
           </label>
           <input
             type="text"
@@ -69,28 +69,29 @@ export const VerifyOtpOrganism = ({ email, onSuccess, onBack }) => {
             onChange={(e) => setOtp(e.target.value)}
             placeholder="123456"
             required
-            className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-4 text-white text-center text-3xl font-black tracking-[0.5em] placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all"
+            className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-5 py-3 text-white text-center text-2xl md:text-3xl font-black tracking-[0.5em] placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all"
           />
         </div>
 
-        <Button
-          type="submit"
-          variant="primary"
-          className="w-full py-4 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-sky-500/20 transition-all active:scale-95"
-          disabled={loading}
-        >
-          {loading ? "Memverifikasi..." : "Verifikasi OTP"}
-        </Button>
-      </form>
+        <div className="flex flex-col gap-2">
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full py-3 bg-sky-500 hover:bg-sky-400 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-sky-500/20 transition-all active:scale-95"
+            disabled={loading}
+          >
+            {loading ? "Memverifikasi..." : "Verifikasi"}
+          </Button>
 
-      <div className="mt-8 text-center">
-        <button
-          onClick={onBack}
-          className="text-slate-500 font-black hover:text-white transition-colors text-sm uppercase tracking-widest"
-        >
-          Kembali
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={onBack}
+            className="text-slate-500 font-bold hover:text-white transition-colors text-[10px] uppercase tracking-widest py-2"
+          >
+            Kembali
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

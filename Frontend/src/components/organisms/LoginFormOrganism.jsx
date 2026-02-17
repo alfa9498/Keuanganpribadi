@@ -117,14 +117,14 @@ export const LoginFormOrganism = ({
               onChange={handleChange}
               placeholder="••••••••"
               autoComplete="off"
-              className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-5 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all pr-12"
+              className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-5 py-2.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/10 transition-all text-xs pr-12"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
         </div>
@@ -132,7 +132,7 @@ export const LoginFormOrganism = ({
         <Button
           type="submit"
           variant="primary"
-          className="w-full py-3 md:py-3.5 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-sky-500/20 transition-all active:scale-95"
+          className="w-full py-3 bg-sky-500 hover:bg-sky-400 text-white rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-sky-500/20 transition-all active:scale-95"
           disabled={loading}
         >
           {loading ? "Authenticating..." : "Sign In Now"}
