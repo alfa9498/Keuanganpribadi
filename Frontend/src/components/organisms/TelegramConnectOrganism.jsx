@@ -64,16 +64,13 @@ export const TelegramConnectOrganism = ({ user }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-8">
+    <div className="max-w-4xl mx-auto p-2 md:p-4">
       {/* Header Section */}
-      <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center p-3 bg-sky-500/10 rounded-3xl border border-sky-500/20 mb-4 group transition-all hover:scale-110">
-          <Send className="w-10 h-10 text-sky-500 group-hover:rotate-12 transition-transform" />
-        </div>
-        <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-2">
+      <div className="text-center mb-2">
+        <h1 className="text-xl md:text-2xl font-black text-white tracking-tight mb-1">
           Telegram <span className="text-sky-500">Bot Connection</span>
         </h1>
-        <p className="text-slate-400 text-sm max-w-2xl mx-auto">
+        <p className="text-slate-400 text-xs max-w-2xl mx-auto">
           Hubungkan akun Anda dengan Telegram untuk mencatat transaksi lebih
           cepat melalui chat atau foto struk.
         </p>
@@ -123,24 +120,24 @@ export const TelegramConnectOrganism = ({ user }) => {
         </div>
       ) : (
         /* Unconnected State */
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {/* Method 1: Magic Link */}
           <div className="group relative">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-            <div className="relative h-full bg-slate-900/80 backdrop-blur-xl border border-white/5 rounded-3xl p-6 flex flex-col items-center text-center">
-              <div className="w-10 h-10 bg-sky-500/10 rounded-2xl flex items-center justify-center text-sky-500 mb-4">
-                <ExternalLink size={20} />
+            <div className="relative h-full bg-slate-900/80 backdrop-blur-xl border border-white/5 rounded-3xl p-4 flex flex-col items-center text-center">
+              <div className="w-8 h-8 bg-sky-500/10 rounded-xl flex items-center justify-center text-sky-500 mb-2">
+                <ExternalLink size={16} />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">
+              <h3 className="text-sm font-bold text-white mb-1">
                 Cara 1: Link Otomatis
               </h3>
-              <p className="text-slate-400 text-xs mb-4 flex-1">
+              <p className="text-slate-400 text-[10px] mb-3 flex-1">
                 Klik tombol di bawah ini untuk membuka bot Telegram dan
-                hubungkan akun secara instan tanpa perlu ketik manual.
+                hubungkan akun secara instan.
               </p>
               <button
                 onClick={() => window.open(linkData?.url || "#", "_blank")}
-                className="w-full py-3 bg-sky-500 hover:bg-sky-400 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-sky-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-sky-500 hover:bg-sky-400 text-white rounded-xl font-black uppercase tracking-widest text-[9px] shadow-lg shadow-sky-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
               >
                 Hubungkan Sekarang
                 <ExternalLink size={14} />
@@ -151,20 +148,20 @@ export const TelegramConnectOrganism = ({ user }) => {
           {/* Method 2: Verification Code */}
           <div className="group relative">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-            <div className="relative h-full bg-slate-900/80 backdrop-blur-xl border border-white/5 rounded-3xl p-6 flex flex-col items-center text-center">
-              <div className="w-10 h-10 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-500 mb-4">
-                <span className="font-black text-lg">#</span>
+            <div className="relative h-full bg-slate-900/80 backdrop-blur-xl border border-white/5 rounded-3xl p-4 flex flex-col items-center text-center">
+              <div className="w-8 h-8 bg-indigo-500/10 rounded-xl flex items-center justify-center text-indigo-500 mb-2">
+                <span className="font-black text-sm">#</span>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">
+              <h3 className="text-sm font-bold text-white mb-1">
                 Cara 2: Kode Verifikasi
               </h3>
-              <p className="text-slate-400 text-xs mb-4 flex-1">
-                Jika Link di samping tidak terbuka, kirimkan kode verifikasi
-                berikut ke bot kami secara manual.
+              <p className="text-slate-400 text-[10px] mb-3 flex-1">
+                Jika Link tidak terbuka, kirimkan kode verifikasi berikut ke bot
+                secara manual.
               </p>
 
-              <div className="w-full bg-slate-950/80 border border-white/5 rounded-2xl p-3 mb-2 flex items-center justify-between group/code">
-                <span className="text-xl font-black text-white tracking-[0.2em] ml-2">
+              <div className="w-full bg-slate-950/80 border border-white/5 rounded-xl p-2 mb-1.5 flex items-center justify-between group/code">
+                <span className="text-lg font-black text-white tracking-[0.2em] ml-2">
                   {verificationCode || "------"}
                 </span>
                 <button
@@ -188,10 +185,10 @@ export const TelegramConnectOrganism = ({ user }) => {
 
       {/* Footer / Status Refresh */}
       {!isConnected && (
-        <div className="mt-12 text-center">
-          <p className="text-slate-500 text-sm flex items-center justify-center gap-2">
-            <RefreshCw size={14} />
-            Koneksi akan terdeteksi otomatis setelah Anda mengirimkan kode.
+        <div className="mt-4 text-center">
+          <p className="text-slate-500 text-[10px] flex items-center justify-center gap-1.5">
+            <RefreshCw size={12} />
+            Auto-detect aktif.
           </p>
         </div>
       )}
