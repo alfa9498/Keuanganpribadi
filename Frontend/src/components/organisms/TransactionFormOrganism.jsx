@@ -148,6 +148,12 @@ export const TransactionFormOrganism = ({
       return;
     }
 
+    // STRICT GUARD: Only allow submission on Step 4
+    if (activeStep < 4) {
+      handleNext();
+      return;
+    }
+
     try {
       const url = isEdit
         ? `${API_URL}/transaction/${initialData.id}`
@@ -264,26 +270,26 @@ export const TransactionFormOrganism = ({
   return (
     <div className="flex justify-center w-full animate-fade-in p-1 md:p-0">
       <Card
-        className={`w-full overflow-hidden ${!isEdit ? "max-w-lg border-t-4 border-t-finance-primary shadow-xl" : "p-0 shadow-none border-0"}`}
+        className={`w-full overflow-hidden ${!isEdit ? "max-w-md border-t-2 border-t-finance-primary shadow-lg" : "p-0 shadow-none border-0"}`}
       >
         {!isEdit && (
-          <div className="p-3 md:p-4 pb-0">
-            <div className="flex items-center justify-between mb-3 md:mb-5">
+          <div className="p-2 md:p-4 pb-0">
+            <div className="flex items-center justify-between mb-2 md:mb-4">
               <div>
-                <h2 className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                <h2 className="text-base md:text-lg font-black text-slate-900 dark:text-white tracking-tight">
                   {isEdit ? "Edit" : "Tambah"} Transaksi
                 </h2>
-                <p className="text-[9px] md:text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                <p className="text-[8px] md:text-[9px] text-slate-500 dark:text-slate-400 font-bold mt-0">
                   Step {activeStep} / 4: {steps[activeStep - 1].label}
                 </p>
               </div>
-              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+              <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-md">
                 {steps.map((step) => (
                   <div
                     key={step.id}
-                    className={`flex items-center justify-center w-6 h-6 md:w-7 md:h-7 rounded-md md:rounded-lg transition-all duration-300 ${
+                    className={`flex items-center justify-center w-5 h-5 md:w-6 md:h-6 rounded-sm md:rounded transition-all duration-300 ${
                       activeStep === step.id
-                        ? "bg-finance-primary text-white shadow-md shadow-finance-primary/20 scale-105"
+                        ? "bg-finance-primary text-white shadow-sm shadow-finance-primary/20 scale-105"
                         : activeStep > step.id
                           ? "bg-emerald-500 text-white"
                           : "text-slate-400 dark:text-slate-500"
@@ -300,7 +306,7 @@ export const TransactionFormOrganism = ({
             </div>
 
             {/* Progress Bar Container */}
-            <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-3 md:mb-5">
+            <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-2 md:mb-4">
               <div
                 className="h-full bg-finance-primary transition-all duration-700 ease-out shadow-[0_0_10px_rgba(var(--finance-primary-rgb),0.3)]"
                 style={{ width: `${(activeStep / 4) * 100}%` }}
@@ -309,8 +315,17 @@ export const TransactionFormOrganism = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col">
-          <div className="p-3 md:p-5 min-h-[220px] space-y-3 md:space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && activeStep < 4) {
+              e.preventDefault();
+              handleNext();
+            }
+          }}
+          className="flex flex-col"
+        >
+          <div className="p-2 md:p-4 min-h-[200px] space-y-2 md:space-y-3">
             {/* STEP 1: Info Utama */}
             {activeStep === 1 && (
               <div className="space-y-4 md:space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -341,12 +356,12 @@ export const TransactionFormOrganism = ({
                   </FormField>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 md:p-6 rounded-2xl md:rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-inner">
-                  <label className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1.5 block">
+                <div className="bg-slate-50 dark:bg-slate-900/50 p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner">
+                  <label className="text-[8px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1 block">
                     Jumlah Nominal (IDR)
                   </label>
                   <div className="relative">
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 text-xl md:text-3xl font-black text-slate-400">
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 text-lg md:text-2xl font-black text-slate-400">
                       Rp
                     </span>
                     <input
@@ -355,7 +370,7 @@ export const TransactionFormOrganism = ({
                       value={formatRupiah(formData.amount)}
                       onChange={handleAmountChange}
                       placeholder="0"
-                      className={`w-full bg-transparent border-0 border-b-2 ${errors.amount ? "border-rose-500" : "border-slate-200 dark:border-slate-700"} focus:ring-0 focus:border-finance-primary transition-all px-9 md:px-12 py-2 md:py-4 text-2xl md:text-4xl font-black text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700`}
+                      className={`w-full bg-transparent border-0 border-b-2 ${errors.amount ? "border-rose-500" : "border-slate-200 dark:border-slate-700"} focus:ring-0 focus:border-finance-primary transition-all px-7 md:px-10 py-1 md:py-3 text-xl md:text-3xl font-black text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700`}
                     />
                   </div>
                   {errors.amount && (
@@ -621,13 +636,13 @@ export const TransactionFormOrganism = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="p-4 md:p-6 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-2 md:gap-3">
+          <div className="p-3 md:p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-2 md:gap-3">
             <div className="flex gap-2 md:gap-3 flex-1">
               {activeStep === 1 ? (
                 <Button
                   type="button"
                   variant="ghost"
-                  className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-100 rounded-xl md:rounded-2xl h-12 md:h-14 font-black uppercase tracking-widest text-[9px] md:text-[10px]"
+                  className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-100 rounded-lg md:rounded-xl h-10 md:h-12 font-black uppercase tracking-widest text-[8px] md:text-[10px]"
                   onClick={() =>
                     onCancel
                       ? onCancel()
@@ -642,10 +657,10 @@ export const TransactionFormOrganism = ({
                 <Button
                   type="button"
                   variant="ghost"
-                  className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-100 rounded-xl md:rounded-2xl h-12 md:h-14 font-black uppercase tracking-widest text-[9px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2"
+                  className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-100 rounded-lg md:rounded-xl h-10 md:h-12 font-black uppercase tracking-widest text-[8px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2"
                   onClick={handleBack}
                 >
-                  <ChevronLeft size={14} md:size={16} />
+                  <ChevronLeft size={12} md:size={14} />
                   Kembali
                 </Button>
               )}
@@ -654,19 +669,19 @@ export const TransactionFormOrganism = ({
                 <Button
                   type="button"
                   variant="primary"
-                  className="flex-[2] h-11 md:h-12 rounded-lg md:rounded-xl font-black uppercase tracking-widest text-[9px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2 shadow-lg shadow-finance-primary/20"
+                  className="flex-[2] h-10 md:h-12 rounded-lg md:rounded-xl font-black uppercase tracking-widest text-[8px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2 shadow-sm shadow-finance-primary/20"
                   onClick={handleNext}
                 >
                   Lanjut
-                  <ChevronRight size={14} md:size={16} />
+                  <ChevronRight size={12} md:size={14} />
                 </Button>
               ) : (
                 <Button
                   type="submit"
                   variant="primary"
-                  className="flex-[2] h-11 md:h-12 rounded-lg md:rounded-xl bg-emerald-600 hover:bg-emerald-500 font-black uppercase tracking-widest text-[9px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2 shadow-lg shadow-emerald-500/20"
+                  className="flex-[2] h-10 md:h-12 rounded-lg md:rounded-xl bg-emerald-600 hover:bg-emerald-500 font-black uppercase tracking-widest text-[8px] md:text-[10px] flex items-center justify-center gap-1 md:gap-2 shadow-sm shadow-emerald-500/20"
                 >
-                  <CheckCircle2 size={14} md:size={16} />
+                  <CheckCircle2 size={12} md:size={14} />
                   {isEdit ? "Update" : "Simpan"}
                 </Button>
               )}

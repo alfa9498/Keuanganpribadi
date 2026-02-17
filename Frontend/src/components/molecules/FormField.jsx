@@ -20,7 +20,7 @@ export const FormField = ({
   return (
     <div className="w-full space-y-1.5">
       {label && (
-        <Label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">
+        <Label className="text-[9px] md:text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">
           {label}
         </Label>
       )}
