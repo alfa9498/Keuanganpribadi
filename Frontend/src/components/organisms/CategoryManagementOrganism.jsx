@@ -52,6 +52,7 @@ const CategoryManagementOrganism = () => {
     type: null,
     id: null,
     name: "",
+    transactionCount: 0,
   });
 
   useEffect(() => {
@@ -122,12 +123,13 @@ const CategoryManagementOrganism = () => {
     }
   };
 
-  const handleDelete = (type, id, name) => {
+  const handleDelete = (type, id, name, transactionCount = 0) => {
     setDeleteConfirm({
       isOpen: true,
       type,
       id,
       name,
+      transactionCount,
     });
   };
 
@@ -216,7 +218,14 @@ const CategoryManagementOrganism = () => {
                   <Edit2 size={18} />
                 </button>
                 <button
-                  onClick={() => handleDelete("group", group.id, group.name)}
+                  onClick={() =>
+                    handleDelete(
+                      "group",
+                      group.id,
+                      group.name,
+                      group.transaction_count,
+                    )
+                  }
                   className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 rounded-2xl transition-all"
                 >
                   <Trash2 size={18} />
@@ -246,7 +255,14 @@ const CategoryManagementOrganism = () => {
                           <Edit2 size={16} />
                         </button>
                         <button
-                          onClick={() => handleDelete("item", cat.id, cat.name)}
+                          onClick={() =>
+                            handleDelete(
+                              "item",
+                              cat.id,
+                              cat.name,
+                              cat.transaction_count,
+                            )
+                          }
                           className="p-2 text-slate-300 hover:text-rose-600 transition-colors"
                         >
                           <Trash2 size={16} />
@@ -317,7 +333,9 @@ const CategoryManagementOrganism = () => {
                 <Edit2 size={16} />
               </button>
               <button
-                onClick={() => handleDelete("item", cat.id, cat.name)}
+                onClick={() =>
+                  handleDelete("item", cat.id, cat.name, cat.transaction_count)
+                }
                 className="p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl transition-all"
               >
                 <Trash2 size={16} />
@@ -407,37 +425,76 @@ const CategoryManagementOrganism = () => {
       <Modal
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ ...deleteConfirm, isOpen: false })}
-        title="Konfirmasi Hapus"
+        title={
+          deleteConfirm.transactionCount > 0
+            ? "Tidak Dapat Menghapus"
+            : "Konfirmasi Hapus"
+        }
         maxWidth="max-w-sm"
       >
         <div className="text-center p-4">
-          <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Trash2 size={32} />
+          <div
+            className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+              deleteConfirm.transactionCount > 0
+                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
+                : "bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400"
+            }`}
+          >
+            {deleteConfirm.transactionCount > 0 ? (
+              <AlertCircle size={32} />
+            ) : (
+              <Trash2 size={32} />
+            )}
           </div>
-          <h4 className="text-xl font-black text-slate-900 dark:text-white mb-2">
-            Hapus {deleteConfirm.type === "group" ? "Grup" : "Kategori"}?
-          </h4>
-          <p className="text-slate-500 dark:text-slate-400 mb-8">
-            Apakah Anda yakin ingin menghapus{" "}
-            <strong>{deleteConfirm.name}</strong>? Tindakan ini tidak dapat
-            dibatalkan.
-          </p>
-          <div className="flex gap-3">
-            <button
-              onClick={() =>
-                setDeleteConfirm({ ...deleteConfirm, isOpen: false })
-              }
-              className="flex-1 py-3 text-slate-500 font-black uppercase tracking-widest text-[10px] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
-            >
-              Batal
-            </button>
-            <button
-              onClick={confirmDelete}
-              className="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-[10px] rounded-xl shadow-lg shadow-rose-500/20 transition-all active:scale-95"
-            >
-              Ya, Hapus
-            </button>
-          </div>
+
+          {deleteConfirm.transactionCount > 0 ? (
+            <>
+              <h4 className="text-xl font-black text-slate-900 dark:text-white mb-2">
+                Kategori Digunakan
+              </h4>
+              <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm">
+                <strong>{deleteConfirm.name}</strong> tidak dapat dihapus karena
+                masih memiliki{" "}
+                <strong>{deleteConfirm.transactionCount} transaksi</strong>.
+                Silakan hapus atau pindahkan transaksi tersebut terlebih dahulu.
+              </p>
+              <button
+                onClick={() =>
+                  setDeleteConfirm({ ...deleteConfirm, isOpen: false })
+                }
+                className="w-full py-3 bg-slate-900 dark:bg-slate-800 text-white font-black uppercase tracking-widest text-[10px] rounded-xl transition-all active:scale-95"
+              >
+                Mengerti
+              </button>
+            </>
+          ) : (
+            <>
+              <h4 className="text-xl font-black text-slate-900 dark:text-white mb-2">
+                Hapus {deleteConfirm.type === "group" ? "Grup" : "Kategori"}?
+              </h4>
+              <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm">
+                Apakah Anda yakin ingin menghapus{" "}
+                <strong>{deleteConfirm.name}</strong>? Tindakan ini tidak dapat
+                dibatalkan.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() =>
+                    setDeleteConfirm({ ...deleteConfirm, isOpen: false })
+                  }
+                  className="flex-1 py-3 text-slate-500 font-black uppercase tracking-widest text-[10px] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-[10px] rounded-xl shadow-lg shadow-rose-500/20 transition-all active:scale-95"
+                >
+                  Ya, Hapus
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </Modal>
 

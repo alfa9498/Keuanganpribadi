@@ -3,15 +3,22 @@ const db = require("../config/db");
 // --- HELPER FUNCTIONS ---
 
 const getGroups = async (userId, type) => {
-  let query = "SELECT * FROM category_groups WHERE user_id = ?";
+  let query = `
+    SELECT cg.*, 
+    (SELECT COUNT(*) FROM transactions t 
+     JOIN categories c ON t.category = c.name 
+     WHERE c.group_id = cg.id AND t.user_id = cg.user_id) as transaction_count
+    FROM category_groups cg 
+    WHERE cg.user_id = ?
+  `;
   const params = [userId];
 
   if (type) {
-    query += " AND type = ?";
+    query += " AND cg.type = ?";
     params.push(type);
   }
 
-  query += " ORDER BY id ASC"; // Or by specific order field if added later
+  query += " ORDER BY cg.id ASC";
 
   const [rows] = await db.promise().query(query, params);
   return rows;
@@ -19,7 +26,8 @@ const getGroups = async (userId, type) => {
 
 const getCategories = async (userId, type) => {
   let query = `
-        SELECT c.*, cg.name as group_name 
+        SELECT c.*, cg.name as group_name,
+        (SELECT COUNT(*) FROM transactions t WHERE t.category = c.name AND t.user_id = c.user_id) as transaction_count
         FROM categories c
         LEFT JOIN category_groups cg ON c.group_id = cg.id
         WHERE c.user_id = ?
@@ -95,15 +103,25 @@ exports.updateGroup = async (userId, groupId, data) => {
 };
 
 exports.deleteGroup = async (userId, groupId) => {
-  // Cascade delete handles sub-categories, but logic in DB
-  // Ideally check if transactions use this group's categories?
-  // For now simple delete.
-  await db
-    .promise()
-    .query("DELETE FROM category_groups WHERE id = ? AND user_id = ?", [
-      groupId,
-      userId,
-    ]);
+  // Check usage in transactions first!
+  const promiseConn = db.promise();
+  const [usage] = await promiseConn.query(
+    `SELECT COUNT(*) as count FROM transactions t 
+     JOIN categories c ON t.category = c.name 
+     WHERE c.group_id = ? AND t.user_id = ?`,
+    [groupId, userId],
+  );
+
+  if (usage[0].count > 0) {
+    throw new Error(
+      `Cannot delete group because its categories are used in ${usage[0].count} transactions.`,
+    );
+  }
+
+  await promiseConn.query(
+    "DELETE FROM category_groups WHERE id = ? AND user_id = ?",
+    [groupId, userId],
+  );
   return true;
 };
 
