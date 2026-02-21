@@ -34,7 +34,7 @@ export const MainLayoutTemplate = ({
         />
 
         {/* Content Area */}
-        <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden pt-16 lg:pt-0">
+        <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
           {/* Header */}
           <HeaderOrganism
             user={user}
