@@ -36,6 +36,7 @@ export const ReportDashboardOrganism = ({ user }) => {
     income: [],
   });
   const [reportTab, setReportTab] = useState("cashflow");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // ... (rest of the file until the income tab) ...
 
@@ -483,26 +484,52 @@ export const ReportDashboardOrganism = ({ user }) => {
             </p>
           </div>
 
-          <div className="flex gap-3 w-full lg:w-auto">
+          <div className="flex flex-row gap-2 md:gap-3 w-full lg:w-auto">
             <button
               onClick={exportToPDF}
-              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-900 dark:bg-blue-600 text-white hover:bg-black dark:hover:bg-blue-500 rounded-2xl transition-all shadow-xl shadow-slate-900/10 dark:shadow-blue-900/20 text-sm font-black active:scale-95"
+              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-3 md:px-6 py-3.5 bg-slate-900 dark:bg-blue-600 text-white hover:bg-black dark:hover:bg-blue-500 rounded-2xl transition-all shadow-xl shadow-slate-900/10 dark:shadow-blue-900/20 text-xs md:text-sm font-black active:scale-95"
             >
               <Download size={18} />
-              <span>EXPORT PDF</span>
+              <span className="hidden md:inline">EXPORT PDF</span>
+              <span className="md:hidden">EXPORT</span>
             </button>
             <button
               onClick={fetchTransactions}
-              className="p-3.5 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all active:scale-95"
+              className="flex items-center justify-center p-3.5 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all active:scale-95"
               title="Refresh Data"
             >
               <RefreshCw size={18} />
+            </button>
+            <button
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className={`lg:hidden flex items-center justify-center p-3.5 rounded-2xl border transition-all active:scale-95 ${
+                showMobileFilters
+                  ? "bg-slate-900 dark:bg-slate-700 border-slate-900 dark:border-slate-600 text-white shadow-lg"
+                  : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+              }`}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="4" x2="20" y1="21" y2="21" />
+                <line x1="4" x2="20" y1="14" y2="14" />
+                <line x1="4" x2="20" y1="7" y2="7" />
+              </svg>
             </button>
           </div>
         </div>
 
         {/* Cohesive Filter Bar */}
-        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 pt-6 border-t border-slate-50 dark:border-slate-800">
+        <div
+          className={`lg:flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 pt-6 border-t border-slate-50 dark:border-slate-800 ${showMobileFilters ? "flex" : "hidden"}`}
+        >
           <div className="w-full sm:w-auto">
             <AccountFilter
               currentAccount={filterAccount}
