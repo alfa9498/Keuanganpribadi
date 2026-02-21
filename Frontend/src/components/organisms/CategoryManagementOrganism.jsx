@@ -22,6 +22,7 @@ import {
   updateCategory,
   deleteCategory,
 } from "../../services/categoryService";
+import { Modal } from "../molecules/Modal";
 
 const CategoryManagementOrganism = () => {
   const [activeTab, setActiveTab] = useState("expense"); // 'expense' | 'income'
@@ -44,6 +45,14 @@ const CategoryManagementOrganism = () => {
 
   // Accordion State
   const [expandedGroups, setExpandedGroups] = useState({});
+
+  // Delete Confirmation State
+  const [deleteConfirm, setDeleteConfirm] = useState({
+    isOpen: false,
+    type: null,
+    id: null,
+    name: "",
+  });
 
   useEffect(() => {
     loadCategories();
@@ -113,14 +122,24 @@ const CategoryManagementOrganism = () => {
     }
   };
 
-  const handleDelete = async (type, id) => {
-    if (!window.confirm("Are you sure you want to delete this?")) return;
+  const handleDelete = (type, id, name) => {
+    setDeleteConfirm({
+      isOpen: true,
+      type,
+      id,
+      name,
+    });
+  };
+
+  const confirmDelete = async () => {
+    const { type, id } = deleteConfirm;
     try {
       if (type === "group") {
         await deleteGroup(id);
       } else {
         await deleteCategory(id);
       }
+      setDeleteConfirm({ ...deleteConfirm, isOpen: false });
       loadCategories();
     } catch (err) {
       alert(err.message);
@@ -197,7 +216,7 @@ const CategoryManagementOrganism = () => {
                   <Edit2 size={18} />
                 </button>
                 <button
-                  onClick={() => handleDelete("group", group.id)}
+                  onClick={() => handleDelete("group", group.id, group.name)}
                   className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 rounded-2xl transition-all"
                 >
                   <Trash2 size={18} />
@@ -227,7 +246,7 @@ const CategoryManagementOrganism = () => {
                           <Edit2 size={16} />
                         </button>
                         <button
-                          onClick={() => handleDelete("item", cat.id)}
+                          onClick={() => handleDelete("item", cat.id, cat.name)}
                           className="p-2 text-slate-300 hover:text-rose-600 transition-colors"
                         >
                           <Trash2 size={16} />
@@ -298,7 +317,7 @@ const CategoryManagementOrganism = () => {
                 <Edit2 size={16} />
               </button>
               <button
-                onClick={() => handleDelete("item", cat.id)}
+                onClick={() => handleDelete("item", cat.id, cat.name)}
                 className="p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl transition-all"
               >
                 <Trash2 size={16} />
@@ -383,6 +402,44 @@ const CategoryManagementOrganism = () => {
       ) : (
         renderIncomeTab()
       )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ ...deleteConfirm, isOpen: false })}
+        title="Konfirmasi Hapus"
+        maxWidth="max-w-sm"
+      >
+        <div className="text-center p-4">
+          <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Trash2 size={32} />
+          </div>
+          <h4 className="text-xl font-black text-slate-900 dark:text-white mb-2">
+            Hapus {deleteConfirm.type === "group" ? "Grup" : "Kategori"}?
+          </h4>
+          <p className="text-slate-500 dark:text-slate-400 mb-8">
+            Apakah Anda yakin ingin menghapus{" "}
+            <strong>{deleteConfirm.name}</strong>? Tindakan ini tidak dapat
+            dibatalkan.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() =>
+                setDeleteConfirm({ ...deleteConfirm, isOpen: false })
+              }
+              className="flex-1 py-3 text-slate-500 font-black uppercase tracking-widest text-[10px] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+            >
+              Batal
+            </button>
+            <button
+              onClick={confirmDelete}
+              className="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-[10px] rounded-xl shadow-lg shadow-rose-500/20 transition-all active:scale-95"
+            >
+              Ya, Hapus
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       {/* MODAL */}
       {isModalOpen && (
