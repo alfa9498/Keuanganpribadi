@@ -495,7 +495,7 @@ export const RecentTransactionsOrganism = ({
               <th className="px-4 py-2 text-center w-28">Aksi</th>
             </tr>
           </thead>
-          <tbody className="text-[12px] font-medium tabular-nums divide-y divide-slate-300">
+          <tbody className="text-[12px] font-medium tabular-nums divide-y divide-slate-300 dark:divide-slate-800">
             {isLoading && (
               <tr>
                 <td colSpan="8" className="py-20 text-center bg-white/50">
@@ -513,7 +513,7 @@ export const RecentTransactionsOrganism = ({
                     key={tx.id}
                     className={`${idx % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50/80 dark:bg-slate-800/50"} hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors group border-b border-slate-100 dark:border-slate-800`}
                   >
-                    <td className="px-4 py-2 border-r border-slate-200 text-slate-800 font-bold whitespace-nowrap">
+                    <td className="px-4 py-2 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-bold whitespace-nowrap">
                       {new Date(tx.date).toLocaleDateString("id-ID", {
                         day: "2-digit",
                         month: "short",
@@ -525,23 +525,23 @@ export const RecentTransactionsOrganism = ({
                         <div
                           className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${tx.type === "income" ? "bg-emerald-500" : "bg-rose-500"}`}
                         />
-                        <span className="font-bold text-slate-900 truncate">
+                        <span className="font-bold text-slate-900 dark:text-slate-100 truncate">
                           {tx.category}
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-2 border-r border-slate-200 text-slate-600 truncate max-w-sm italic">
+                    <td className="px-4 py-2 border-r border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 truncate max-w-sm italic">
                       {tx.description || "-"}
                     </td>
-                    <td className="px-4 py-2 border-r border-slate-200 text-slate-500 text-[10px] hidden lg:table-cell uppercase">
-                      <span className="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
+                    <td className="px-4 py-2 border-r border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-[10px] hidden lg:table-cell uppercase">
+                      <span className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded">
                         {tx.payment_method}
                       </span>
                     </td>
                     <td className="px-4 py-2 border-r border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold hidden lg:table-cell">
                       {tx.account}
                     </td>
-                    <td className="px-4 py-2 border-r border-slate-200 text-center hidden xl:table-cell">
+                    <td className="px-4 py-2 border-r border-slate-200 dark:border-slate-800 text-center hidden xl:table-cell">
                       {tx.status === "done" ? (
                         <span className="text-[9px] font-black text-slate-400">
                           DONE
@@ -553,7 +553,7 @@ export const RecentTransactionsOrganism = ({
                       )}
                     </td>
                     <td
-                      className={`px-4 py-2 border-r border-slate-200 text-right font-black ${
+                      className={`px-4 py-2 border-r border-slate-200 dark:border-slate-800 text-right font-black ${
                         tx.type === "income"
                           ? "text-emerald-600"
                           : "text-rose-600"
@@ -600,24 +600,28 @@ export const RecentTransactionsOrganism = ({
       </div>
 
       {/* Pagination / Footer */}
-      <div className="px-6 py-4 bg-slate-50/30 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="text-xs text-slate-500 font-medium">
+      <div className="px-6 py-4 bg-slate-50/30 dark:bg-slate-800/30 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
           Menampilkan{" "}
-          <span className="text-slate-800">
+          <span className="text-slate-800 dark:text-slate-200">
             {(currentPage - 1) * rowsPerPage + 1}
           </span>{" "}
           sampai{" "}
-          <span className="text-slate-800">
+          <span className="text-slate-800 dark:text-slate-200">
             {Math.min(currentPage * rowsPerPage, totalItems)}
           </span>{" "}
-          dari <span className="text-slate-800">{totalItems}</span> rekaman
+          dari{" "}
+          <span className="text-slate-800 dark:text-slate-200">
+            {totalItems}
+          </span>{" "}
+          rekaman
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
-            className="p-2 border border-slate-200 rounded-lg hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:hover:shadow-none transition-all"
+            className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm disabled:opacity-30 disabled:hover:shadow-none transition-all text-slate-600 dark:text-slate-400"
           >
             <ChevronLeft size={16} />
           </button>
@@ -629,8 +633,8 @@ export const RecentTransactionsOrganism = ({
                 onClick={() => setCurrentPage(i + 1)}
                 className={`w-8 h-8 text-[11px] font-bold rounded-lg transition-all ${
                   currentPage === i + 1
-                    ? "bg-finance-primary text-white shadow-lg shadow-finance-primary/30"
-                    : "text-slate-500 hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200"
+                    ? "bg-finance-primary dark:bg-blue-600 text-white shadow-lg shadow-finance-primary/30 dark:shadow-blue-900/30"
+                    : "text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-600"
                 }`}
               >
                 {i + 1}
@@ -646,7 +650,7 @@ export const RecentTransactionsOrganism = ({
               setCurrentPage((prev) => Math.min(totalPages, prev + 1))
             }
             disabled={currentPage === totalPages || totalItems === 0}
-            className="p-2 border border-slate-200 rounded-lg hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:hover:shadow-none transition-all"
+            className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm disabled:opacity-30 disabled:hover:shadow-none transition-all text-slate-600 dark:text-slate-400"
           >
             <ChevronRight size={16} />
           </button>
@@ -654,7 +658,7 @@ export const RecentTransactionsOrganism = ({
           <Button
             variant="ghost"
             size="sm"
-            className="ml-4 text-[10px] uppercase tracking-widest font-bold text-slate-400 hover:text-finance-primary"
+            className="ml-4 text-[10px] uppercase tracking-widest font-bold text-slate-400 dark:text-slate-500 hover:text-finance-primary dark:hover:text-blue-400"
             onClick={handleViewAll}
           >
             {isExpanded ? (
