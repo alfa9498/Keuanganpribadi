@@ -23,6 +23,7 @@ import { useNotification } from "../../context/NotificationContext";
 import { CategoryFilter } from "../molecules/CategoryFilter";
 import { TimeFilter } from "../molecules/TimeFilter";
 import { AccountFilter } from "../molecules/AccountFilter";
+import { StatusFilter } from "../molecules/StatusFilter";
 import { API_URL } from "../../config/api";
 
 export const RecentTransactionsOrganism = ({
@@ -36,6 +37,8 @@ export const RecentTransactionsOrganism = ({
   onCategoryChange: externalCategoryChange,
   filterAccount: externalAccount,
   onAccountChange: externalAccountChange,
+  filterStatus: externalStatus,
+  onStatusChange: externalStatusChange,
   filterRange = "ALL",
   onRangeChange,
 }) => {
@@ -43,6 +46,8 @@ export const RecentTransactionsOrganism = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedAccount, setSelectedAccount] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+
   const activeCategory =
     externalCategory !== undefined ? externalCategory : selectedCategory;
   const onCategoryChange =
@@ -56,6 +61,13 @@ export const RecentTransactionsOrganism = ({
     externalAccountChange !== undefined
       ? externalAccountChange
       : setSelectedAccount;
+
+  const activeStatus =
+    externalStatus !== undefined ? externalStatus : selectedStatus;
+  const onStatusChange =
+    externalStatusChange !== undefined
+      ? externalStatusChange
+      : setSelectedStatus;
   const [sortConfig, setSortConfig] = useState({
     key: "date",
     direction: "desc",
@@ -205,6 +217,7 @@ export const RecentTransactionsOrganism = ({
         search: searchTerm,
         category: categoryParam,
         account: activeAccount, // Add account filter
+        status: activeStatus, // Add status filter
         sortBy: sortConfig.key,
         sortOrder: sortConfig.direction,
         page: currentPage,
@@ -379,6 +392,10 @@ export const RecentTransactionsOrganism = ({
               <AccountFilter
                 currentAccount={activeAccount}
                 onAccountChange={onAccountChange}
+              />
+              <StatusFilter
+                currentStatus={activeStatus}
+                onStatusChange={onStatusChange}
               />
             </>
           )}

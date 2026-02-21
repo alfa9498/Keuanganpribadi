@@ -9,6 +9,7 @@ import { TimeFilter } from "../molecules/TimeFilter";
 import { API_URL } from "../../config/api";
 import { CategoryFilter } from "../molecules/CategoryFilter";
 import { AccountFilter } from "../molecules/AccountFilter";
+import { StatusFilter } from "../molecules/StatusFilter";
 import { fetchCategories } from "../../services/categoryService";
 
 export const TransactionListOrganism = ({
@@ -20,6 +21,7 @@ export const TransactionListOrganism = ({
   filterAccount,
   setFilterAccount,
 }) => {
+  const [filterStatus, setFilterStatus] = useState("");
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [activeListTab, setActiveListTab] = useState("all"); // all, income, expense
@@ -145,11 +147,17 @@ export const TransactionListOrganism = ({
               categories={categoriesData}
             />
           </div>
+          <div className="w-full sm:w-auto">
+            <StatusFilter
+              currentStatus={filterStatus}
+              onStatusChange={setFilterStatus}
+            />
+          </div>
         </div>
       </div>
 
       <RecentTransactionsOrganism
-        key={`${activeListTab}-${refreshKey}-${filterRange}-${filterAccount}-${filterCategory}`} // Force remount on filter changes
+        key={`${activeListTab}-${refreshKey}-${filterRange}-${filterAccount}-${filterCategory}-${filterStatus}`} // Force remount on filter changes
         onViewAll={() => setActiveListTab("all")}
         user={user}
         onRefresh={null}
@@ -159,6 +167,8 @@ export const TransactionListOrganism = ({
         onCategoryChange={setFilterCategory}
         filterAccount={filterAccount}
         onAccountChange={setFilterAccount}
+        filterStatus={filterStatus}
+        onStatusChange={setFilterStatus}
         title={
           activeListTab === "income"
             ? "Daftar Pemasukan"
