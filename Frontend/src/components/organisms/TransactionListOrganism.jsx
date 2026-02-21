@@ -100,7 +100,7 @@ export const TransactionListOrganism = ({
           </div>
 
           {/* Top Row / Right: Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+          <div className="grid grid-cols-2 md:flex md:flex-row gap-3 w-full xl:w-auto">
             <Button
               onClick={() => setIsAddOpen(true)}
               variant="primary"
@@ -126,28 +126,28 @@ export const TransactionListOrganism = ({
         </div>
 
         {/* Bottom Row / Center: Global Filters */}
-        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 pt-4 border-t border-slate-50">
-          <div className="w-full sm:w-auto">
+        <div className="grid grid-cols-2 lg:flex lg:flex-row flex-wrap items-center justify-center gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
+          <div className="col-span-1 lg:w-auto">
             <TimeFilter
               currentRange={filterRange}
               onRangeChange={setFilterRange}
             />
           </div>
-          <div className="w-full sm:w-auto">
+          <div className="col-span-1 lg:w-auto">
             <AccountFilter
               currentAccount={filterAccount}
               onAccountChange={setFilterAccount}
               accounts={accounts}
             />
           </div>
-          <div className="w-full sm:w-auto">
+          <div className="col-span-1 lg:w-auto">
             <CategoryFilter
               currentCategory={filterCategory}
               onCategoryChange={setFilterCategory}
               categories={categoriesData}
             />
           </div>
-          <div className="w-full sm:w-auto">
+          <div className="col-span-1 lg:w-auto">
             <StatusFilter
               currentStatus={filterStatus}
               onStatusChange={setFilterStatus}
