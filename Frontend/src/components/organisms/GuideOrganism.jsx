@@ -10,6 +10,7 @@ import {
   Lightbulb,
   Smartphone,
   ShieldCheck,
+  HelpCircle,
 } from "lucide-react";
 
 export const GuideOrganism = () => {
@@ -63,6 +64,20 @@ export const GuideOrganism = () => {
         "Klik Simpan untuk menambah data.",
       ],
       color: "bg-emerald-50",
+    },
+    {
+      id: "debt-receivables",
+      title: "4. Memasukkan Hutang & Piutang",
+      icon: <HelpCircle className="text-indigo-500" size={24} />,
+      content:
+        "Kelola catatan uang yang dipinjam atau dipinjamkan agar saldo tetap akurat.",
+      steps: [
+        "Hutang: Input Income dengan kategori 'Hutang' saat menerima uang.",
+        "Bayar Hutang: Input Expense dengan kategori 'Cicilan / Hutang' saat melunasi.",
+        "Piutang: Input Expense dengan kategori 'Piutang' saat meminjamkan uang.",
+        "Terima Piutang: Input Income dengan kategori 'Piutang' saat uang kembali.",
+      ],
+      color: "bg-indigo-50",
     },
   ];
 
