@@ -25,6 +25,23 @@ export const DashboardTrendChart = ({ data, isMobile }) => {
     return value;
   };
 
+  // Determine optimal tick values based on data length and screen size
+  const getOptimalTickValues = () => {
+    const dataLength = data.length;
+    if (dataLength === 0) return undefined;
+
+    if (isMobile) {
+      if (dataLength <= 7) return "every 1 day"; // Show all for a week
+      if (dataLength <= 31) return "every 5 days"; // Show fewer for a month
+      if (dataLength <= 90) return "every 2 weeks"; // Even fewer for 3 months
+      return "every 1 month"; // Show only monthly for "All Time"
+    } else {
+      if (dataLength <= 14) return "every 1 day";
+      if (dataLength <= 60) return "every 5 days";
+      return "every 2 weeks";
+    }
+  };
+
   if (!data || data.length === 0) {
     return (
       <div className="h-full w-full flex items-center justify-center text-slate-500 text-xs">
@@ -58,7 +75,7 @@ export const DashboardTrendChart = ({ data, isMobile }) => {
           legendOffset: 36,
           legendPosition: "middle",
           // Show fewer tick values on mobile to avoid horizontal crowding
-          tickValues: isMobile ? 5 : 10,
+          tickValues: getOptimalTickValues(),
         }}
         axisLeft={{
           tickSize: 5,
