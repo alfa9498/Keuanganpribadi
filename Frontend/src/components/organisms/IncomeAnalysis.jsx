@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
 import { PieChart, TrendingUp, Tag, ArrowDownRight } from "lucide-react";
@@ -10,6 +10,15 @@ import { PieChart, TrendingUp, Tag, ArrowDownRight } from "lucide-react";
  * 2. Sources (Donut + List): Breakdown of where money comes from.
  */
 export const IncomeAnalysis = ({ transactions, totalIncome }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // 1. Prepare Data for Breakdown (Donut & List)
   const breakdownData = useMemo(() => {
     const incomeTx = transactions.filter((tx) => tx.type === "income");
@@ -186,7 +195,7 @@ export const IncomeAnalysis = ({ transactions, totalIncome }) => {
               activeOuterRadiusOffset={8}
               colors={colors}
               borderWidth={0}
-              enableArcLinkLabels={true}
+              enableArcLinkLabels={!isMobile}
               arcLinkLabelsSkipAngle={10}
               arcLinkLabelsTextColor={
                 window.document.documentElement.classList.contains("dark")

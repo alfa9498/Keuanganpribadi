@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { PieChart, ArrowDownRight, Tag } from "lucide-react";
 import { normalizeCategory } from "../../utils/categoryUtils";
@@ -9,6 +9,15 @@ import { normalizeCategory } from "../../utils/categoryUtils";
  * Styling inspired by Monarch Money (Clean, White, Elegant).
  */
 export const SpendingBreakdown = ({ transactions, totalExpense }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const data = useMemo(() => {
     const expenseTx = transactions.filter((tx) => tx.type === "expense");
     const breakdown = expenseTx.reduce((acc, tx) => {
@@ -79,7 +88,7 @@ export const SpendingBreakdown = ({ transactions, totalExpense }) => {
             activeOuterRadiusOffset={8}
             colors={colors}
             borderWidth={0}
-            enableArcLinkLabels={true}
+            enableArcLinkLabels={!isMobile}
             arcLinkLabelsSkipAngle={10}
             arcLinkLabelsTextColor={
               window.document.documentElement.classList.contains("dark")
