@@ -391,8 +391,6 @@ export const DashboardOrganism = ({
     let totalPiutangReceived = 0;
 
     allTransactions.forEach((tx) => {
-      if (tx.status === "pending") return; // Skip pending: don't affect physical balance yet
-
       const amt = parseFloat(tx.amount);
       const desc = tx.description || tx.category || "Tanpa Keterangan";
 
@@ -402,15 +400,10 @@ export const DashboardOrganism = ({
           ? `(Pending) ${tx.description}`
           : `(Pending) ${tx.category}`;
         hutangMap[debtDesc] = (hutangMap[debtDesc] || 0) + amt;
+        return; // Don't process further if it's already handled as pending debt
       }
 
-      if (tx.type === "expense" && tx.status === "pending") {
-        totalHutangReceived += amt; // Treat pending expense as debt received
-        const debtDesc = tx.description
-          ? `(Pending) ${tx.description}`
-          : `(Pending) ${tx.category}`;
-        hutangMap[debtDesc] = (hutangMap[debtDesc] || 0) + amt;
-      }
+      if (tx.status === "pending") return; // Skip other pending types (like income) for regular debt calculation
 
       if (tx.type === "income" && tx.category === "Hutang") {
         totalHutangReceived += amt;
