@@ -11,6 +11,7 @@ import {
   Smartphone,
   ShieldCheck,
   HelpCircle,
+  Target,
 } from "lucide-react";
 
 export const GuideOrganism = () => {
@@ -80,6 +81,20 @@ export const GuideOrganism = () => {
         "Pending Expense: Jika Anda mencatat Pengeluaran (Expense) dengan status 'Pending', maka sistem otomatis menganggapnya sebagai 'Hutang' sampai Anda mengubahnya menjadi 'Selesai'.",
       ],
       color: "bg-indigo-50",
+    },
+    {
+      id: "planning",
+      title: "5. Planning & Budgeting (Zero-Based)",
+      icon: <Target className="text-rose-500" size={24} />,
+      content:
+        "Gunakan konsep Zero-Based Budgeting di mana setiap Rupiah yang masuk harus diberi tugas hingga sisanya menjadi nol.",
+      steps: [
+        "Ledger (Buku Besar): Pusat komando. Pastikan indikator Sisa Uang (Unallocated) berwarna Hijau. Jika Merah (Over-Allocated), berarti rencana pengeluaran Anda melebihi pendapatan.",
+        "Savings Goals (Target Tabungan): Tentukan tujuan (misal: Dana Darurat) dan penuhi 'Target Nabung Bulanan' terlebih dahulu (Pay Yourself First).",
+        "Envelopes (Amplop Anggaran): Atur batas maksimal pengeluaran bulanan (Limit). Dibagi menjadi 4 grup: Survival (Pokok), Optional (Keinginan), Culture (Edukasi), dan Extra (Darurat).",
+        "Cara Kerja: Setiap transaksi 'Expense' yang Anda catat akan otomatis mengurangi sisa saldo di Envelopes. Bar akan berubah kuning/merah jika hampir habis.",
+      ],
+      color: "bg-rose-50",
     },
   ];
 
