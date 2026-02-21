@@ -465,7 +465,7 @@ export const ReportDashboardOrganism = ({ user }) => {
   }
 
   return (
-    <div className="w-full max-w-[1600px] p-4 space-y-6 animate-fade-in font-inter text-slate-800 dark:text-slate-200">
+    <div className="w-full max-w-[1600px] space-y-4 md:space-y-6 animate-fade-in font-inter text-slate-800 dark:text-slate-200">
       {/* Header & Filters */}
       {/* Header & Filters Section */}
       <div className="flex flex-col gap-6 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">

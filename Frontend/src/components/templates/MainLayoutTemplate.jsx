@@ -19,23 +19,23 @@ export const MainLayoutTemplate = ({
   const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
 
   return (
-    <div className="min-h-[100dvh] bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-inter transition-all duration-300 overflow-x-hidden">
-      <div className="flex h-[100dvh] overflow-hidden">
-        {/* Sidebar */}
-        <SidebarOrganism
-          activeTab={activeTab}
-          onTabChange={onTabChange}
-          isOpen={sidebarOpen}
-          toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-          isMinimized={isSidebarMinimized}
-          setIsMinimized={setIsSidebarMinimized}
-          onLogout={onLogout}
-          user={user}
-        />
+    <div className="flex h-[100dvh] w-full overflow-hidden bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-inter transition-all duration-300">
+      {/* Sidebar */}
+      <SidebarOrganism
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+        isOpen={sidebarOpen}
+        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        isMinimized={isSidebarMinimized}
+        setIsMinimized={setIsSidebarMinimized}
+        onLogout={onLogout}
+        user={user}
+      />
 
-        {/* Content Area */}
-        <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
-          {/* Header */}
+      {/* Main Container - Strict Flex Column */}
+      <div className="flex flex-1 flex-col overflow-hidden relative">
+        {/* Header - Fixed Height, Top Sibling */}
+        <div className="flex-none z-30 w-full relative">
           <HeaderOrganism
             user={user}
             toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
@@ -48,12 +48,12 @@ export const MainLayoutTemplate = ({
             filterAccount={filterAccount}
             setFilterAccount={setFilterAccount}
           />
+        </div>
 
-          {/* Main Content */}
-          <main className="flex-1">
-            <div className="mx-auto max-w-screen-2xl p-3 md:p-6 2xl:p-10">
-              {children}
-            </div>
+        {/* Scrollable Content Area - Sibling below Header */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden relative w-full h-full">
+          <main className="w-full h-full p-2 md:p-6 lg:p-10 mx-auto max-w-screen-2xl relative block">
+            {children}
           </main>
         </div>
       </div>

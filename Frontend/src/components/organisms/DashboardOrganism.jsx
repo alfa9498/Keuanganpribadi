@@ -655,7 +655,7 @@ export const DashboardOrganism = ({
   };
 
   return (
-    <div className="w-full max-w-[1600px] p-4 md:p-6 space-y-4 animate-fade-in font-inter">
+    <div className="w-full max-w-[1600px] space-y-4 md:space-y-6 animate-fade-in font-inter text-slate-800 dark:text-slate-200">
       {/* Lanyard Summary Slider */}
       {React.useMemo(
         () => (
@@ -710,7 +710,7 @@ export const DashboardOrganism = ({
       <BentoGrid>
         {/* 5. Main Trend Chart (Big) */}
         <BentoCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-slate-100 dark:bg-slate-900 !p-0 border border-slate-200 dark:border-slate-800 overflow-hidden relative">
-          <div className="p-6 relative z-10">
+          <div className="p-4 md:p-6 relative z-10 flex flex-col h-full">
             <div className="flex flex-wrap justify-between items-end mb-4 gap-2">
               <div>
                 <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
@@ -731,7 +731,7 @@ export const DashboardOrganism = ({
                 </span>
               </div>
             </div>
-            <div className="flex-1 w-full min-h-0">
+            <div className="flex-1 w-full min-h-[220px]">
               <DashboardTrendChart data={chartData} isMobile={isMobile} />
             </div>
           </div>

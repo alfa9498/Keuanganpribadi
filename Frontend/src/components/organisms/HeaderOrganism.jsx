@@ -191,23 +191,23 @@ export const HeaderOrganism = ({
   }, [showNotifications]);
 
   return (
-    <header className="sticky top-0 z-20 flex w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm pl-4 pr-6 py-3 transition-colors duration-300">
+    <header className="flex w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm pl-4 pr-6 py-2 md:py-3 transition-colors duration-300 relative z-20">
       <div className="flex flex-grow items-center justify-between">
         {/* Mobile Controls (Menu & Filter) */}
         <div className="flex items-center gap-2 lg:hidden">
           <button
             onClick={toggleSidebar}
-            className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-finance-primary dark:hover:text-white hover:border-finance-primary/50 transition-all active:scale-95"
+            className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-finance-primary dark:hover:text-white hover:border-finance-primary/50 transition-all active:scale-95"
           >
-            <Menu size={20} />
+            <Menu size={22} />
           </button>
 
           {activeTab === "dashboard" && (
             <button
               onClick={() => setShowMobileFilters(!showMobileFilters)}
-              className={`p-2 rounded-xl border transition-all active:scale-95 ${showMobileFilters ? "bg-slate-900 dark:bg-slate-700 border-slate-900 dark:border-slate-600 text-white shadow-lg" : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"}`}
+              className={`p-3 rounded-xl border transition-all active:scale-95 ${showMobileFilters ? "bg-slate-900 dark:bg-slate-700 border-slate-900 dark:border-slate-600 text-white shadow-lg" : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"}`}
             >
-              <SlidersHorizontal size={20} />
+              <SlidersHorizontal size={22} />
             </button>
           )}
         </div>
