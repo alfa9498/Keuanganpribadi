@@ -72,10 +72,11 @@ export const GuideOrganism = () => {
       content:
         "Kelola catatan uang yang dipinjam atau dipinjamkan agar saldo tetap akurat.",
       steps: [
-        "Hutang: Input Income dengan kategori 'Hutang' saat menerima uang.",
+        "Hutang: Input Income dengan kategori 'Hutang' saat menerima uang pinjaman.",
         "Bayar Hutang: Input Expense dengan kategori 'Cicilan / Hutang' saat melunasi.",
-        "Piutang: Input Expense dengan kategori 'Piutang' saat meminjamkan uang.",
-        "Terima Piutang: Input Income dengan kategori 'Piutang' saat uang kembali.",
+        "Piutang: Input Expense dengan kategori 'Piutang' saat Anda meminjamkan uang ke orang lain.",
+        "Terima Piutang: Input Income dengan kategori 'Piutang' saat orang tersebut mengembalikan uang.",
+        "PENTING: Pastikan penulisan kategori benar-benar sama (Capital Sensitive) agar Dashboard bisa menghitung saldo Hutang & Piutang dengan akurat.",
         "Pending Expense: Jika Anda mencatat Pengeluaran (Expense) dengan status 'Pending', maka sistem otomatis menganggapnya sebagai 'Hutang' sampai Anda mengubahnya menjadi 'Selesai'.",
       ],
       color: "bg-indigo-50",
