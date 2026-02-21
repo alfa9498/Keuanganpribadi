@@ -24,6 +24,7 @@ export const TransactionListOrganism = ({
   const [filterStatus, setFilterStatus] = useState("");
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [activeListTab, setActiveListTab] = useState("all"); // all, income, expense
   const [refreshKey, setRefreshKey] = useState(0);
   const [accounts, setAccounts] = useState([]);
@@ -62,17 +63,17 @@ export const TransactionListOrganism = ({
   };
 
   return (
-    <div className="w-full max-w-[1600px] p-4 space-y-4 animate-fade-in">
-      <div className="flex flex-col gap-4 md:gap-6 bg-white p-4 md:p-5 rounded-3xl border border-slate-100 shadow-sm transition-all">
+    <div className="w-full max-w-[1600px] p-4 space-y-4 animate-fade-in text-slate-900 dark:text-slate-100">
+      <div className="flex flex-col gap-4 md:gap-6 bg-white dark:bg-slate-900 p-4 md:p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all">
         <div className="flex flex-col xl:flex-row justify-between items-center gap-4 md:gap-6">
           {/* Top Row / Left: Type Tabs */}
-          <div className="flex flex-wrap bg-slate-100 p-1.5 rounded-2xl w-full xl:w-auto shadow-inner">
+          <div className="flex flex-wrap bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl w-full xl:w-auto shadow-inner">
             <button
               onClick={() => setActiveListTab("all")}
               className={`flex-1 xl:flex-none px-4 md:px-6 py-2.5 text-xs md:text-sm font-black rounded-xl transition-all whitespace-nowrap ${
                 activeListTab === "all"
-                  ? "bg-white text-finance-primary shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-white dark:bg-slate-700 text-finance-primary dark:text-blue-400 shadow-sm"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
               }`}
             >
               Semua
@@ -81,8 +82,8 @@ export const TransactionListOrganism = ({
               onClick={() => setActiveListTab("income")}
               className={`flex-1 xl:flex-none px-4 md:px-6 py-2.5 text-xs md:text-sm font-black rounded-xl transition-all whitespace-nowrap ${
                 activeListTab === "income"
-                  ? "bg-white text-emerald-600 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
               }`}
             >
               Pemasukan
@@ -91,8 +92,8 @@ export const TransactionListOrganism = ({
               onClick={() => setActiveListTab("expense")}
               className={`flex-1 xl:flex-none px-4 md:px-6 py-2.5 text-xs md:text-sm font-black rounded-xl transition-all whitespace-nowrap ${
                 activeListTab === "expense"
-                  ? "bg-white text-rose-600 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
               }`}
             >
               Pengeluaran
@@ -100,54 +101,81 @@ export const TransactionListOrganism = ({
           </div>
 
           {/* Top Row / Right: Actions */}
-          <div className="grid grid-cols-2 md:flex md:flex-row gap-3 w-full xl:w-auto">
+          <div className="flex flex-row gap-2 md:gap-3 w-full xl:w-auto">
             <Button
               onClick={() => setIsAddOpen(true)}
               variant="primary"
-              className="flex-1 group flex items-center justify-center gap-2 px-6 py-3 rounded-2xl transition-all shadow-lg shadow-finance-primary/20 hover:scale-[1.02] active:scale-95 bg-slate-900 border-none"
+              className="flex-1 group flex items-center justify-center gap-2 px-3 md:px-6 py-3 rounded-2xl transition-all shadow-lg shadow-finance-primary/20 hover:scale-[1.02] active:scale-95 bg-slate-900 border-none"
             >
               <Plus size={18} className="text-white" />
-              <span className="font-bold whitespace-nowrap text-white text-sm">
-                Add Transaction
+              <span className="font-bold whitespace-nowrap text-white text-xs md:text-sm">
+                Add
               </span>
             </Button>
 
             <Button
               onClick={() => setIsImportOpen(true)}
               variant="ghost"
-              className="flex-1 group flex items-center justify-center gap-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100/50 px-6 py-3 rounded-2xl transition-all active:scale-95"
+              className="flex-1 group flex items-center justify-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-100/50 dark:border-emerald-800/50 px-3 md:px-6 py-3 rounded-2xl transition-all active:scale-95"
             >
               <FileUp size={18} />
-              <span className="font-bold whitespace-nowrap text-sm">
+              <span className="font-bold whitespace-nowrap text-xs md:text-sm text-emerald-600 dark:text-emerald-400">
                 Import
               </span>
             </Button>
+
+            {/* Mobile Filter Toggle */}
+            <button
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className={`xl:hidden flex items-center justify-center p-3 rounded-2xl border transition-all active:scale-95 ${
+                showMobileFilters
+                  ? "bg-slate-900 dark:bg-slate-700 border-slate-900 dark:border-slate-600 text-white shadow-lg"
+                  : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+              }`}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="4" x2="20" y1="21" y2="21" />
+                <line x1="4" x2="20" y1="14" y2="14" />
+                <line x1="4" x2="20" y1="7" y2="7" />
+              </svg>
+            </button>
           </div>
         </div>
 
         {/* Bottom Row / Center: Global Filters */}
-        <div className="grid grid-cols-2 lg:flex lg:flex-row flex-wrap items-center justify-center gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
-          <div className="col-span-1 lg:w-auto">
+        <div
+          className={`xl:flex flex-col lg:flex-row flex-wrap items-center justify-center gap-3 pt-4 border-t border-slate-50 dark:border-slate-800 ${showMobileFilters ? "flex" : "hidden"}`}
+        >
+          <div className="w-full lg:w-auto">
             <TimeFilter
               currentRange={filterRange}
               onRangeChange={setFilterRange}
             />
           </div>
-          <div className="col-span-1 lg:w-auto">
+          <div className="w-full lg:w-auto">
             <AccountFilter
               currentAccount={filterAccount}
               onAccountChange={setFilterAccount}
               accounts={accounts}
             />
           </div>
-          <div className="col-span-1 lg:w-auto">
+          <div className="w-full lg:w-auto">
             <CategoryFilter
               currentCategory={filterCategory}
               onCategoryChange={setFilterCategory}
               categories={categoriesData}
             />
           </div>
-          <div className="col-span-1 lg:w-auto">
+          <div className="w-full lg:w-auto">
             <StatusFilter
               currentStatus={filterStatus}
               onStatusChange={setFilterStatus}
