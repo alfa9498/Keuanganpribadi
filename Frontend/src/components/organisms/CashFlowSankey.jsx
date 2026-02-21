@@ -136,10 +136,11 @@ export const CashFlowSankey = ({ transactions }) => {
         labelPosition="outside"
         labelOrientation="horizontal"
         labelPadding={windowWidth < 768 ? 8 : 16}
-        labelTextColor={{
-          from: "color",
-          modifiers: [["darker", 1]],
-        }}
+        labelTextColor={
+          window.document.documentElement.classList.contains("dark")
+            ? "#e2e8f0" // slate-200 for dark mode
+            : "#334155" // slate-700 for light mode
+        }
         // Smaller labels for mobile
         theme={{
           labels: {
