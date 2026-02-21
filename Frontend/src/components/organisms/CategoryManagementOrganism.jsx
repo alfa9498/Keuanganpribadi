@@ -196,14 +196,12 @@ const CategoryManagementOrganism = () => {
                 >
                   <Edit2 size={18} />
                 </button>
-                {!group.is_default && (
-                  <button
-                    onClick={() => handleDelete("group", group.id)}
-                    className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 rounded-2xl transition-all"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                )}
+                <button
+                  onClick={() => handleDelete("group", group.id)}
+                  className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 rounded-2xl transition-all"
+                >
+                  <Trash2 size={18} />
+                </button>
               </div>
             </div>
 
@@ -228,14 +226,12 @@ const CategoryManagementOrganism = () => {
                         >
                           <Edit2 size={16} />
                         </button>
-                        {!cat.is_default && (
-                          <button
-                            onClick={() => handleDelete("item", cat.id)}
-                            className="p-2 text-slate-300 hover:text-rose-600 transition-colors"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleDelete("item", cat.id)}
+                          className="p-2 text-slate-300 hover:text-rose-600 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </div>
                   ))
@@ -301,14 +297,12 @@ const CategoryManagementOrganism = () => {
               >
                 <Edit2 size={16} />
               </button>
-              {!cat.is_default && (
-                <button
-                  onClick={() => handleDelete("item", cat.id)}
-                  className="p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl transition-all"
-                >
-                  <Trash2 size={16} />
-                </button>
-              )}
+              <button
+                onClick={() => handleDelete("item", cat.id)}
+                className="p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl transition-all"
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
           </div>
         ))}
