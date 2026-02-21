@@ -37,7 +37,7 @@ export const DashboardTrendChart = ({ data, isMobile }) => {
     <div className="h-[280px] w-full">
       <ResponsiveLine
         data={lineData}
-        margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+        margin={{ top: 20, right: 20, bottom: isMobile ? 60 : 50, left: 40 }}
         xScale={{ type: "point" }}
         yScale={{
           type: "linear",
@@ -53,11 +53,12 @@ export const DashboardTrendChart = ({ data, isMobile }) => {
         axisBottom={{
           tickSize: 5,
           tickPadding: 5,
-          tickRotation: isMobile ? -45 : 0,
+          tickRotation: isMobile ? -90 : -45, // Rotated further for mobile, and slight rotation for desktop
           legend: "",
           legendOffset: 36,
           legendPosition: "middle",
-          tickValues: isMobile ? (window.innerWidth < 500 ? 4 : 6) : undefined,
+          // Show fewer tick values on mobile to avoid horizontal crowding
+          tickValues: isMobile ? 5 : 10,
         }}
         axisLeft={{
           tickSize: 5,
