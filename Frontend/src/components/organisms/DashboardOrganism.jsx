@@ -396,9 +396,7 @@ export const DashboardOrganism = ({
 
       if (tx.type === "expense" && tx.status === "pending") {
         totalHutangReceived += amt; // Treat pending expense as debt received
-        const debtDesc = tx.description
-          ? `(Pending) ${tx.description}`
-          : `(Pending) ${tx.category}`;
+        const debtDesc = `(Pending) ${tx.category}`;
         hutangMap[debtDesc] = (hutangMap[debtDesc] || 0) + amt;
         return; // Don't process further if it's already handled as pending debt
       }
