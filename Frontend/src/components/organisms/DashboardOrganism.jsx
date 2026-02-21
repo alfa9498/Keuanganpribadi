@@ -327,6 +327,8 @@ export const DashboardOrganism = ({
     }, {});
 
     allTransactions.forEach((tx) => {
+      if (tx.status === "pending") return; // Skip pending: don't affect physical balance yet
+
       const amt = parseFloat(tx.amount);
 
       // Robustness: Handle transactions for accounts not in DB
@@ -389,8 +391,26 @@ export const DashboardOrganism = ({
     let totalPiutangReceived = 0;
 
     allTransactions.forEach((tx) => {
+      if (tx.status === "pending") return; // Skip pending: don't affect physical balance yet
+
       const amt = parseFloat(tx.amount);
       const desc = tx.description || tx.category || "Tanpa Keterangan";
+
+      if (tx.type === "expense" && tx.status === "pending") {
+        totalHutangReceived += amt; // Treat pending expense as debt received
+        const debtDesc = tx.description
+          ? `(Pending) ${tx.description}`
+          : `(Pending) ${tx.category}`;
+        hutangMap[debtDesc] = (hutangMap[debtDesc] || 0) + amt;
+      }
+
+      if (tx.type === "expense" && tx.status === "pending") {
+        totalHutangReceived += amt; // Treat pending expense as debt received
+        const debtDesc = tx.description
+          ? `(Pending) ${tx.description}`
+          : `(Pending) ${tx.category}`;
+        hutangMap[debtDesc] = (hutangMap[debtDesc] || 0) + amt;
+      }
 
       if (tx.type === "income" && tx.category === "Hutang") {
         totalHutangReceived += amt;
@@ -440,6 +460,8 @@ export const DashboardOrganism = ({
     sortedTxs.forEach((tx) => {
       // Filter: Only include transactions from specific accounts
       // if (!SUMMARY_ACCOUNTS.includes(tx.account)) return;
+
+      if (tx.status === "pending") return; // Skip pending in Trend Chart & Summary Stats
 
       // EXCLUDE Internal Transfers from Income/Expense Totals
       if (

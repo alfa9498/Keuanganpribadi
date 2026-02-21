@@ -76,6 +76,7 @@ export const GuideOrganism = () => {
         "Bayar Hutang: Input Expense dengan kategori 'Cicilan / Hutang' saat melunasi.",
         "Piutang: Input Expense dengan kategori 'Piutang' saat meminjamkan uang.",
         "Terima Piutang: Input Income dengan kategori 'Piutang' saat uang kembali.",
+        "Pending Expense: Jika Anda mencatat Pengeluaran (Expense) dengan status 'Pending', maka sistem otomatis menganggapnya sebagai 'Hutang' sampai Anda mengubahnya menjadi 'Selesai'.",
       ],
       color: "bg-indigo-50",
     },
