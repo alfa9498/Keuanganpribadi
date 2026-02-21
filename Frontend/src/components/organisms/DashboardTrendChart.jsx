@@ -41,7 +41,7 @@ export const DashboardTrendChart = ({ data, isMobile }) => {
         xScale={{ type: "point" }}
         yScale={{
           type: "linear",
-          min: 0, // 'auto' sometimes looks messy for budget apps
+          min: 0,
           max: "auto",
           stacked: false,
           reverse: false,
@@ -53,11 +53,11 @@ export const DashboardTrendChart = ({ data, isMobile }) => {
         axisBottom={{
           tickSize: 5,
           tickPadding: 5,
-          tickRotation: 0,
-          legend: isMobile ? "" : "",
+          tickRotation: isMobile ? -45 : 0,
+          legend: "",
           legendOffset: 36,
           legendPosition: "middle",
-          tickValues: isMobile ? "every 5 days" : undefined, // Prevent crowding on mobile
+          tickValues: isMobile ? (window.innerWidth < 500 ? 4 : 6) : undefined,
         }}
         axisLeft={{
           tickSize: 5,
@@ -67,6 +67,7 @@ export const DashboardTrendChart = ({ data, isMobile }) => {
           legendOffset: -40,
           legendPosition: "middle",
           format: formatCurrency,
+          tickValues: isMobile ? 5 : undefined,
         }}
         enableGridX={false}
         enableGridY={true}

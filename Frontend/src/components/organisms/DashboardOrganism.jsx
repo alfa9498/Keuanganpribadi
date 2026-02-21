@@ -96,7 +96,7 @@ export const DashboardOrganism = ({
   });
   const [accountSummaries, setAccountSummaries] = useState([]);
   const [accounts, setAccounts] = useState([]);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [debtModal, setDebtModal] = useState({
     show: false,
     type: "",
@@ -139,7 +139,7 @@ export const DashboardOrganism = ({
   };
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -740,7 +740,7 @@ export const DashboardOrganism = ({
         </BentoCard>
 
         {/* 6. Accounts List (Scrollable) */}
-        <BentoCard className="col-span-1 md:col-span-1 row-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-0 overflow-hidden flex flex-col">
+        <BentoCard className="col-span-1 md:col-span-1 lg:col-span-2 row-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-0 overflow-hidden flex flex-col">
           <div className="p-6 pb-2">
             <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -788,7 +788,7 @@ export const DashboardOrganism = ({
         </BentoCard>
 
         {/* 7. Top Expenses Pie */}
-        <BentoCard className="col-span-1 md:col-span-1 row-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-6 flex flex-col justify-between relative overflow-hidden">
+        <BentoCard className="col-span-1 md:col-span-1 lg:col-span-2 lg:row-span-2 row-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-6 flex flex-col justify-between relative overflow-hidden">
           <div>
             <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-1">
               Top Pengeluaran
@@ -803,7 +803,7 @@ export const DashboardOrganism = ({
         </BentoCard>
 
         {/* 8. Expenses by Main Category (Bar) */}
-        <BentoCard className="col-span-1 md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-6">
+        <BentoCard className="col-span-1 md:col-span-2 lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-6">
           <div className="mb-4">
             <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-1">
               Kategori Utama
@@ -843,7 +843,7 @@ export const DashboardOrganism = ({
         </BentoCard>
 
         {/* 9. Top Sub-Categories (Bar) */}
-        <BentoCard className="col-span-1 md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-6">
+        <BentoCard className="col-span-1 md:col-span-2 lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 !p-6">
           <div className="mb-4">
             <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-1">
               Sub-Kategori Teratas

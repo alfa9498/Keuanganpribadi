@@ -192,9 +192,9 @@ export const SidebarOrganism = ({
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-30 h-screen transition-all duration-300 ease-in-out lg:translate-x-0 lg:static ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } ${isMinimized ? "w-20" : "w-60"} bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white`}
+        className={`fixed top-0 left-0 z-40 h-[100dvh] transition-all duration-300 ease-in-out lg:translate-x-0 lg:static ${
+          isOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
+        } ${isMinimized ? "w-20" : "w-60"} bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white flex flex-col`}
       >
         {/* Logo */}
         <div
@@ -237,7 +237,7 @@ export const SidebarOrganism = ({
 
         {/* Navigation */}
         <nav
-          className={`px-3 py-4 space-y-0.5 transition-all duration-300 ${isMinimized ? "px-2" : ""}`}
+          className={`px-3 py-4 space-y-0.5 transition-all duration-300 flex-1 overflow-y-auto custom-scrollbar ${isMinimized ? "px-2" : ""}`}
         >
           {!isMinimized && (
             <p className="px-4 text-[9px] font-black text-slate-500/80 uppercase tracking-[0.2em] mb-3">
@@ -259,7 +259,7 @@ export const SidebarOrganism = ({
 
         {/* Bottom Actions */}
         <div
-          className={`absolute bottom-0 left-0 w-full p-3 border-t border-slate-200 dark:border-slate-800 transition-all duration-300 ${isMinimized ? "px-2" : ""}`}
+          className={`mt-auto w-full p-3 border-t border-slate-200 dark:border-slate-800 transition-all duration-300 ${isMinimized ? "px-2" : ""}`}
         >
           {/* User Profile Section */}
           <div className="relative mb-3" ref={userMenuRef}>
